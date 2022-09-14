@@ -1,0 +1,8 @@
+Library/
+Temp/
+replays/
+obj/
+userMaps/
+Assets/previews/*
+bin/
+Debug/
