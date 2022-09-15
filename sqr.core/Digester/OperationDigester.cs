@@ -1,4 +1,5 @@
-﻿using Qrakhen.Dependor;
+﻿using Newtonsoft.Json;
+using Qrakhen.Dependor;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -9,12 +10,13 @@ using static Qrakhen.Sqr.Core.Token;
 namespace Qrakhen.Sqr.Core
 {
     [Injectable]
-    public class OperationDigester : Digester<Stack<Token>, Operation>
+    public class OperationDigester : Digester<Stack<Token>, Node>
     {
         private readonly Logger log;
         private readonly ValueDigester valueDigester;
+        private readonly ValueDigester structureDigester;
 
-        public Operation digest(Stack<Token> input, Qontext qontext, Node node = null)
+        public Node digest(Stack<Token> input, Qontext qontext, Node node = null)
         {
             if (node == null) node = new Node();
 
@@ -28,18 +30,31 @@ namespace Qrakhen.Sqr.Core
                         throw new SqrError("unexpected operator-less node " + node);
                     }
                 } else if (t.isType(Token.Type.Operator)) {
+                    var op = input.digest().get<Operator>();
                     if (node.op == null) {
-                        node.op = (Operator)input.digest().value;
+                        node.op = op;
                     } else {
-                        throw new SqrError("2 ops? " + node);
+                        if (node.done) {
+                            if (op.weight > node.op.weight) {
+                                node.right = digest(input, qontext, new Node(node.right, null, op));
+                            } else { 
+                                node = digest(input, qontext, new Node(node, null, op));
+                            }
+                        } else {
+                            throw new SqrError("2 ops? " + node);
+                        }
                     }
+                } else if (
+                        t.isType(Token.Type.Structure) && 
+                        t.get<string>() == Structure.get(Structure.Type.GROUP).open) {
+                    if (node.done) log.error("nap");
+                    //var n = digest();
                 } else if (t.isType(Token.Type.End)) {
                     input.digest();
                     break;
                 }
             } while (!input.done);
-            log.debug(node);
-            return new Operation(node);
+            return node;
         }
     }
 }

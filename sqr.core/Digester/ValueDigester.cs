@@ -16,8 +16,8 @@ namespace Qrakhen.Sqr.Core
         {
             do {
                 Token t = input.peek();
-                if (t.isType(Token.Type.Structure))
-                    return structureDigester.digest(input, qontext);
+                if (t.isType(Token.Type.Structure)) // bei [] array und bei () group => value durch execute (node)
+                    return null;// structureDigester.digest(input, qontext);
 
                 if (!t.isType(Token.Type.Value))
                     throw new SqrError("token is not a value: " + t);

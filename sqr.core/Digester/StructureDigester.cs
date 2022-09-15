@@ -10,6 +10,28 @@ namespace Qrakhen.Sqr.Core
     {
         public Value digest(Stack<Token> input, Qontext qontext)
         {
+            int level = 0;
+            List<Token> buffer = new List<Token>();
+            var t = input.peek();
+            if (!t.isType(Token.Type.Structure))
+                throw new SqrError("nop");
+
+            var structure = input.digest().get<Structure>();
+            do {
+                t = input.digest();
+                buffer.Add(t);
+                if (t.get<string>() == structure.open) {
+                    level++;
+                } else if (t.get<string>() == structure.close) {
+                    if (level == 0)
+                        break;
+                    else
+                        level--;
+                }                
+            } while (!input.done);
+
+            var stack = new Stack<Token>(buffer.ToArray());
+
             return null;
         }
     }

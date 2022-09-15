@@ -22,10 +22,11 @@ namespace Qrakhen.Sqr.Core
                     //var breaktest = ": a ! x ooo p ? ! 'astr\\'ing' asd 5 / 3 * 10 - 43 asdasdasasdas true*** falseaaaa true ':asd:dAD'adAS:Asd:[]3414:As ! 231 111 12.321 1,1,1,";
                     //new List<Token>(tokenDigester.digest(new Core.Stack<char>(breaktest.ToCharArray()))).ForEach(Console.WriteLine);
 
-                var op = "5 + 7 / 12 - 3 * 9 + 1";
+                var op = "2 - 3 + 3 * 3 / 5";
                 var t = tokenDigester.digest(new Core.Stack<char>(op.ToCharArray()));
                 new List<Token>(t).ForEach(Console.WriteLine);
-                operationDigester.digest(new Stack<Token>(t), Qontext.globalContext);
+                Console.Write(operationDigester.digest(new Stack<Token>(t), Qontext.globalContext));
+                Console.Write(operationDigester.digest(new Stack<Token>(t), Qontext.globalContext).execute());
                 Console.ReadLine();
 
                 /*} catch (SqrError e) {

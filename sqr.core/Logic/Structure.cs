@@ -24,6 +24,11 @@ namespace Qrakhen.Sqr.Core
             return structures.findOne(_ => _.open == symbol);
         }
 
+        public static Structure get(Type type)
+        {
+            return structures[type];
+        }
+
         public override string ToString()
         {
             return open + " " + close;
