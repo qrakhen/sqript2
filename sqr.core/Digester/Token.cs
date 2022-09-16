@@ -4,15 +4,15 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {  
-    public class Token
+    public class Token : ITyped<Token.Type>
     {
         public readonly object value;
-        public readonly Type type;
+        public new Type type => base.type;
 
         private Token(object value, Type type)
         {
             this.value = value;
-            this.type = type;
+            base.type = type;
         }
 
         public T get<T>()
@@ -56,11 +56,14 @@ namespace Qrakhen.Sqr.Core
         public static object parse(string raw, Type type)
         {
             try {
-                if (type == Type.Boolean || type == Type.Identifier) return (raw == "true" ? true : false);
+                if (raw == "true" || raw == "false") return (raw == "true" ? true : false);
                 if (type == Type.Number) return double.Parse(raw, System.Globalization.NumberFormatInfo.InvariantInfo);
                 if (type == Type.Operator) return Operator.get(raw);
                 if (type == Type.Structure) return Structure.get(raw);
-                if (type == Type.Keyword || type == Type.Identifier) return Keyword.get(raw);
+                if (type == Type.Keyword || type == Type.Identifier) {
+                    var v = Keyword.get(raw);
+                    if (v != null) return v;
+                }
                 return raw;
             } catch(Exception e) {
                 throw new SqrError("trying to parse raw token value " + raw + " as " + type + ". didn't work.");
@@ -70,11 +73,6 @@ namespace Qrakhen.Sqr.Core
         public override string ToString()
         {
             return type + "[ " + value + " ]";
-        }
-
-        public bool isType(Type types)
-        {
-            return (((int)type & (int)types) >= (int)type);
         }
 
         [Flags]

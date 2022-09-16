@@ -4,11 +4,10 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Operator
+    public class Operator : ITyped<Operator.Type>
     {
         private static readonly Storage<Type, Operator> operators = new Storage<Type, Operator>();
 
-        public Type type;
         public string symbol;
         public int weight;
         public Func<Value, Value, Value> resolve;
@@ -19,6 +18,11 @@ namespace Qrakhen.Sqr.Core
             this.symbol = symbol;
             this.weight = weight;
             this.resolve = resolve;
+        }
+
+        public override string ToString()
+        {
+            return symbol;
         }
 
         public static Operator get(string symbol)

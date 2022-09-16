@@ -12,30 +12,28 @@ namespace Qrakhen.Sqr.Core
         private readonly Logger log;
         private readonly StructureDigester structureDigester;
 
-        public Value digest(Stack<Token> input, Qontext qontext)
+        public override Value digest(Stack<Token> input, Qontext qontext)
         {
-            do {
-                Token t = input.peek();
-                if (t.isType(Token.Type.Structure)) // bei [] array und bei () group => value durch execute (node)
-                    return null;// structureDigester.digest(input, qontext);
+            Token t = input.peek();
+            if (t.isType(Token.Type.Structure)) // bei [] array und bei () group => value durch execute (node)
+                return null;// structureDigester.digest(input, qontext);
 
-                if (!t.isType(Token.Type.Value))
-                    throw new SqrError("token is not a value: " + t);
+            if (!t.isType(Token.Type.Value))
+                throw new SqrError("token is not a value: " + t);
 
-                if (!t.isType(Token.Type.Identifier))
-                    return input.digest().makeValue();
+            if (!t.isType(Token.Type.Identifier))
+                return input.digest().makeValue();
 
-                List<string> name = new List<string>();
-                while(input.peek().isType(Token.Type.Identifier)) {
-                    name.Add(input.digest().value.ToString());
-                    if (input.peek().isType(Token.Type.Accessor)) {
-                        input.digest();
-                    }
+            List<string> name = new List<string>();
+            input.process(() => input.peek().isType(Token.Type.Identifier), (v) => {
+                name.Add(input.digest().value.ToString());
+                if (input.peek() != null && input.peek().isType(Token.Type.Accessor)) {
+                    input.digest();
                 }
-                log.debug("found name " + string.Join(":", name));
-                var value = qontext.resolveName(name.ToArray());
-            } while (!input.done);
-            return null;
+            });
+            log.debug("found name " + string.Join(":", name));
+            var value = qontext.resolveName(name.ToArray());
+            return value;
         }
     }
 }

@@ -11,11 +11,6 @@ namespace Qrakhen.Sqr.Core
     {
         private readonly Logger log;
 
-        public TokenDigester()
-        {
-            Console.WriteLine("henlo");
-        }
-
         public Token[] digest(Stack<char> input)
         {
             var result = new List<Token>();
@@ -81,7 +76,7 @@ namespace Qrakhen.Sqr.Core
         }
 
         static readonly private Dictionary<Token.Type, string> matches = new Dictionary<Token.Type, string>() {
-            { Token.Type.Operator, @"[\/\-\*+=&<>^?!]" },
+            { Token.Type.Operator, @"[\/\-\*+=&<>^?!~]" },
             { Token.Type.Number, @"[\d.]" },
             { Token.Type.String, "[\"']" },
             { Token.Type.Structure, @"[{}()[\],]" },

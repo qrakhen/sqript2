@@ -4,11 +4,10 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Structure
+    public class Structure : ITyped<Structure.Type>
     {
         private static readonly Storage<Type, Structure> structures = new Storage<Type, Structure>();
 
-        public readonly Type type;
         public readonly string open;
         public readonly string close;
 

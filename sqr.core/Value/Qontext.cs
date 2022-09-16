@@ -1,11 +1,14 @@
-﻿using System;
+﻿using Qrakhen.Dependor;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {  
-    public class Qontext
+    public class Qontext : Injector
     {
+        protected readonly Logger log;
+
         protected Storage<string, Value> names = new Storage<string, Value>();
 
         public static readonly Qontext globalContext = new Qontext();
@@ -20,6 +23,23 @@ namespace Qrakhen.Sqr.Core
         public Value get(string name)
         {
             return names[name];
+        }
+
+        public Value register(
+                Token token, 
+                Value.Type type = Value.Type.None, 
+                object value = null, 
+                bool isReference = false, 
+                bool isStrictType = false, 
+                bool isReadonly = false)
+        {
+            var name = token.get<string>();
+            if (names[name] != null) {
+                throw new SqrError("name " + name + " already declared in qontext");
+            }
+
+            log.debug("registered " + name + " in qontext");
+            return names[name] = new Value(type, value, isReference, isStrictType, isReadonly);
         }
 
         public Value resolveName(string name) => resolveName(new string[] { name });

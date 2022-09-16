@@ -4,21 +4,37 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Keyword
+    public class Keyword : ITyped<Keyword.Type>
     {
         private static readonly Storage<Type, Keyword> keywords = new Storage<Type, Keyword>();
 
-        public Type type;
         public string symbol;
         public Func<object, Stack<Token>> resolve;
+
+        public Keyword(Type type, string symbol)
+        {
+            this.type = type;
+            this.symbol = symbol;
+        }
+
+        public override string ToString()
+        {
+            return symbol;
+        }
 
         public static Keyword get(string symbol)
         {
             return keywords.findOne(_ => _.symbol == symbol);
         }
 
+        [Flags]
         public enum Type
         {
+            DECLARE_DYN,
+            DECLARE_REF,
+            DECLARE_FUNQTION,
+            DECLARE_QLASS,
+            DECLARE = DECLARE_DYN | DECLARE_REF | DECLARE_FUNQTION | DECLARE_QLASS,
             IMPORT,
             QONDITION_IF,
             QONDITION_ELSE,
@@ -26,18 +42,26 @@ namespace Qrakhen.Sqr.Core
             LOOP_WHILE,
             LOOP_DO,
             FUNQTION_RETURN,
-            FUNQTION_DECLARE,
-            QLASS_DECLARE,
         }
 
-        public const Type IMPORT = Type.IMPORT;
-        public const Type QONDITION_IF = Type.QONDITION_IF;
-        public const Type QONDITION_ELSE = Type.QONDITION_ELSE;
-        public const Type LOOP_FOR = Type.LOOP_FOR;
-        public const Type LOOP_WHILE = Type.LOOP_WHILE;
-        public const Type LOOP_DO = Type.LOOP_DO;
-        public const Type FUNQTION_RETURN = Type.FUNQTION_RETURN;
-        public const Type FUNQTION_DECLARE = Type.FUNQTION_DECLARE;
-        public const Type QLASS_DECLARE = Type.QLASS_DECLARE;
+        public static void register(Type type, string symbol)
+        {
+            keywords.Add(type, new Keyword(type, symbol));
+        }
+
+        static Keyword()
+        {
+            register(Type.DECLARE_DYN, "var"); 
+            register(Type.DECLARE_REF, "ref");
+            register(Type.DECLARE_FUNQTION, "funqtion");
+            register(Type.DECLARE_QLASS, "qlass");
+            register(Type.IMPORT, "import");
+            register(Type.QONDITION_IF, "if");
+            register(Type.QONDITION_ELSE, "else");
+            register(Type.LOOP_FOR, "for");
+            register(Type.LOOP_WHILE, "while");
+            register(Type.LOOP_DO, "do");
+            register(Type.FUNQTION_RETURN, "return");
+        }
     }
 }

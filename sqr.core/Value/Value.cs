@@ -2,14 +2,12 @@
 
 namespace Qrakhen.Sqr.Core
 {  
-    public sealed class Value
+    public sealed class Value : ITyped<Value.Type>
     {
         private bool __set;
         private object __value;
 
         public object rawValue => __value;
-
-        public Type type { get; private set; }
 
         public readonly bool isReference;
         public readonly bool isStrictType;
@@ -71,7 +69,7 @@ namespace Qrakhen.Sqr.Core
 
         public override string ToString()
         {
-            return rawValue?.ToString();
+            return rawValue == null ? "null" : rawValue.ToString();
         }
 
         [Flags]
@@ -91,11 +89,6 @@ namespace Qrakhen.Sqr.Core
         public bool isTypeDefaultReferenced(Type type)
         {
             return (!isType(Type.Boolean | Type.Number | Type.String));
-        }
-
-        public bool isType(Type types)
-        {
-            return (((int)type & (int)types) >= (int)type);
         }
 
         private Type typeFromSysType(System.Type type) // into dict..

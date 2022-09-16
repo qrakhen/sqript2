@@ -54,5 +54,12 @@ namespace Qrakhen.Sqr.Core
         }
 
         public T[] digestRange(int amount) => digestRange(index, amount);
+
+        public void process(Func<bool> condition, Action<T> callback)
+        {
+            while (!done && condition()) {
+                callback(peek());
+            }
+        }
     }
 }
