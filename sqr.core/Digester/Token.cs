@@ -101,7 +101,7 @@ namespace Qrakhen.Sqr.Core
             Comment = 512,
             End = 1024,
 
-            Value = Boolean | Number | String
+            Value = Boolean | Number | String | Identifier
         }       
     }
 }
