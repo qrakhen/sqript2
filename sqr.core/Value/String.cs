@@ -14,9 +14,9 @@ namespace Qrakhen.Sqr.Core
         }
 
         [ExtenderFunqtion]
-        public Value span(Value[] parameters)
+        public static Value span(Value[] parameters, Value self)
         {
-            return new String(__value.Substring((int)(parameters[0] as Number), (int)(parameters[1] as Number)));
+            return new String((self as String).__value.Substring((int)(parameters[0] as Number), (int)(parameters[1] as Number)));
         }
 
         public static implicit operator string(String s) => s.__value;

@@ -27,14 +27,12 @@ namespace Qrakhen.Sqr.Core
         }
 
         public Variable register(
-                Token token, 
-                Value.Type type = Value.Type.None, 
+                string name, 
                 Value value = null, 
                 bool isReference = false, 
                 bool isStrictType = false, 
                 bool isReadonly = false)
         {
-            var name = token.get<string>();
             if (names[name] != null) {
                 throw new SqrError("name " + name + " already declared in qontext");
             }

@@ -46,9 +46,9 @@ namespace Qrakhen.Sqr.Core
                                 throw new SqrError("identifier expected after keyword " + k.symbol + ", got " + t + "instead");
                             } else {
                                 if (k.isType(Keyword.Type.DECLARE_DYN)) {
-                                    node = new Node(qontext.register(t), null, null);
+                                    node = new Node(qontext.register(t.get<string>()), null, null);
                                 } else if (k.isType(Keyword.Type.DECLARE_REF)) {
-                                    node = new Node(qontext.register(t, Value.Type.None, null, true), null, null);
+                                    node = new Node(qontext.register(t.get<string>(), null, true), null, null); ;
                                 } else {
                                     throw new SqrError("not yet implemented: " + k.symbol);
                                 }
