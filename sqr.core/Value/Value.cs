@@ -10,13 +10,15 @@ namespace Qrakhen.Sqr.Core
     {
         public static Value Null => new Value(Type.Null, false);
 
-        private readonly Storage<string, ExtenderFunqtion> extensions;
+        private readonly Storage<string, Member> members = new Storage<string, Member>();
         public readonly bool isPrimitive;
 
         public Value(Value.Type type = Type.None, bool isPrimitive = false)
         {
             this.type = type;
             this.isPrimitive = isPrimitive;
+
+            members.Add("toString", new Member());
         }
 
         [ExtenderFunqtion]
