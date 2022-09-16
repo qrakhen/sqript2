@@ -12,9 +12,14 @@ namespace Qrakhen.Sqr.Core
         {
             log.spam("in " + GetType().Name);
 
+            input.process((current) => { 
+                if (!current().isType(Token.Type.Identifier))
+                    throw new SqrError("identifier expected");
+                
 
+            });
 
-            return Value.Null;
+            return Value<Objeqt>.Null;
         }
     }
 }

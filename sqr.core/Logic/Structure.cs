@@ -47,7 +47,7 @@ namespace Qrakhen.Sqr.Core
 
         static Structure()
         {
-            register(Type.BODY, "{", "}");
+            register(Type.OBJEQT, "{", "}");
             register(Type.QOLLECTION, "[", "]");
             register(Type.GROUP, "(", ")");
         }

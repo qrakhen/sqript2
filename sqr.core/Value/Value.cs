@@ -8,7 +8,7 @@ namespace Qrakhen.Sqr.Core
 
     public class Value : ITyped<Value.Type>
     {
-        public static NullValue Null => new NullValue();
+        public static Value Null => new Value(Type.Null, false);
 
         private readonly Storage<string, ExtenderFunqtion> extensions;
         public readonly bool isPrimitive;
@@ -25,16 +25,12 @@ namespace Qrakhen.Sqr.Core
             return new String(ToString());
         }
 
-        private Type typeFromSysType(System.Type type) // into dict..
+        public override bool Equals(object obj)
         {
-            if (type == typeof(bool)) return Type.Boolean;
-            if (type == typeof(double)) return Type.Number;
-            if (type == typeof(string)) return Type.String;
-            if (type == typeof(Qollection)) return Type.Qollection;
-            if (type == typeof(Objeqt)) return Type.Objeqt;
-            if (type == typeof(Funqtion)) return Type.Funqtion;
-            if (type == typeof(Value)) return Type.Variable;
-            return Type.None;
+            if (type == Type.Null && obj is Value)
+                return (obj as Value).type == type;
+
+            return base.Equals(obj);
         }
 
         [Flags]
@@ -53,25 +49,6 @@ namespace Qrakhen.Sqr.Core
         }
     }
 
-    public class NullValue : Value
-    {
-        public NullValue() : base(Type.Null, false)
-        {           
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is NullValue)
-                return true;
-            return base.Equals(obj);
-        }
-
-        public override string ToString()
-        {
-            return "null";
-        }
-    }
-
     public class Value<T> : Value
     {
         protected T __value;
@@ -79,6 +56,14 @@ namespace Qrakhen.Sqr.Core
         public Value(T value = default(T), Value.Type type = Type.None, bool isPrimitive = false) : base(type, isPrimitive)
         {
             __value = value;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is Value<T>)
+                return (obj as Value<T>).__value.Equals(__value);
+
+            return base.Equals(obj);
         }
 
         public override string ToString()
