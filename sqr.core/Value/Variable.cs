@@ -6,6 +6,8 @@ namespace Qrakhen.Sqr.Core
     {
         private bool __set;
 
+        public Value value { get => get(); set => set(value); }
+
         public new Type type => __value.type;
         public new bool isPrimitive => __value.isPrimitive;
 
@@ -69,10 +71,15 @@ namespace Qrakhen.Sqr.Core
 
         public T get<T>()
         {
+            return (T)get<T>();
+        }
+
+        public Value get()
+        {
             if (isReference)
-                return (__value as Variable).get<T>();
+                return (__value as Variable).get();
             else
-                return (T)(object)__value;
+                return __value;
         }
 
         public Variable getReference()

@@ -2,6 +2,7 @@
 using Qrakhen.Dependor;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
@@ -20,12 +21,12 @@ namespace Qrakhen.Sqr.Core
             this.parent = parent;
         }
 
-        public Value get(string name)
+        public Variable get(string name)
         {
             return names[name];
         }
 
-        public Value register(
+        public Variable register(
                 Token token, 
                 Value.Type type = Value.Type.None, 
                 Value value = null, 
@@ -40,9 +41,9 @@ namespace Qrakhen.Sqr.Core
             return names[name] = new Variable(value, isReference, isStrictType, isReadonly);
         }
 
-        public Value resolveName(string name) => resolveName(new string[] { name });
+        public Variable resolveName(string name) => resolveName(new string[] { name });
 
-        public Value resolveName(string[] name)
+        public Variable resolveName(string[] name)
         {
             var qontext = lookUp(name[0]);
             return qontext.lookAhead(name);
@@ -58,14 +59,18 @@ namespace Qrakhen.Sqr.Core
                 throw new SqrError("could not find the name " + name[0] + " within the current qontext (recursive lookup)");
         }
 
-        protected Value lookAhead(string[] name)
+        protected Variable lookAhead(string[] name)
         {
             Qontext q = this;
             for (int i = 0; i < name.Length - 1; i++) {
-                var v = q.get(name[i]);
+                var v = q.get(name[i])?.get();
                 if (v is Qontext)
-                    q = v as Qontext;
-                else
+                    q = v as Qontext;                
+                else if (v is Value) {
+                    // native function/extensions not final
+                    var m = v.GetType().GetMethod(name[i + 1]);
+                    m.Invoke(v, new Value[0]);
+                } else
                     throw new SqrError("could not find name " + name + " in the current qontext (recursive look ahead)");
             }
 
