@@ -19,7 +19,7 @@ namespace Qrakhen.Sqr.Core
 
             });
 
-            return Value<Objeqt>.Null;
+            return (Objeqt)Value.Null;
         }
     }
 }
