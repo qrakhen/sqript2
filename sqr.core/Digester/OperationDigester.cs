@@ -63,11 +63,6 @@ namespace Qrakhen.Sqr.Core
                     var op = input.digest().get<Operator>();
                     if (node.op == null) {
                         node.op = op;
-                        if (level == 0) {
-                            if (op.type == Operator.Type.ASSIGN) {
-
-                            }
-                        }
                     } else {
                         if (node.done) {
                             if (op.weight > node.op.weight) {

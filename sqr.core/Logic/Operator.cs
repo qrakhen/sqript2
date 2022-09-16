@@ -119,9 +119,7 @@ namespace Qrakhen.Sqr.Core
             });
 
             register(Type.ASSIGN_REF, "<&", 0, (left, right) => {
-                if (!left.isReference)
-                    throw new SqrError("can not pass value " + right + "'s reference to " + left + ": not a reference");
-                left.set(right);
+                left.set(right, true);
                 return left;
             });
 

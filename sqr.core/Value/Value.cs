@@ -9,7 +9,7 @@ namespace Qrakhen.Sqr.Core
 
         public object rawValue => __value;
 
-        public readonly bool isReference;
+        public bool isReference { get; private set; }
         public readonly bool isStrictType;
         public readonly bool isReadonly;
 
@@ -28,23 +28,44 @@ namespace Qrakhen.Sqr.Core
                 this.set(value);
         }            
 
-        public void set(object value)
+        public void set(object value, bool asReference = false)
         {
             if (isReadonly && __set)
                 throw new SqrError("can not set value of readonly value", this);
 
-            if (isReference && value.GetType() != typeof(Value))
-                throw new SqrError("can not assign type " + value.GetType() + " to reference", this);
-            
-            if (!isReference && value.GetType() == typeof(Value))
+            // mutate to real value
+            if (!asReference && value.GetType() == typeof(Value))
                 value = (value as Value).rawValue;
 
+            // typecheck
             if (isStrictType && type != typeFromSysType(value.GetType()))
                 throw new SqrError("can not assign type of " + value + " to type of " + type, this);
             else
                 type = typeFromSysType(value.GetType());
 
-            __value = value;
+            // reference logic
+            if (asReference) {
+                if (!isReference) {
+                    if (isStrictType)
+                        throw new SqrError("can not make value into reference due to it being strictly typed to " + type, this);
+                    else
+                        isReference = true;
+                }
+
+                if (value.GetType() != typeof(Value))
+                    throw new SqrError("can not assign type " + value.GetType() + " as reference, has to be an identifier or name", this);
+
+                __value = value; // set value as reference
+
+            } else {
+                if (isReference) {
+                    if (getReference() == null)
+                        throw new SqrError("no reference assigned yet. use <& to assign a value by its reference.", this);
+                    getReference().set(value); // set value of reference
+                } else {
+                    __value = value; // set value as real value
+                }
+            }         
 
             if (!__set)
                 __set = true;
