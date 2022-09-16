@@ -45,8 +45,6 @@ namespace Qrakhen.Dependor
                    t => t.IsClass &&
                    t.GetCustomAttributes(typeof(InjectableAttribute), true).Length > 0);
 
-            types.ToList().ForEach(Console.WriteLine);
-
             foreach (var t in types) {
                 if (injectables.ContainsKey(t))
                     continue;
@@ -55,6 +53,8 @@ namespace Qrakhen.Dependor
                     throw new Exception("DI Error: " + t.Name + " needs to have either no, or one empty public constructor.");
 
                 injectables.Add(t, Activator.CreateInstance(t));
+
+                Console.WriteLine(" # Dependor: registered service " + t);
             }
 
             foreach (var i in injectables.Values) {

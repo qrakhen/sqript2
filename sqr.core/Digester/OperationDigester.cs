@@ -18,13 +18,16 @@ namespace Qrakhen.Sqr.Core
 
         public Node digest(Stack<Token> input, Qontext qontext, Node node = null, int level = 0)
         {
+            log.spam("in " + GetType().Name);
             if (input.done)
                 return null;
 
+            log.spam("digesting operation at level " + level);
             if (node == null) node = new Node();
             do { 
-                log.debug(node);
+                log.spam("current node: " + node);
                 Token t = input.peek();
+                log.spam("token peeked: " + t);
                 if (t.isType(Token.Type.Value)) {
                     Value v = valueDigester.digest(input, qontext);
                     if (!node.put(v)) {
@@ -49,6 +52,8 @@ namespace Qrakhen.Sqr.Core
                                 } else {
                                     throw new SqrError("not yet implemented: " + k.symbol);
                                 }
+
+                                log.debug("registered " + t + " in qontext");
                             }
                         } else {
                             throw new SqrError("not yet implemented: " + t);

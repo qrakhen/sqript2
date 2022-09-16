@@ -14,6 +14,7 @@ namespace Qrakhen.Sqr.Core
 
         public override Value digest(Stack<Token> input, Qontext qontext)
         {
+            log.spam("in " + GetType().Name);
             Token t = input.peek();
             if (t.isType(Token.Type.Structure)) // bei [] array und bei () group => value durch execute (node)
                 return null;// structureDigester.digest(input, qontext);
@@ -31,7 +32,7 @@ namespace Qrakhen.Sqr.Core
                     input.digest();
                 }
             });
-            log.debug("found name " + string.Join(":", name));
+            log.debug("detected name " + string.Join(":", name));
             var value = qontext.resolveName(name.ToArray());
             return value;
         }

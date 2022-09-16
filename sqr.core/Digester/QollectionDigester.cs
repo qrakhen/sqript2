@@ -10,6 +10,7 @@ namespace Qrakhen.Sqr.Core
     {
         public Qollection digest(Stack<Token> input)
         {
+            log.spam("in " + GetType().Name);
             return null;
         }
     }

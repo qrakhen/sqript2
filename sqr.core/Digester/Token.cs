@@ -33,7 +33,7 @@ namespace Qrakhen.Sqr.Core
             if (type == Type.Boolean) return Value.Type.Boolean;
             if (type == Type.Number) return Value.Type.Number;
             if (type == Type.String) return Value.Type.String;
-            if (type == Type.Identifier) return Value.Type.Identifier;
+            if (type == Type.Identifier) return Value.Type.Reference;
             return Value.Type.None;
         }
 

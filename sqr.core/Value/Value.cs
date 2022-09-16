@@ -41,6 +41,8 @@ namespace Qrakhen.Sqr.Core
 
             if (isStrictType && type != typeFromSysType(value.GetType()))
                 throw new SqrError("can not assign type of " + value + " to type of " + type, this);
+            else
+                type = typeFromSysType(value.GetType());
 
             __value = value;
 
@@ -83,7 +85,7 @@ namespace Qrakhen.Sqr.Core
             Objeqt = 16,
             Funqtion = 32,
             Qontext = Qollection | Objeqt | Funqtion,
-            Identifier = 64
+            Reference = 64
         }
 
         public bool isTypeDefaultReferenced(Type type)
@@ -99,7 +101,7 @@ namespace Qrakhen.Sqr.Core
             if (type == typeof(Qollection)) return Type.Qollection;
             if (type == typeof(Objeqt)) return Type.Objeqt;
             if (type == typeof(Funqtion)) return Type.Funqtion;
-            if (type == typeof(Value)) return Type.Identifier;
+            if (type == typeof(Value)) return Type.Reference;
             return Type.None;
         }
     }

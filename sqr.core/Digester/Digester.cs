@@ -6,6 +6,8 @@ namespace Qrakhen.Sqr.Core
 { 
     public abstract class Digester<TIn, TOut>
     {
+        protected readonly Logger log;
+
         public virtual TOut digest(TIn input) { throw new SqrError("digest overload not implemented"); }
         public virtual TOut digest(TIn input, Qontext context) { throw new SqrError("digest overload not implemented"); }
         public virtual TOut digest(TIn input, Qontext context, object recursor) { throw new SqrError("digest overload not implemented"); }

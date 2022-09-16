@@ -1,14 +1,14 @@
-﻿using Qrakhen.Dependor;
+﻿using Newtonsoft.Json;
+using Qrakhen.Dependor;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {  
-    public class Qontext : Injector
+    public class Qontext
     {
-        protected readonly Logger log;
-
+        [JsonProperty]
         protected Storage<string, Value> names = new Storage<string, Value>();
 
         public static readonly Qontext globalContext = new Qontext();
@@ -37,8 +37,6 @@ namespace Qrakhen.Sqr.Core
             if (names[name] != null) {
                 throw new SqrError("name " + name + " already declared in qontext");
             }
-
-            log.debug("registered " + name + " in qontext");
             return names[name] = new Value(type, value, isReference, isStrictType, isReadonly);
         }
 

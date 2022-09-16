@@ -13,6 +13,7 @@ namespace Qrakhen.Sqr.Core
 
         public Token[] digest(Stack<char> input)
         {
+            log.spam("in " + GetType().Name);
             var result = new List<Token>();
             while (!input.done) {
                 var type = matchType(input.peek());

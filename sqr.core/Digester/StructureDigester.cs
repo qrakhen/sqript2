@@ -10,6 +10,7 @@ namespace Qrakhen.Sqr.Core
     {
         public Value digest(Stack<Token> input, Qontext qontext)
         {
+            log.spam("in " + GetType().Name);
             int level = 0;
             List<Token> buffer = new List<Token>();
             var t = input.peek();

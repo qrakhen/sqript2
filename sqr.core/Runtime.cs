@@ -1,4 +1,5 @@
-﻿using Qrakhen.Dependor;
+﻿using Newtonsoft.Json;
+using Qrakhen.Dependor;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -16,6 +17,8 @@ namespace Qrakhen.Sqr.Core
 
         public void run()
         {
+            log.setLoggingLevel(Logger.Level.VERBOSE);
+            log.success("welcome to Sqript2.0, or simply sqr. Enjoy thyself.");
             do {
                 try {
 
@@ -27,30 +30,74 @@ namespace Qrakhen.Sqr.Core
                     execute(Console.ReadLine());
 
                 } catch (SqrError e) {
-                    log.error(e);
-                    //throw e;
+                    log.error(log.loggingLevel > Logger.Level.INFO ? e : (object)e.Message);
+                    log.warn("are you by any chance stupid?");
                 } catch (Exception e) {
                     log.error("### system exceptions need to be completely eradicated ###");
                     log.error(e);
                     log.error("### system exceptions need to be completely eradicated ###");
-                    //throw e;
+                    throw e;
                 }
             } while (alive);
         }
 
         private void execute(string input)
         {
+            if (input.StartsWith("/")) {
+                commands(input.Substring(1));
+                return;
+            }
+
             var t = tokenDigester.digest(new Core.Stack<char>(applyAliases(input).ToCharArray()));
-            new List<Token>(t).ForEach(Console.WriteLine);
+            log.spam("token list: ");
+            new List<Token>(t).ForEach(_ => log.spam(_));
             var r = operationDigester.digest(new Stack<Token>(t), Qontext.globalContext);
-            log.debug(r.execute());
+            log.success(r.execute());
+        }
+
+        private void commands(string input)
+        {
+            log.spam("command " + input);
+            if (input == "q") {
+                log.info(json(Qontext.globalContext));
+                return;
+            } else if (input.StartsWith("alias")) {
+                var args = input.Split(" ");
+                if (args.Length == 1) {
+                    log.info(aliases);
+                } else if (args.Length == 2) {
+                    aliases.Remove(args[1]);
+                    log.info("removed alias for " + args[1]);
+                } else if (args.Length == 3) {
+                    aliases[args[1]] = args[2];
+                    log.info("added/updated alias " + args[1] + " > " + args[2]);
+                } else {
+                    log.error("usage: /alias [from] [to], example: /alias *~ var");
+                }
+            } else if (input.StartsWith("help")) {
+                log.warn("the help DLC is available on steam for $39.95");
+            }
         }
 
         private string applyAliases(string value)
         {
-            foreach (var alias in aliases)
-                value = value.Replace(alias.Key, alias.Value + " ");
+            log.spam("applying aliases");
+            foreach (var alias in aliases) {
+                log.spam("applying " + alias.Key + " > " + alias.Value);
+                value = value.Replace(alias.Key, " " + alias.Value + " ");
+            }
             return value;
+        }
+
+        private string json(object any)
+        {
+            return JsonConvert.SerializeObject(
+                any,
+                Formatting.Indented,
+                new JsonSerializerSettings {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                }
+            );
         }
 
         static readonly private Dictionary<string, string> aliases = new Dictionary<string, string>() {
