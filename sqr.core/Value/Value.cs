@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Qrakhen.Sqr.Core
 {
-    public delegate Value ExtenderFunqtion(Value[] parameters);
+    public delegate Value ExtenderFunqtion(Value[] parameters, Value self);
     public class ExtenderFunqtionAttribute : Attribute { }
 
     public class Value : ITyped<Value.Type>
     {
         public static Value Null => new Value(Type.Null, false);
 
+        private static readonly Storage<System.Type, Storage<string, ExtenderFunqtion>> extensions =
+            new Storage<System.Type, Storage<string, ExtenderFunqtion>>();
         private readonly Storage<string, Member> members = new Storage<string, Member>();
         public readonly bool isPrimitive;
 
@@ -17,14 +20,12 @@ namespace Qrakhen.Sqr.Core
         {
             this.type = type;
             this.isPrimitive = isPrimitive;
-
-            members.Add("toString", new Member());
         }
 
-        [ExtenderFunqtion]
-        public Value toString(Value[] parameters)
+        [ExtenderFunqtion] // vielleicht doch lieber mit echten funqtions?
+        public static Value toString(Value[] parameters, Value self)
         {
-            return new String(ToString());
+            return new String(self.ToString());
         }
 
         public override bool Equals(object obj)
@@ -33,6 +34,32 @@ namespace Qrakhen.Sqr.Core
                 return (obj as Value).type == type;
 
             return base.Equals(obj);
+        }
+
+        static Value()
+        {
+            var types = new System.Type[] {
+                typeof(Value),
+                typeof(String),
+                typeof(Number),
+                typeof(Boolean),
+                typeof(Objeqt),
+                typeof(Qollection),
+                typeof(Funqtion)
+            };
+
+            foreach (var type in types) {
+                extensions[type] = new Storage<string, ExtenderFunqtion>();
+
+                type
+                    .GetMethods()
+                    .Where(_ => Attribute.GetCustomAttribute(_, typeof(ExtenderFunqtionAttribute)) != null)
+                    .ToList()
+                    .ForEach(_ => {
+                        Dependor.Dependor.get<Logger>().debug("loading native extension function " + type.Name + ":" + _.Name);
+                        extensions[typeof(Value)][_.Name] = (parameters, self) => { return (Value)_.Invoke(self, parameters); };
+                    });
+            }
         }
 
         [Flags]
