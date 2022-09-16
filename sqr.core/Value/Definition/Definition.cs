@@ -1,4 +1,4 @@
-public class Definition
+public class Definition no, Deqlaration
 {
     public string name;
 
