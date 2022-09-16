@@ -6,16 +6,16 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {  
-    public class Qontext
+    public class Qontext : Value
     {
         [JsonProperty]
-        protected Storage<string, Value> names = new Storage<string, Value>();
+        protected Storage<string, Variable> names = new Storage<string, Variable>();
 
         public static readonly Qontext globalContext = new Qontext();
 
         public Qontext parent { get; protected set; }
 
-        public Qontext(Qontext parent = null)
+        public Qontext(Qontext parent = null) : base(Value.Type.Qontext, false)
         {
             this.parent = parent;
         }
@@ -28,7 +28,7 @@ namespace Qrakhen.Sqr.Core
         public Value register(
                 Token token, 
                 Value.Type type = Value.Type.None, 
-                object value = null, 
+                Value value = null, 
                 bool isReference = false, 
                 bool isStrictType = false, 
                 bool isReadonly = false)
@@ -37,7 +37,7 @@ namespace Qrakhen.Sqr.Core
             if (names[name] != null) {
                 throw new SqrError("name " + name + " already declared in qontext");
             }
-            return names[name] = new Value(type, value, isReference, isStrictType, isReadonly);
+            return names[name] = new Variable(value, isReference, isStrictType, isReadonly);
         }
 
         public Value resolveName(string name) => resolveName(new string[] { name });
@@ -63,49 +63,13 @@ namespace Qrakhen.Sqr.Core
             Qontext q = this;
             for (int i = 0; i < name.Length - 1; i++) {
                 var v = q.get(name[i]);
-                if (v.isType(Value.Type.Qontext))
-                    q = v.get<Qontext>();
+                if (v is Qontext)
+                    q = v as Qontext;
                 else
                     throw new SqrError("could not find name " + name + " in the current qontext (recursive look ahead)");
             }
 
             return (q != null ? q.get(name[name.Length - 1]) : null);
-        }
-    }
-
-    public class Qollection : Qontext
-    {
-        // override names with indexes
-        public void add(Value value) { }
-    }
-
-    public class Objeqt : Qontext
-    {
-
-    }
-
-    public class Funqtion : Qontext
-    {
-        public Parameter[] declaredParameters;
-        public Value.Type returnType;
-        public Body body;
-        
-        public Value execute(Value[] parameters)
-        {
-            for (int i = 0; i < declaredParameters.Length; i++) {
-                var p = declaredParameters[i];
-                names[p.name] = parameters[i];
-            }
-
-            return null;
-        }
-
-        public struct Parameter
-        {
-            public string name;
-            public Value.Type type;
-            public Value defaultValue;
-            public bool optional;
         }
     }
 }

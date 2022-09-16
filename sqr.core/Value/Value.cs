@@ -1,98 +1,38 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Qrakhen.Sqr.Core
-{  
-    public sealed class Value : ITyped<Value.Type>
+{
+    public delegate Value ExtenderFunqtion(Value[] parameters);
+    public class ExtenderFunqtionAttribute : Attribute { }
+
+    public class Value : ITyped<Value.Type>
     {
-        private bool __set;
-        private object __value;
+        private readonly Storage<string, ExtenderFunqtion> extensions;
+        public readonly bool isPrimitive;
 
-        public object rawValue => __value;
-
-        public bool isReference { get; private set; }
-        public readonly bool isStrictType;
-        public readonly bool isReadonly;
-
-        public Value(
-                Type type, 
-                object value = null, 
-                bool isReference = false, 
-                bool isStrictType = false, 
-                bool isReadonly = false)
+        public Value(Value.Type type = Type.None, bool isPrimitive = false)
         {
             this.type = type;
-            this.isReference = isReference;
-            this.isStrictType = isStrictType;
-            this.isReadonly = isReadonly;
-            if (value != null)
-                this.set(value);
-        }            
-
-        public void set(object value, bool asReference = false)
-        {
-            if (isReadonly && __set)
-                throw new SqrError("can not set value of readonly value", this);
-
-            // mutate to real value
-            if (!asReference && value.GetType() == typeof(Value))
-                value = (value as Value).rawValue;
-
-            // typecheck
-            if (isStrictType && type != typeFromSysType(value.GetType()))
-                throw new SqrError("can not assign type of " + value + " to type of " + type, this);
-            else
-                type = typeFromSysType(value.GetType());
-
-            // reference logic
-            if (asReference) {
-                if (!isReference) {
-                    if (isStrictType)
-                        throw new SqrError("can not make value into reference due to it being strictly typed to " + type, this);
-                    else
-                        isReference = true;
-                }
-
-                if (value.GetType() != typeof(Value))
-                    throw new SqrError("can not assign type " + value.GetType() + " as reference, has to be an identifier or name", this);
-
-                __value = value; // set value as reference
-
-            } else {
-                if (isReference) {
-                    if (getReference() == null)
-                        throw new SqrError("no reference assigned yet. use <& to assign a value by its reference.", this);
-                    getReference().set(value); // set value of reference
-                } else {
-                    __value = value; // set value as real value
-                }
-            }         
-
-            if (!__set)
-                __set = true;
+            this.isPrimitive = isPrimitive;
         }
 
-        public T get<T>()
+        [ExtenderFunqtion]
+        public Value toString(Value[] parameters)
         {
-            if (isReference)
-                return (rawValue as Value).get<T>();
-            else
-                return (T)rawValue;
+            return new String(ToString());
         }
 
-        public Value getReference()
+        private Type typeFromSysType(System.Type type) // into dict..
         {
-            if (isReference)
-                return (Value)rawValue;
-            else
-                throw new SqrError("value is not a reference", this);
-        }
-
-        public double asNumber() => get<double>();
-        public bool asBoolean() => get<bool>();
-
-        public override string ToString()
-        {
-            return rawValue == null ? "null" : rawValue.ToString();
+            if (type == typeof(bool)) return Type.Boolean;
+            if (type == typeof(double)) return Type.Number;
+            if (type == typeof(string)) return Type.String;
+            if (type == typeof(Qollection)) return Type.Qollection;
+            if (type == typeof(Objeqt)) return Type.Objeqt;
+            if (type == typeof(Funqtion)) return Type.Funqtion;
+            if (type == typeof(Value)) return Type.Variable;
+            return Type.None;
         }
 
         [Flags]
@@ -106,24 +46,22 @@ namespace Qrakhen.Sqr.Core
             Objeqt = 16,
             Funqtion = 32,
             Qontext = Qollection | Objeqt | Funqtion,
-            Reference = 64
+            Variable = 64
+        }
+    }
+
+    public class Value<T> : Value
+    {
+        protected T __value;
+
+        public Value(T value = default(T), Value.Type type = Type.None, bool isPrimitive = false) : base(type, isPrimitive)
+        {
+            __value = value;
         }
 
-        public bool isTypeDefaultReferenced(Type type)
+        public override string ToString()
         {
-            return (!isType(Type.Boolean | Type.Number | Type.String));
-        }
-
-        private Type typeFromSysType(System.Type type) // into dict..
-        {
-            if (type == typeof(bool)) return Type.Boolean;
-            if (type == typeof(double)) return Type.Number;
-            if (type == typeof(string)) return Type.String;
-            if (type == typeof(Qollection)) return Type.Qollection;
-            if (type == typeof(Objeqt)) return Type.Objeqt;
-            if (type == typeof(Funqtion)) return Type.Funqtion;
-            if (type == typeof(Value)) return Type.Reference;
-            return Type.None;
+            return __value.ToString();
         }
     }
 }
