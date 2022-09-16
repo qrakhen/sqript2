@@ -11,7 +11,15 @@ namespace Qrakhen.Sqr.Core
         public Objeqt digest(Stack<Token> input)
         {
             log.spam("in " + GetType().Name);
-            return null;
+
+            input.process((current) => { 
+                if (!current().isType(Token.Type.Identifier))
+                    throw new SqrError("identifier expected");
+                
+
+            });
+
+            return Value<Objeqt>.Null;
         }
     }
 }
