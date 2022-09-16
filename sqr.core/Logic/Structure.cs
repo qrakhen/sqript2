@@ -35,8 +35,8 @@ namespace Qrakhen.Sqr.Core
 
         public enum Type
         {
-            BODY,
-            LIST,
+            OBJEQT,
+            QOLLECTION,
             GROUP
         }
 
@@ -48,7 +48,7 @@ namespace Qrakhen.Sqr.Core
         static Structure()
         {
             register(Type.BODY, "{", "}");
-            register(Type.LIST, "[", "]");
+            register(Type.QOLLECTION, "[", "]");
             register(Type.GROUP, "(", ")");
         }
     }

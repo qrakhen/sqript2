@@ -8,6 +8,9 @@ namespace Qrakhen.Sqr.Core
     [Injectable]
     public class StructureDigester : Digester<Stack<Token>, Value>
     {
+        private readonly ObjeqtDigester objeqtDigester;
+        private readonly QollectionDigester qollectionDigester;
+
         public Value digest(Stack<Token> input, Qontext qontext)
         {
             log.spam("in " + GetType().Name);
@@ -32,8 +35,12 @@ namespace Qrakhen.Sqr.Core
             } while (!input.done);
 
             var stack = new Stack<Token>(buffer.ToArray());
-
-            return null;
+            if (structure.type == Structure.Type.OBJEQT) {
+                return objeqtDigester.digest(stack);
+            } else if (structure.type == Structure.Type.QOLLECTION) {
+                return qollectionDigester.digest(stack);
+            } else
+                return Value.Null;
         }
     }
 }

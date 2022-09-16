@@ -8,6 +8,8 @@ namespace Qrakhen.Sqr.Core
 
     public class Value : ITyped<Value.Type>
     {
+        public static NullValue Null => new NullValue();
+
         private readonly Storage<string, ExtenderFunqtion> extensions;
         public readonly bool isPrimitive;
 
@@ -46,7 +48,27 @@ namespace Qrakhen.Sqr.Core
             Objeqt = 16,
             Funqtion = 32,
             Qontext = Qollection | Objeqt | Funqtion,
-            Variable = 64
+            Variable = 64,
+            Null = 128
+        }
+    }
+
+    public class NullValue : Value
+    {
+        public NullValue() : base(Type.Null, false)
+        {           
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is NullValue)
+                return true;
+            return base.Equals(obj);
+        }
+
+        public override string ToString()
+        {
+            return "null";
         }
     }
 

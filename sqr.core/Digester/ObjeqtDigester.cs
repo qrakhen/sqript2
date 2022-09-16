@@ -11,7 +11,10 @@ namespace Qrakhen.Sqr.Core
         public Objeqt digest(Stack<Token> input)
         {
             log.spam("in " + GetType().Name);
-            return null;
+
+
+
+            return Value.Null;
         }
     }
 }
