@@ -6,19 +6,21 @@ namespace Qrakhen.Sqr.Core
 {
     public class Stack<T>
     {
-        protected T[] items;
+        protected T[] __items;
         public int index { get; protected set; }
-        public int length => items.Length;
+        public int length => __items.Length;
         public bool done => (index >= length);
+
+        public T[] items => (T[])__items.Clone();
 
         public Stack(T[] items = null)
         {
-            this.items = (items?.Clone() as T[]);
+            this.__items = (items?.Clone() as T[]);
         }
 
         public void set(T[] items)
         {
-            this.items = items.Clone() as T[];
+            this.__items = items.Clone() as T[];
         }
 
         public T peek(int delta = 0)
@@ -26,7 +28,7 @@ namespace Qrakhen.Sqr.Core
             if (index + delta >= length)
                 return default(T);
 
-            return items[index + delta];
+            return __items[index + delta];
         }
 
         public T digest()
@@ -34,7 +36,7 @@ namespace Qrakhen.Sqr.Core
             if (done)
                 throw new SqrError("stack is done, can not digest any further.");
 
-            return items[index++];
+            return __items[index++];
         }
 
         public T[] digestUntil(T value)
@@ -48,7 +50,7 @@ namespace Qrakhen.Sqr.Core
              
         public T[] digestRange(int from, int amount)
         {
-            var r = items.AsSpan(index + from, amount).ToArray();
+            var r = __items.AsSpan(index + from, amount).ToArray();
             index += amount;
             return r;
         }

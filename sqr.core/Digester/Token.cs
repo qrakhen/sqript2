@@ -105,6 +105,7 @@ namespace Qrakhen.Sqr.Core
             Whitespace = 512,
             Comment = 1024,
             End = 2048,
+            Type = 4096,
 
             Value = Boolean | Float | Number | String | Identifier
         }       

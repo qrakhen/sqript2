@@ -2,6 +2,7 @@
 using Qrakhen.Dependor;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
@@ -33,6 +34,11 @@ namespace Qrakhen.Sqr.Core
         public override void set(Number index, Value value)
         {
             items[index.asInteger()] = value;
+        }
+
+        public override string ToString()
+        {
+            return "[\n" + string.Join("\n", items?.Select(_ => "    " + _?.ToString())) + "\n]"; 
         }
     }
 }

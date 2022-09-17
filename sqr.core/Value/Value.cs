@@ -11,7 +11,7 @@ namespace Qrakhen.Sqr.Core
         public readonly Storage<string, Variable> fields;
         public readonly Type type;
 
-        public Value(Qrakhen.Sqr.Core.Type type)
+        public Value(Type type)
         {
             if (type == null)
                 type = Type.Value;
@@ -50,6 +50,11 @@ namespace Qrakhen.Sqr.Core
             return false;
         }
 
+        public virtual object getValue()
+        {
+            return this;
+        }
+
         public virtual String toString()
         {
             return new String("Value"); 
@@ -66,6 +71,11 @@ namespace Qrakhen.Sqr.Core
         }
 
         public T get() => __value;
+
+        public override object getValue()
+        {
+            return this;
+        }
 
         public override bool Equals(object obj)
         {

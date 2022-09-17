@@ -17,7 +17,7 @@ namespace Qrakhen.Sqr.Core
 
         public void run()
         {
-            log.setLoggingLevel(Logger.Level.VERBOSE);
+            log.setLoggingLevel(Logger.Level.SPAM);
             log.success("welcome to Sqript2.0, or simply sqr. Enjoy thyself.");
             do {
                 try {
@@ -27,7 +27,7 @@ namespace Qrakhen.Sqr.Core
 
                     var op = "*~ a <~ 5;"; // 2 - 3 + 3 * 3 / 5 + test:von:mama:her";
 
-                    Console.Write(" <: ");
+                    Console.Write("    <: ");
                     execute(Console.ReadLine());
 
                 } catch (SqrError e) {
@@ -52,16 +52,13 @@ namespace Qrakhen.Sqr.Core
                 return;
             }
 
-            var t = tokenDigester.digest(new Core.Stack<char>(applyAliases(input).ToCharArray()));
-            log.spam("token list: ");
-            new List<Token>(t).ForEach(_ => log.spam(_));
-            var r = operationDigester.digest(new Stack<Token>(t), Qontext.globalContext);
-            log.success(r.execute());
+            var tokenStack = tokenDigester.digest(new Core.Stack<char>(applyAliases(input).ToCharArray()));
+            var operation = operationDigester.digest(tokenStack, Qontext.globalContext);
+            log.success(operation.execute());
         }
 
         private void commands(string input)
         {
-            log.spam("command " + input);
             if (input == "q") {
                 log.cmd(json(Qontext.globalContext));
                 return;
@@ -96,10 +93,19 @@ namespace Qrakhen.Sqr.Core
 
         private string applyAliases(string value)
         {
-            log.spam("applying aliases");
+            log.debug("applying aliases:");
             foreach (var alias in aliases) {
-                log.spam("applying " + alias.Key + " > " + alias.Value);
-                value = value.Replace(alias.Key, " " + alias.Value + " ");
+                if (alias.Key.Contains("$")) {
+                    log.debug("  + " + alias.Key + " > " + alias.Value);
+                    var pattern = Regex.Escape(alias.Key).Replace("\\$", "(.+?)");
+                    var m = Regex.Matches(value, pattern);
+                    for (var i = 0; i < m.Count; i++) {
+                        value = value.Replace(m[i].Groups[0].Value, alias.Value.Replace("$", m[i].Groups[1].Value));
+                    }
+                } else {
+                    log.debug("  + " + alias.Key + " > " + alias.Value);
+                    value = value.Replace(alias.Key, " " + alias.Value + " ");
+                }                
             }
             return value;
         }
@@ -117,7 +123,9 @@ namespace Qrakhen.Sqr.Core
 
         static readonly private Dictionary<string, string> aliases = new Dictionary<string, string>() {
             { "*~", "var" },
-            { "*&", "ref" }
+            { "*&", "ref" },
+            { "*$~", "@$" },
+            { "*$&", "@$&" }
         };
     }
 }

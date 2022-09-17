@@ -6,9 +6,9 @@ using System.Text.RegularExpressions;
 namespace Qrakhen.Sqr.Core
 {
     [Injectable]
-    public class StructureDigester : Digester<Stack<Token>, Token[]>
+    public class StructureDigester : Digester<Stack<Token>, Stack<Token>>
     {
-        public override Token[] digest(Stack<Token> input, Qontext qontext)
+        public override Stack<Token> digest(Stack<Token> input, Qontext qontext)
         {
             log.spam("in " + GetType().Name);
             int level = 0;
@@ -37,7 +37,7 @@ namespace Qrakhen.Sqr.Core
                 buffer.Add(t);
             } while (!input.done);
             log.spam("digested " + buffer.Count + " items");
-            return buffer.ToArray();
+            return new Stack<Token>(buffer.ToArray());
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Qrakhen.Sqr.Core
         /// <param name="qontext"></param>
         /// <param name="until"></param>
         /// <returns></returns>
-        public override Token[] digestUntil(Stack<Token> input, Qontext qontext, string until)
+        public override Stack<Token> digestUntil(Stack<Token> input, Qontext qontext, string until)
         {
             log.spam("in " + GetType().Name);
             int level = 0;
@@ -60,7 +60,6 @@ namespace Qrakhen.Sqr.Core
                 if (t.raw == until)
                     break;
 
-                buffer.Add(t);
                 if (Structure.openers.Contains(t.raw)) {
                     level++;
                     log.spam("incremented level: " + level);
@@ -73,9 +72,10 @@ namespace Qrakhen.Sqr.Core
                         log.spam("decremented level: " + level);
                     }
                 }
+                buffer.Add(t);
             } while (!input.done);
             log.spam("digested " + buffer.Count + " items");
-            return buffer.ToArray();
+            return new Stack<Token>(buffer.ToArray());
         }
     }
 }

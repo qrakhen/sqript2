@@ -7,11 +7,11 @@ using System.Linq;
 namespace Qrakhen.Sqr.Core
 {  
     [Injectable]
-    public class TokenDigester : Digester<Stack<char>, Token[]>
+    public class TokenDigester : Digester<Stack<char>, Stack<Token>>
     {
         private readonly Logger log;
 
-        public Token[] digest(Stack<char> input)
+        public Stack<Token> digest(Stack<char> input)
         {
             log.spam("in " + GetType().Name);
             var result = new List<Token>();
@@ -21,7 +21,8 @@ namespace Qrakhen.Sqr.Core
                 if (value != null)
                     result.Add(Token.create(value, type));
             }
-            return result.ToArray();
+            log.spam(string.Join(",", result.Select(_ => _.type + ": " + _.raw)));
+            return new Stack<Token>(result.ToArray());
         }
 
         private string readString(Stack<char> input)
@@ -43,6 +44,17 @@ namespace Qrakhen.Sqr.Core
             return buffer;
         }
 
+        private string readType(Stack<char> input, Token.Type type)
+        {
+            string buffer = "";
+            while (matchType(input.peek()) == type) {
+                buffer += input.digest();
+                if (input.done)
+                    break;
+            }
+            return buffer;
+        }
+
         private string readValue(Token.Type type, Stack<char> input)
         {
             if (type == Token.Type.Comment) {
@@ -58,12 +70,21 @@ namespace Qrakhen.Sqr.Core
             if (type == Token.Type.String)
                 return readString(input);
 
+            if (type == Token.Type.Type) {
+                var r = input.digest() + readType(input, Token.Type.Identifier);
+                if (input.peek() == '&')
+                    return r + input.digest();
+                else
+                    return r;
+            }
+
             string buffer = "";
             while (type == matchType(input.peek())) {
                 buffer += input.digest();
-                if (input.done)
+                if (input.done || type == Token.Type.Structure)
                     break;
             }
+
             return buffer;
         }
 
@@ -83,6 +104,7 @@ namespace Qrakhen.Sqr.Core
             { Token.Type.Structure, @"[{}()[\],]" },
             { Token.Type.End, @";" },
             { Token.Type.Accessor, @"[.:]" },
+            { Token.Type.Type, "@" },
             { Token.Type.Whitespace, @"\s" },
             { Token.Type.Comment, @"#" },
         };

@@ -87,21 +87,31 @@ namespace Qrakhen.Sqr.Core
                     if (node.done)
                         throw new SqrError("a structure does not belong here after a done node: " + t.raw + ".");
 
-                    var s = structureDigester.digest(input, qontext);
+                    var innerStack = structureDigester.digest(input, qontext);
                     if (Structure.get(t.raw).type == Structure.Type.QOLLECTION) {
-                        var qollection = qollectionDigester.digest(new Stack<Token>(s), qontext);
-                        log.spam(qollection);
+                        var qollection = qollectionDigester.digest(
+                            innerStack,
+                            qontext, 
+                            Structure.get(Structure.Type.QOLLECTION).separator);
                         handleValue(qollection, node);
                     } else if (Structure.get(t.raw).type == Structure.Type.GROUP) {
-                        var r = digest(new Stack<Token>(s), qontext).execute();
-                        log.spam(r);
+                        var r = digest(innerStack, qontext).execute();
                         handleValue(r, node);
                     }
                 } else if (t.isType(Token.Type.End)) {
                     input.digest();
                     break;
+                } else {
+                    throw new SqrError("currently unknown token " + t);
                 }
             } while (!input.done);
+
+            if (level == 0) {
+                if (node.check(011)) {
+                    node.left = new Value(Type.Value);
+                }
+            }
+
             return node;
         }
 

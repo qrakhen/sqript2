@@ -44,13 +44,23 @@ namespace Qrakhen.Sqr.Core
                     {
                         Value _right;
                         if (right is Node) _right = (right as Node).execute();
-                        else if (right is Variable) _right = (right as Variable).get();
                         else _right = (Value)right;
 
                         Value _left;
                         if (left is Node) _left = (left as Node).execute();
-                        else if (left is Variable && !op.isType(Operator.Type.ASSIGN | Operator.Type.ASSIGN_REF)) _left = (left as Variable).get();
                         else _left = (Value)left;
+
+                        if (op.isType(Operator.Type.ASSIGN_REF)) {
+
+                        } else if (op.isType(Operator.Type.ASSIGN)) {
+                            if (_right is Variable)
+                                _right = (_right as Variable).get();
+                        } else {
+                            if (_left is Variable)
+                                _left = (_left as Variable).get();
+                            if (_right is Variable)
+                                _right = (_right as Variable).get();
+                        }
 
                         Logger.TEMP_STATIC_DEBUG.spam("resolving " + this);
                         Logger.TEMP_STATIC_DEBUG.spam("result " + op.resolve(_left, _right));
@@ -66,6 +76,11 @@ namespace Qrakhen.Sqr.Core
 
             public bool done => (left != null && right != null && op != null);
             public bool empty => (left == null && right == null && op == null);
+
+            public bool check(int pattern)
+            {
+                return (pattern == (left != null ? 100 : 0) + (op != null ? 10 : 0) + (right != null ? 1 : 0));
+            }
 
             public bool put(object value)
             {

@@ -10,7 +10,7 @@ namespace Qrakhen.Sqr.Core
     {
         private readonly OperationDigester operationDigester;
 
-        public DeclaredParam[] declaredParameters;
+        public DeclaredParam[] declaredParameters = new DeclaredParam[0];
         public Type returnType;
         public Body body;
         

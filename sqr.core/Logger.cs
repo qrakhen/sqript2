@@ -20,7 +20,8 @@ namespace Qrakhen.Sqr.Core
             WARNINGS = 2,
             INFO = 3,
             DEBUG = 4,
-            VERBOSE = 5
+            VERBOSE = 5,
+            SPAM = 6
         }
 
         public Logger()
@@ -68,7 +69,7 @@ namespace Qrakhen.Sqr.Core
             string[] lines = (message + (v != null ? "\n" + v : "")).ToString().Split(new char[] { '\n' });
             foreach (string line in lines) {
                 Console.ForegroundColor = color;
-                Console.Write(" ~> ");
+                Console.Write("    ~: ");
                 write(line, color);
             }
 
@@ -103,11 +104,16 @@ namespace Qrakhen.Sqr.Core
         public void debug(object message, ConsoleColor color = ConsoleColor.Gray)
         {
             if (((int)loggingLevel >= (int)Level.DEBUG)) writeOut(message, color);
+        }        
+
+        public void verbose(object message, ConsoleColor color = ConsoleColor.DarkGray)
+        {
+            if (((int)loggingLevel >= (int)Level.VERBOSE)) writeOut(message, color);
         }
 
         public void spam(object message, ConsoleColor color = ConsoleColor.DarkGray)
         {
-            if (((int)loggingLevel >= (int)Level.VERBOSE)) writeOut(message, color);
+            if (((int)loggingLevel >= (int)Level.SPAM)) writeOut(message, color);
         }
     }
 }

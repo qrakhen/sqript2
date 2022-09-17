@@ -71,7 +71,7 @@ namespace Qrakhen.Sqr.Core
             return (T)(object)get();
         }
 
-        public Value get()
+        public new Value get()
         {
             if (isReference)
                 return (__value as Variable).get();
@@ -85,6 +85,11 @@ namespace Qrakhen.Sqr.Core
                 return (Variable)__value;
             else
                 throw new SqrError("value is not a reference", this);
+        }
+
+        public override object getValue()
+        {
+            return get();
         }
 
         public override string ToString()
