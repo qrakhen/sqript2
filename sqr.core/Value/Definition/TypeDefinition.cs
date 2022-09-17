@@ -1,6 +1,7 @@
 using Qrakhen.Sqr.Core;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 
 namespace Qrakhen.Sqr.Core 
@@ -19,8 +20,11 @@ namespace Qrakhen.Sqr.Core
             Qallable = definitions["Qallable"],
             Objeqt = definitions["Objeqt"];
 
+        public static readonly Module coreModule = new Module("Core", new Module("Sqript", null));
+
+        public readonly string id;
         public readonly string name;
-        public readonly string module; //wie namespace
+        public readonly Module module;
         public readonly TypeDefinition extends;
         public readonly NativeType nativeType;
         public readonly Storage<string, Field> fields;
@@ -36,14 +40,35 @@ namespace Qrakhen.Sqr.Core
             nativeType = args.nativeType;
             fields = args.fields ?? new Storage<string, Field>();
             methods = args.methods ?? new Storage<string, Method>();
+            extends = args.extends;
+
+            id = buildTypeId(this);
 
             if (definitions.contains(name))
                 throw new SqrError("can not redeclare type " + name);
 
             definitions[name] = this;
+
+            if (extends != null)
+                extend();
         }
 
         public TypeDefinition() { }
+
+        private void extend()
+        {
+            foreach (var f in extends.fields)
+            {
+                if (fields[f.Key] == null)
+                    fields[f.Key] = f.Value;
+            }
+
+            foreach (var m in extends.methods)
+            {
+                if (methods[m.Key] == null)
+                    methods[m.Key] = m.Value;
+            }
+        }
 
         // natives types are instantiated by just using new() since theyre hard coded
         public Instance spawn(Funqtion.ProvidedParam[] parameters)
@@ -55,6 +80,10 @@ namespace Qrakhen.Sqr.Core
         {
             return method.funqtion.execute(parameters, qontext, invoker);
         }
+        public override string ToString()
+        {
+            return id;
+        }
 
         public static TypeDefinition get(string name)
         {
@@ -65,6 +94,18 @@ namespace Qrakhen.Sqr.Core
         {
             return new TypeDefinition(args);
         }
+
+        public static string buildTypeId(TypeDefinition type)
+        {
+            var id = type.name;
+            var m = type.module;
+            while(m != null)
+            {
+                id = m.name + "/" + id;
+                m = m.parent;
+            }
+            return id;
+        } 
 
         public class Field
         {
@@ -83,10 +124,10 @@ namespace Qrakhen.Sqr.Core
             public readonly Access access;
             public readonly Funqtion funqtion;
 
-            public Method(Access access, Funqtion funqtion)
+            public Method(Funqtion funqtion, Access access = Access.Public)
             {
-                this.access = access;
                 this.funqtion = funqtion;
+                this.access = access;
             }
 
             public Value makeValue() => new Value<Funqtion>(funqtion, TypeDefinition.Qallable);
@@ -101,11 +142,37 @@ namespace Qrakhen.Sqr.Core
 
         public struct Args
         {
-            public string module;
             public string name;
+            public Module module;
+            public TypeDefinition extends;
             public NativeType nativeType;
             public Storage<string, Field> fields;
             public Storage<string, Method> methods;
+        }
+        static TypeDefinition()
+        {
+            var val = register(new Args
+            {
+                name = "Value",
+                nativeType = NativeType.None,
+                fields = null,
+                methods = new Storage<string, Method>() {
+                { "toString", new Method(
+                    new InternalFunqtion((p, self) => self.toString())) }
+                }
+            });
+
+            var str = register(new Args
+            {
+                name = "String",
+                nativeType = NativeType.None,
+                fields = null,
+                extends = val,
+                methods = new Storage<string, Method>() {
+                { "span", new Method(
+                    new InternalFunqtion((p, self) => (self as Core.String).span(p[0].value, p[1].value))) }
+                }
+            });
         }
     }
 

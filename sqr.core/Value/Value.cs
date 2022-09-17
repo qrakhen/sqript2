@@ -4,26 +4,24 @@ using System.Linq;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Value : ITyped<NativeType>
+    public class Value
     {
         public static Value Null => null;
 
         public readonly Storage<string, Variable> fields;
-        public readonly TypeDefinition definition;
-        public NativeType nativeType => definition?.nativeType ?? NativeType.None;
-        public new string type => definition.name;
+        public readonly TypeDefinition type;
 
         public Value(TypeDefinition definition)
         {
             if (definition == null)
                 definition = TypeDefinition.Value;
-            this.definition = definition;
+            this.type = definition;
         }
 
         public virtual Value accessMember(string name)
         {
-            if (definition.methods.contains(name))
-                return definition.methods[name].makeValue();
+            if (type.methods.contains(name))
+                return type.methods[name].makeValue();
             else if (fields.contains(name))
                 return fields[name];
             else
@@ -40,7 +38,12 @@ namespace Qrakhen.Sqr.Core
                     throw new SqrError("could not find name " + memberNames + " in the current qontext (recursive look ahead)");
             }
             return v;
-        }      
+        }
+
+        public virtual String toString()
+        {
+            return new String("Value"); 
+        }
     }
 
     public class Value<T> : Value

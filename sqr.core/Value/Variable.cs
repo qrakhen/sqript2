@@ -8,7 +8,7 @@ namespace Qrakhen.Sqr.Core
 
         public Value value { get => get(); set => set(value); }
 
-        public new TypeDefinition definition => value?.definition;
+        public new TypeDefinition definition => value?.type;
 
         public bool isReference { get; private set; }
         public readonly bool isStrictType;
@@ -18,7 +18,7 @@ namespace Qrakhen.Sqr.Core
                 Value value = null, 
                 bool isReference = false, 
                 bool isStrictType = false, 
-                bool isReadonly = false) : base(value, value?.definition ?? null)
+                bool isReadonly = false) : base(value, value?.type ?? null)
         {
             this.isReference = isReference;
             this.isStrictType = isStrictType;
@@ -32,25 +32,23 @@ namespace Qrakhen.Sqr.Core
             if (isReadonly && __set)
                 throw new SqrError("can not set value of readonly value", this);
 
-            // mutate to real value
             if (!asReference && value.GetType() == typeof(Variable))
                 value = (value as Variable).__value;
 
-            // typecheck
-            if (isStrictType && nativeType != value.nativeType)
-                throw new SqrError("can not assign type of " + value + " to type of " + nativeType, this);
+            if (isStrictType && type?.name != value.type?.name)
+                throw new SqrError("can not assign type of " + value.type + " to type of " + type, this);
 
             // reference logic
             if (asReference) {
                 if (!isReference) {
                     if (isStrictType)
-                        throw new SqrError("can not make value into reference due to it being strictly typed to " + nativeType, this);
+                        throw new SqrError("can not make value into reference due to it being strictly typed", this);
                     else
                         isReference = true;
                 }
 
                 if (value.GetType() != typeof(Variable))
-                    throw new SqrError("can not assign type " + value.GetType() + " as reference, has to be an identifier or name", this);
+                    throw new SqrError("can not assign type " + value.type + " as reference, has to be an identifier or name", this);
 
                 __value = value; // set value as reference
 
@@ -92,11 +90,6 @@ namespace Qrakhen.Sqr.Core
         public override string ToString()
         {
             return __value == null ? "null" : __value.ToString();
-        }
-
-        public bool isTypeDefaultReferenced(NativeType type)
-        {
-            return (!isType(NativeType.Boolean | NativeType.Number | NativeType.String));
         }
     }
 }
