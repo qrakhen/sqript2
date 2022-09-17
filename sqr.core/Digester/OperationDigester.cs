@@ -15,6 +15,7 @@ namespace Qrakhen.Sqr.Core
         private readonly Logger log;
         private readonly ValueDigester valueDigester;
         private readonly StructureDigester structureDigester;
+        private readonly QollectionDigester qollectionDigester;
 
         public override Operation digest(Stack<Token> input, Qontext qontext)
         {
@@ -47,9 +48,9 @@ namespace Qrakhen.Sqr.Core
                                 throw new SqrError("identifier expected after keyword " + k.symbol + ", got " + t + "instead");
                             } else {
                                 if (k.isType(Keyword.Type.DECLARE_DYN)) {
-                                    node = new Node(qontext.register(t.get<string>()), null, null);
+                                    node = new Node(qontext.register(t.raw), null, null);
                                 } else if (k.isType(Keyword.Type.DECLARE_REF)) {
-                                    node = new Node(qontext.register(t.get<string>(), null, true), null, null); ;
+                                    node = new Node(qontext.register(t.raw, null, true), null, null); ;
                                 } else {
                                     throw new SqrError("not yet implemented: " + k.symbol);
                                 }
@@ -76,7 +77,7 @@ namespace Qrakhen.Sqr.Core
                                 node = build(input, qontext, new Node(node, null, op), level + 1);
                             }
                         } else {
-                            throw new SqrError("2 operators? " + node);
+                            throw new SqrError("2 operatorss? " + node);
                         }
                     }
                 } else if (t.isType(Token.Type.Structure)) {
@@ -87,9 +88,15 @@ namespace Qrakhen.Sqr.Core
                         throw new SqrError("a structure does not belong here after a done node: " + t.raw + ".");
 
                     var s = structureDigester.digest(input, qontext);
-                    var op = digest(new Stack<Token>(s), qontext);
-                    var r = op.execute();
-                    handleValue(r, node);
+                    if (Structure.get(t.raw).type == Structure.Type.QOLLECTION) {
+                        var qollection = qollectionDigester.digest(new Stack<Token>(s), qontext);
+                        log.spam(qollection);
+                        handleValue(qollection, node);
+                    } else if (Structure.get(t.raw).type == Structure.Type.GROUP) {
+                        var r = digest(new Stack<Token>(s), qontext).execute();
+                        log.spam(r);
+                        handleValue(r, node);
+                    }
                 } else if (t.isType(Token.Type.End)) {
                     input.digest();
                     break;

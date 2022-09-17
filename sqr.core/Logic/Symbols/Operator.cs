@@ -48,7 +48,7 @@ namespace Qrakhen.Sqr.Core
             LOGIC_OR,
             LOGIC_AND,
             LOGIC_XOR,
-            LIST_ADD,
+            QOLLECTION_ADD,
             ASSIGN,
             ASSIGN_REF
         }
@@ -116,8 +116,8 @@ namespace Qrakhen.Sqr.Core
                 return new Boolean((left as Number) <= (right as Number));
             });
 
-            register(Type.LIST_ADD, "<+", 0, (left, right) => {
-                (left as List).add(right);
+            register(Type.QOLLECTION_ADD, "<+", 0, (left, right) => {
+                (left as Qollection).add(right);
                 return left;
             });
 

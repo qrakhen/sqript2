@@ -6,20 +6,30 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public abstract class Qollection : Value
+    public class Qollection : ItemSet
     {
-        [Native]
-        public int length { get; protected set; }
+        protected List<Value> items;
+
+        public Qollection() : base(Type.Qollection)
+        {
+        }
 
         [Native]
-        public Type itemType { get; protected set; }
-
-        public Qollection(Type type) : base(type) { }
-
-        [Native]
-        public abstract void set(Number index, Value value);
+        public void add(Value value)
+        {
+            items.Add(value);
+        }
 
         [Native]
-        public abstract Value get(Number index);
+        public override Value get(Number index)
+        {
+            return items[index.asInteger()];
+        }
+
+        [Native]
+        public override void set(Number index, Value value)
+        {
+            items[index.asInteger()] = value;
+        }
     }
 }

@@ -87,7 +87,7 @@ namespace Qrakhen.Sqr.Core
 
         public override string ToString()
         {
-            return type + "[ " + value + " ]";
+            return type + " [ " + raw + " ]";
         }
 
         [Flags]

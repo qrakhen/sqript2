@@ -20,8 +20,10 @@ namespace Qrakhen.Sqr.Core
             if (!t.isType(Token.Type.Value))
                 throw new SqrError("token is not a value: " + t);
 
-            if (!t.isType(Token.Type.Identifier))
+            if (!t.isType(Token.Type.Identifier)) {
+                log.spam("returning " + t.makeValue());
                 return input.digest().makeValue();
+            }
 
             List<string> name = new List<string>();
             input.process(() => input.peek().isType(Token.Type.Identifier), (current, index, abort) => {
@@ -32,6 +34,7 @@ namespace Qrakhen.Sqr.Core
             });
             log.debug("detected name " + string.Join(":", name));
             var value = qontext.resolveName(name.ToArray());
+            log.debug("value to that name: " + value);
             return value;
         }
     }

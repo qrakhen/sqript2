@@ -17,7 +17,7 @@ namespace Qrakhen.Sqr.Core
         {
             log.spam("in " + GetType().Name);
             Structure structure = null;
-            var list = new List();
+            var qollection = new Qollection();
             input.process(() => (input.peek().raw == structure?.close), (current, index, abort) => {
                 var t = current();
                 if (index == 0) {
@@ -39,7 +39,7 @@ namespace Qrakhen.Sqr.Core
                         var op = operationDigester.digest(new Stack<Token>(sub), qontext);
                         var r = op.execute();
                         log.spam("adding result: " + r);
-                        list.add(r);
+                        qollection.add(r);
                     }
                 }
             });

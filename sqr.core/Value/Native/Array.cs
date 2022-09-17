@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Array : Qollection
+    public class Array : ItemSet
     {
         protected Value[] items;
 

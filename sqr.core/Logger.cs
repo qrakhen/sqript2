@@ -56,8 +56,12 @@ namespace Qrakhen.Sqr.Core
         private void writeOut(object message, ConsoleColor color = ConsoleColor.White)
         {
             Value v = null;
-            if (message.GetType() == typeof(SqrError))
-                v = (message as SqrError).value;
+            if (message == null)
+                message = "null";
+            else {
+                if (message.GetType() == typeof(SqrError))
+                    v = (message as SqrError).value;
+            }
 
             var _color = Console.ForegroundColor;
 

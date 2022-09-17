@@ -18,19 +18,25 @@ namespace Qrakhen.Sqr.Core
                 throw new SqrError("nop");
 
             var structure = input.digest().get<Structure>();
+            log.spam("starting to read structure beginning from " + structure.open);
             do {
                 t = input.digest();
-                buffer.Add(t);
+                log.spam(t);
                 if (t.raw == structure.open) {
                     level++;
+                    log.spam("incremented level: " + level);
                 } else if (t.raw == structure.close) {
-                    if (level == 0)
+                    if (level == 0) {
+                        log.spam("done");
                         break;
-                    else
+                    } else {
                         level--;
-                }                
+                        log.spam("decremented level: " + level);
+                    }
+                }
+                buffer.Add(t);
             } while (!input.done);
-
+            log.spam("digested " + buffer.Count + " items");
             return buffer.ToArray();
         }
 
@@ -47,22 +53,28 @@ namespace Qrakhen.Sqr.Core
             int level = 0;
             List<Token> buffer = new List<Token>();
             var t = input.peek();
+            log.spam("starting to read subset of structure, starting from " + t + " until " + until);
             do {
                 t = input.digest();
+                log.spam(t);
                 if (t.raw == until)
                     break;
 
                 buffer.Add(t);
                 if (Structure.openers.Contains(t.raw)) {
                     level++;
+                    log.spam("incremented level: " + level);
                 } else if (Structure.closers.Contains(t.raw)) {
-                    if (level == 0)
+                    if (level == 0) {
+                        log.spam("done prematurely, some structure ended before " + until + " was reached");
                         break;
-                    else
+                    } else {
                         level--;
+                        log.spam("decremented level: " + level);
+                    }
                 }
             } while (!input.done);
-
+            log.spam("digested " + buffer.Count + " items");
             return buffer.ToArray();
         }
     }
