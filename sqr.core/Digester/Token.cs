@@ -26,9 +26,10 @@ namespace Qrakhen.Sqr.Core
                 throw new SqrError("can not make value out of token: not a value token" + this);
 
             if (type == Type.Boolean) return new Boolean((bool)value);
+            if (type == Type.Float) return new Number((float)value);
             if (type == Type.Number) return new Number((double)value);
             if (type == Type.String) return new String((string)value);
-            return new Value(Value.Type.None, true);
+            throw new SqrError("no known native type applied to token " + this);
         }
 
         public Variable makeVariable(bool isReference = false, bool isStrictType = false, bool isReadonly = false)
@@ -39,13 +40,14 @@ namespace Qrakhen.Sqr.Core
             return new Variable(null, isReference, isStrictType, isReadonly);
         }
 
-        public Value.Type toValueType(Type type)
+        public NativeType asNativeType(Type type)
         {
-            if (type == Type.Boolean) return Value.Type.Boolean;
-            if (type == Type.Number) return Value.Type.Number;
-            if (type == Type.String) return Value.Type.String;
-            if (type == Type.Identifier) return Value.Type.Variable;
-            return Value.Type.None;
+            if (type == Type.Boolean) return NativeType.Boolean;
+            if (type == Type.Float) return NativeType.Float;
+            if (type == Type.Number) return NativeType.Number;
+            if (type == Type.String) return NativeType.String;
+            if (type == Type.Identifier) return NativeType.Variable;
+            return NativeType.None;
         }
 
         public static Token create(string raw, Type type)
@@ -91,17 +93,18 @@ namespace Qrakhen.Sqr.Core
         {
             Operator = 1,
             Boolean = 2,
-            Number = 4,
-            String = 8,
-            Structure = 16,
-            Accessor = 32,
-            Keyword = 64,
-            Identifier = 128,
-            Whitespace = 256,
-            Comment = 512,
-            End = 1024,
+            Float = 4,
+            Number = 8,
+            String = 16,
+            Structure = 32,
+            Accessor = 64,
+            Keyword = 128,
+            Identifier = 256,
+            Whitespace = 512,
+            Comment = 1024,
+            End = 2048,
 
-            Value = Boolean | Number | String | Identifier
+            Value = Boolean | Float | Number | String | Identifier
         }       
     }
 }

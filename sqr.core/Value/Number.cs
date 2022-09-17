@@ -8,7 +8,7 @@ namespace Qrakhen.Sqr.Core
 {
     public class Number : Value<double>
     {
-        public Number(double value) : base(value, Value.Type.Number, true)
+        public Number(double value) : base(value, TypeDefinition.Number)
         {
 
         }

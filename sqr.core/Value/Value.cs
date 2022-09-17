@@ -4,85 +4,50 @@ using System.Linq;
 
 namespace Qrakhen.Sqr.Core
 {
-    public delegate Value ExtenderFunqtion(Value[] parameters, Value self);
-    public class ExtenderFunqtionAttribute : Attribute { }
-
-    public class Value : ITyped<Value.Type>
+    public class Value : ITyped<NativeType>
     {
-        public static Value Null => new Value(Type.Null, false);
+        public static Value Null => null;
 
-        private static readonly Storage<System.Type, Storage<string, ExtenderFunqtion>> extensions =
-            new Storage<System.Type, Storage<string, ExtenderFunqtion>>();
-        private readonly Storage<string, Member> members = new Storage<string, Member>();
-        public readonly bool isPrimitive;
+        public readonly Storage<string, Variable> fields;
+        public readonly TypeDefinition definition;
+        public NativeType nativeType => definition?.nativeType ?? NativeType.None;
+        public new string type => definition.name;
 
-        public Value(Value.Type type = Type.None, bool isPrimitive = false)
+        public Value(TypeDefinition definition)
         {
-            this.type = type;
-            this.isPrimitive = isPrimitive;
+            if (definition == null)
+                definition = TypeDefinition.Value;
+            this.definition = definition;
         }
 
-        [ExtenderFunqtion] // vielleicht doch lieber mit echten funqtions?
-        public static Value toString(Value[] parameters, Value self)
+        public virtual Value accessMember(string name)
         {
-            return new String(self.ToString());
+            if (definition.methods.contains(name))
+                return definition.methods[name].makeValue();
+            else if (fields.contains(name))
+                return fields[name];
+            else
+                return Null;
         }
 
-        public override bool Equals(object obj)
+        public Value lookAhead(string[] memberNames)
         {
-            if (type == Type.Null && obj is Value)
-                return (obj as Value).type == type;
-
-            return base.Equals(obj);
-        }
-
-        static Value()
-        {
-            var types = new System.Type[] {
-                typeof(Value),
-                typeof(String),
-                typeof(Number),
-                typeof(Boolean),
-                typeof(Objeqt),
-                typeof(Qollection),
-                typeof(Funqtion)
-            };
-
-            foreach (var type in types) {
-                extensions[type] = new Storage<string, ExtenderFunqtion>();
-
-                type
-                    .GetMethods()
-                    .Where(_ => Attribute.GetCustomAttribute(_, typeof(ExtenderFunqtionAttribute)) != null)
-                    .ToList()
-                    .ForEach(_ => {
-                        Dependor.Dependor.get<Logger>().debug("loading native extension function " + type.Name + ":" + _.Name);
-                        extensions[typeof(Value)][_.Name] = (parameters, self) => { return (Value)_.Invoke(self, parameters); };
-                    });
+            Value v = this;
+            for (int i = 0; i < memberNames.Length; i++)
+            {
+                v = v.accessMember(memberNames[i]);
+                if (v == null)
+                    throw new SqrError("could not find name " + memberNames + " in the current qontext (recursive look ahead)");
             }
-        }
-
-        [Flags]
-        public enum Type
-        {
-            None = default,
-            Boolean = 1,
-            Number = 2,
-            String = 4,
-            Qollection = 8,
-            Objeqt = 16,
-            Funqtion = 32,
-            Qontext = Qollection | Objeqt | Funqtion,
-            Variable = 64,
-            Null = 128
-        }
+            return v;
+        }      
     }
 
     public class Value<T> : Value
     {
         protected T __value;
 
-        public Value(T value = default(T), Value.Type type = Type.None, bool isPrimitive = false) : base(type, isPrimitive)
+        public Value(T value = default(T), TypeDefinition definition = null) : base(definition)
         {
             __value = value;
         }

@@ -7,14 +7,21 @@ namespace Qrakhen.Sqr.Core
     public class Operation
     {
         public Node head { get; protected set; }
+        public bool isReturning => head?.isReturning ?? false;
 
         public Operation(Node head = null)
         {
             this.head = head;
         }
 
+        public Value execute()
+        {
+            return head.execute();
+        }
+
         public class Node
         {
+            public bool isReturning;
             public object left;
             public object right;
             public Operator op;

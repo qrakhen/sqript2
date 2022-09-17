@@ -8,7 +8,7 @@ namespace Qrakhen.Sqr.Core
     [Injectable]
     public class FunqtionDigester : Digester<Stack<Token>, Funqtion>
     {
-        public Funqtion digest(Stack<Token> input)
+        public override Funqtion digest(Stack<Token> input)
         {
             log.spam("in " + GetType().Name);
             return null;

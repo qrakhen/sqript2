@@ -10,13 +10,18 @@ using static Qrakhen.Sqr.Core.Token;
 namespace Qrakhen.Sqr.Core
 {
     [Injectable]
-    public class OperationDigester : Digester<Stack<Token>, Node>
+    public class OperationDigester : Digester<Stack<Token>, Operation>
     {
         private readonly Logger log;
         private readonly ValueDigester valueDigester;
         private readonly ValueDigester structureDigester;
 
-        public Node digest(Stack<Token> input, Qontext qontext, Node node = null, int level = 0)
+        public override Operation digest(Stack<Token> input, Qontext qontext)
+        {
+            return new Operation(build(input, qontext));
+        }
+
+        protected Node build(Stack<Token> input, Qontext qontext, Node node = null, int level = 0)
         {
             log.spam("in " + GetType().Name);
             if (input.done)
@@ -30,6 +35,8 @@ namespace Qrakhen.Sqr.Core
                 log.spam("token peeked: " + t);
                 if (t.isType(Token.Type.Value)) {
                     Value v = valueDigester.digest(input, qontext);
+                    if (v is Variable)
+                        v = (v as Variable).get();
                     if (!node.put(v)) {
                         throw new SqrError("unexpected value after full operation node " + node);
                     } else if (node.done && node.op == null) {
@@ -55,6 +62,10 @@ namespace Qrakhen.Sqr.Core
 
                                 log.debug("registered " + t + " in qontext");
                             }
+                        } else if (k.isType(Keyword.Type.FUNQTION_RETURN)) {
+                            if (level > 0)
+                                throw new SqrError("unexpected return");
+                            node.isReturning = true;
                         } else {
                             throw new SqrError("not yet implemented: " + t);
                         }
@@ -66,9 +77,9 @@ namespace Qrakhen.Sqr.Core
                     } else {
                         if (node.done) {
                             if (op.weight > node.op.weight) {
-                                node.right = digest(input, qontext, new Node(node.right, null, op), level + 1);
+                                node.right = build(input, qontext, new Node(node.right, null, op), level + 1);
                             } else {
-                                node = digest(input, qontext, new Node(node, null, op), level + 1);
+                                node = build(input, qontext, new Node(node, null, op), level + 1);
                             }
                         } else {
                             throw new SqrError("2 ops? " + node);

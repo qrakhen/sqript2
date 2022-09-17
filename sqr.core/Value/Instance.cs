@@ -6,13 +6,11 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Qollection : Value
+    public class Instance : Value
     {
-        public Qollection() : base(TypeDefinition.Qollection)
+        public Instance(TypeDefinition definition) : base(definition)
         {
-        }
 
-        // override names with indexes
-        public void add(Value value) { }
+        }
     }
 }
