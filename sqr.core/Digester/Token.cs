@@ -20,12 +20,23 @@ namespace Qrakhen.Sqr.Core
             return (T)value;
         }
 
-        public Value makeValue(bool isReference = false, bool isStrictType = false, bool isReadonly = false)
+        public Value makeValue()
         {
             if (!isType(Type.Value))
                 throw new SqrError("can not make value out of token: not a value token" + this);
 
-            return new Value(toValueType(type), value, isReference, isStrictType, isReadonly);
+            if (type == Type.Boolean) return new Boolean((bool)value);
+            if (type == Type.Number) return new Number((double)value);
+            if (type == Type.String) return new String((string)value);
+            return new Value(Value.Type.None, true);
+        }
+
+        public Variable makeVariable(bool isReference = false, bool isStrictType = false, bool isReadonly = false)
+        {
+            if (!isType(Type.Identifier))
+                throw new SqrError("can not make variable out of token: not an identifier token" + this);
+
+            return new Variable(null, isReference, isStrictType, isReadonly);
         }
 
         public Value.Type toValueType(Type type)
@@ -33,7 +44,7 @@ namespace Qrakhen.Sqr.Core
             if (type == Type.Boolean) return Value.Type.Boolean;
             if (type == Type.Number) return Value.Type.Number;
             if (type == Type.String) return Value.Type.String;
-            if (type == Type.Identifier) return Value.Type.Reference;
+            if (type == Type.Identifier) return Value.Type.Variable;
             return Value.Type.None;
         }
 

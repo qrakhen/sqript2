@@ -1,98 +1,65 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Qrakhen.Sqr.Core
-{  
-    public sealed class Value : ITyped<Value.Type>
+{
+    public delegate Value ExtenderFunqtion(Value[] parameters, Value self);
+    public class ExtenderFunqtionAttribute : Attribute { }
+
+    public class Value : ITyped<Value.Type>
     {
-        private bool __set;
-        private object __value;
+        public static Value Null => new Value(Type.Null, false);
 
-        public object rawValue => __value;
+        private static readonly Storage<System.Type, Storage<string, ExtenderFunqtion>> extensions =
+            new Storage<System.Type, Storage<string, ExtenderFunqtion>>();
+        private readonly Storage<string, Member> members = new Storage<string, Member>();
+        public readonly bool isPrimitive;
 
-        public bool isReference { get; private set; }
-        public readonly bool isStrictType;
-        public readonly bool isReadonly;
-
-        public Value(
-                Type type, 
-                object value = null, 
-                bool isReference = false, 
-                bool isStrictType = false, 
-                bool isReadonly = false)
+        public Value(Value.Type type = Type.None, bool isPrimitive = false)
         {
             this.type = type;
-            this.isReference = isReference;
-            this.isStrictType = isStrictType;
-            this.isReadonly = isReadonly;
-            if (value != null)
-                this.set(value);
-        }            
-
-        public void set(object value, bool asReference = false)
-        {
-            if (isReadonly && __set)
-                throw new SqrError("can not set value of readonly value", this);
-
-            // mutate to real value
-            if (!asReference && value.GetType() == typeof(Value))
-                value = (value as Value).rawValue;
-
-            // typecheck
-            if (isStrictType && type != typeFromSysType(value.GetType()))
-                throw new SqrError("can not assign type of " + value + " to type of " + type, this);
-            else
-                type = typeFromSysType(value.GetType());
-
-            // reference logic
-            if (asReference) {
-                if (!isReference) {
-                    if (isStrictType)
-                        throw new SqrError("can not make value into reference due to it being strictly typed to " + type, this);
-                    else
-                        isReference = true;
-                }
-
-                if (value.GetType() != typeof(Value))
-                    throw new SqrError("can not assign type " + value.GetType() + " as reference, has to be an identifier or name", this);
-
-                __value = value; // set value as reference
-
-            } else {
-                if (isReference) {
-                    if (getReference() == null)
-                        throw new SqrError("no reference assigned yet. use <& to assign a value by its reference.", this);
-                    getReference().set(value); // set value of reference
-                } else {
-                    __value = value; // set value as real value
-                }
-            }         
-
-            if (!__set)
-                __set = true;
+            this.isPrimitive = isPrimitive;
         }
 
-        public T get<T>()
+        [ExtenderFunqtion] // vielleicht doch lieber mit echten funqtions?
+        public static Value toString(Value[] parameters, Value self)
         {
-            if (isReference)
-                return (rawValue as Value).get<T>();
-            else
-                return (T)rawValue;
+            return new String(self.ToString());
         }
 
-        public Value getReference()
+        public override bool Equals(object obj)
         {
-            if (isReference)
-                return (Value)rawValue;
-            else
-                throw new SqrError("value is not a reference", this);
+            if (type == Type.Null && obj is Value)
+                return (obj as Value).type == type;
+
+            return base.Equals(obj);
         }
 
-        public double asNumber() => get<double>();
-        public bool asBoolean() => get<bool>();
-
-        public override string ToString()
+        static Value()
         {
-            return rawValue == null ? "null" : rawValue.ToString();
+            var types = new System.Type[] {
+                typeof(Value),
+                typeof(String),
+                typeof(Number),
+                typeof(Boolean),
+                typeof(Objeqt),
+                typeof(Qollection),
+                typeof(Funqtion)
+            };
+
+            foreach (var type in types) {
+                extensions[type] = new Storage<string, ExtenderFunqtion>();
+
+                type
+                    .GetMethods()
+                    .Where(_ => Attribute.GetCustomAttribute(_, typeof(ExtenderFunqtionAttribute)) != null)
+                    .ToList()
+                    .ForEach(_ => {
+                        Dependor.Dependor.get<Logger>().debug("loading native extension function " + type.Name + ":" + _.Name);
+                        extensions[typeof(Value)][_.Name] = (parameters, self) => { return (Value)_.Invoke(self, parameters); };
+                    });
+            }
         }
 
         [Flags]
@@ -106,24 +73,31 @@ namespace Qrakhen.Sqr.Core
             Objeqt = 16,
             Funqtion = 32,
             Qontext = Qollection | Objeqt | Funqtion,
-            Reference = 64
+            Variable = 64,
+            Null = 128
+        }
+    }
+
+    public class Value<T> : Value
+    {
+        protected T __value;
+
+        public Value(T value = default(T), Value.Type type = Type.None, bool isPrimitive = false) : base(type, isPrimitive)
+        {
+            __value = value;
         }
 
-        public bool isTypeDefaultReferenced(Type type)
+        public override bool Equals(object obj)
         {
-            return (!isType(Type.Boolean | Type.Number | Type.String));
+            if (obj is Value<T>)
+                return (obj as Value<T>).__value.Equals(__value);
+
+            return base.Equals(obj);
         }
 
-        private Type typeFromSysType(System.Type type) // into dict..
+        public override string ToString()
         {
-            if (type == typeof(bool)) return Type.Boolean;
-            if (type == typeof(double)) return Type.Number;
-            if (type == typeof(string)) return Type.String;
-            if (type == typeof(Qollection)) return Type.Qollection;
-            if (type == typeof(Objeqt)) return Type.Objeqt;
-            if (type == typeof(Funqtion)) return Type.Funqtion;
-            if (type == typeof(Value)) return Type.Reference;
-            return Type.None;
+            return __value.ToString();
         }
     }
 }

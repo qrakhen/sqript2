@@ -33,12 +33,12 @@ namespace Qrakhen.Sqr.Core
                 } catch (SqrError e) {
                     log.error(log.loggingLevel > Logger.Level.INFO ? e : (object)e.Message);
                     log.warn("are you by any chance stupid?");
-                } catch (Exception e) {
+                } /* catch (Exception e) {
                     log.error("### system exceptions need to be completely eradicated ###");
                     log.error(e);
                     log.error("### system exceptions need to be completely eradicated ###");
                     throw e;
-                }
+                }*/
             } while (alive);
         }
 

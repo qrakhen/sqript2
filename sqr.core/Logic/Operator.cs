@@ -61,65 +61,73 @@ namespace Qrakhen.Sqr.Core
         static Operator()
         {   
             register(Type.CALC_ADD, "+", 2, (left, right) => {
-                return new Value(Value.Type.Number, left.asNumber() + right.asNumber());  
+                if (left is Number && right is Number)
+                    return new Number((left as Number) + (right as Number));
+                return new Number(0);
             });
 
             register(Type.CALC_SUB, "-", 2, (left, right) => {
-                return new Value(Value.Type.Number, left.asNumber() - right.asNumber());
+                if (left is Number && right is Number)
+                    return new Number((left as Number) - (right as Number));
+                return new Number(0);
             });
 
             register(Type.CALC_MULT, "*", 4, (left, right) => {
-                return new Value(Value.Type.Number, left.asNumber() * right.asNumber());
+                if (left is Number && right is Number)
+                    return new Number((left as Number) * (right as Number));
+                return new Number(0);
             });
 
             register(Type.CALC_DIV, "/", 4, (left, right) => {
-                return new Value(Value.Type.Number, left.asNumber() / right.asNumber());
+                if (left is Number && right is Number)
+                    return new Number((left as Number) / (right as Number));
+                return new Number(0);
             });
 
             register(Type.COND_AND, "&&", 1, (left, right) => {
-                return new Value(Value.Type.Boolean, left.asBoolean() && right.asBoolean());
+                return new Boolean((left as Boolean) && (right as Boolean));
             });
 
             register(Type.COND_OR, "||", 1, (left, right) => {
-                return new Value(Value.Type.Boolean, left.asBoolean() || right.asBoolean());
+                return new Boolean((left as Boolean) && (right as Boolean));
             });
 
             register(Type.COMP_EQUAL, "==", 1, (left, right) => {
-                return new Value(Value.Type.Boolean, (left.rawValue.Equals(right.rawValue)));
+                return new Boolean(left.Equals(right));
             });
 
             register(Type.COMP_NOTEQUAL, "!=", 1, (left, right) => {
-                return new Value(Value.Type.Boolean, (!left.rawValue.Equals(right.rawValue)));
+                return new Boolean(!left.Equals(right));
             });
 
             register(Type.COMP_GT, ">", 1, (left, right) => {
-                return new Value(Value.Type.Boolean, left.asNumber() > right.asNumber());
+                return new Boolean((left as Number) > (right as Number));
             });
 
             register(Type.COMP_GTEQUAL, ">=", 1, (left, right) => {
-                return new Value(Value.Type.Boolean, left.asNumber() >= right.asNumber());
+                return new Boolean((left as Number) >= (right as Number));
             });
 
             register(Type.COMP_LT, "<", 1, (left, right) => {
-                return new Value(Value.Type.Boolean, left.asNumber() < right.asNumber());
+                return new Boolean((left as Number) < (right as Number));
             });
 
             register(Type.COMP_LTEQUAL, "<=", 1, (left, right) => {
-                return new Value(Value.Type.Boolean, left.asNumber() <= right.asNumber());
+                return new Boolean((left as Number) <= (right as Number));
             });
 
             register(Type.LIST_ADD, "<+", 0, (left, right) => {
-                (left.rawValue as Qollection).add(right);
+                (left as Qollection).add(right);
                 return left;
             });
 
             register(Type.ASSIGN, "<~", 0, (left, right) => {
-                left.set(right);
+                (left as Variable).set(right, false);
                 return left;
             });
 
             register(Type.ASSIGN_REF, "<&", 0, (left, right) => {
-                left.set(right, true);
+                (left as Variable).set(right, true);
                 return left;
             });
 
