@@ -6,6 +6,8 @@ namespace Qrakhen.Sqr.Core
 {  
     public class Token : ITyped<Token.Type>
     {
+        public long __row, __col, __pos = -1;
+
         public readonly string raw;
         public readonly object value;
         public new Type type => base.type;
@@ -87,7 +89,7 @@ namespace Qrakhen.Sqr.Core
 
         public override string ToString()
         {
-            return type + " [ " + raw + " ]";
+            return type + " [ " + raw + " ] @" + __row + ":" + __col + ", p" + __pos;
         }
 
         [Flags]

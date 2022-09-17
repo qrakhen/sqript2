@@ -15,13 +15,25 @@ namespace Qrakhen.Sqr.Core
         {
             log.spam("in " + GetType().Name);
             var result = new List<Token>();
+            long col = 0, row = 0, count = 0, __prev = 0;
             while (!input.done) {
+                if (input.peek() == '\n') {
+                    row++;
+                    col = 0;
+                    __prev = input.index;
+                }
                 var type = matchType(input.peek());
                 var value = readValue(type, input);
-                if (value != null)
-                    result.Add(Token.create(value, type));
+                if (value != null) {
+                    var token = Token.create(value, type);
+                    token.__row = row;
+                    token.__col = input.index - __prev;
+                    token.__pos = input.index;
+                    result.Add(token);
+                }
             }
             log.spam(string.Join(",", result.Select(_ => _.type + ": " + _.raw)));
+            count = input.length;
             return new Stack<Token>(result.ToArray());
         }
 

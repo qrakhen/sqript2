@@ -36,7 +36,7 @@ namespace Qrakhen.Sqr.Core
             {
                 v = v.accessMember(memberNames[i]);
                 if (v == null)
-                    throw new SqrError("could not find name " + memberNames + " in the current qontext (recursive look ahead)");
+                    throw new SqrError("could not find name " + memberNames[i] + " in the current qontext (recursive look ahead)");
             }
             return v;
         }
@@ -55,9 +55,14 @@ namespace Qrakhen.Sqr.Core
             return this;
         }
 
+        public override string ToString()
+        {
+            return type.name;
+        }
+
         public virtual String toString()
         {
-            return new String("Value"); 
+            return new String(ToString());
         }
     }
 
