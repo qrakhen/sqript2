@@ -6,12 +6,12 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Qollection : Value
+    public class Objeqt : Value
     {
-        public Qollection() : base(TypeDefinition.Qollection)
+        private readonly Storage<string, Variable> properties = new Storage<string, Variable>();
+
+        public Objeqt() : base(Type.Objeqt)
         {
         }
-
-        public void add(Value value) { }
     }
 }

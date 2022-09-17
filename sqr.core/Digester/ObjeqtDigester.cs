@@ -12,7 +12,7 @@ namespace Qrakhen.Sqr.Core
         {
             log.spam("in " + GetType().Name);
 
-            input.process((current) => { 
+            input.process((current, index) => { 
                 if (!current().isType(Token.Type.Identifier))
                     throw new SqrError("identifier expected");
                 

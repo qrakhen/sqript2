@@ -10,13 +10,13 @@ namespace Qrakhen.Sqr.Core
     {
         private readonly OperationDigester operationDigester;
 
-        public ParamDefinition[] declaredParameters;
-        public NativeType returnType;
+        public DeclaredParam[] declaredParameters;
+        public Type returnType;
         public Body body;
         
         public virtual Value execute(ProvidedParam[] parameters, Qontext qontext, Value self = null)
         {
-            var eq = getExecutionQontext(parameters, qontext);
+            var eq = createExecutionQontext(parameters, qontext);
             if (self != null)
                 eq.register("this", self);
 
@@ -31,7 +31,7 @@ namespace Qrakhen.Sqr.Core
             return null;
         }
 
-        protected Qontext getExecutionQontext(ProvidedParam[] parameters, Qontext qontext)
+        protected Qontext createExecutionQontext(ProvidedParam[] parameters, Qontext qontext)
         {
             var tempQontext = new Qontext(qontext);
 
@@ -53,7 +53,7 @@ namespace Qrakhen.Sqr.Core
             public Value value;
         }
 
-        public struct ParamDefinition
+        public struct DeclaredParam
         {
             public string name;
             public NativeType type;

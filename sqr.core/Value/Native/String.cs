@@ -8,7 +8,7 @@ namespace Qrakhen.Sqr.Core
 {
     public class String : Value<string>
     {
-        public String(string value) : base(value, TypeDefinition.String)
+        public String(string value) : base(value, Type.String)
         {
 
         }

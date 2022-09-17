@@ -10,17 +10,19 @@ namespace Qrakhen.Sqr.Core
 
         public readonly string open;
         public readonly string close;
+        public readonly string extra;
 
-        public Structure(Type type, string open, string close)
+        public Structure(Type type, string open, string close, string extra = null)
         {
             this.type = type;
             this.open = open;
             this.close = close;
+            this.extra = extra ?? "";
         }
 
         public static Structure get(string symbol)
         {
-            return structures.findOne(_ => _.open == symbol);
+            return structures.findOne(_ => _.open == symbol || _.close == symbol || _.extra == symbol);
         }
 
         public static Structure get(Type type)
@@ -35,21 +37,22 @@ namespace Qrakhen.Sqr.Core
 
         public enum Type
         {
-            OBJEQT,
+            BODY,
             QOLLECTION,
+            ARRAY,
             GROUP
         }
 
-        public static void register(Type type, string open, string close)
+        public static void register(Type type, string open, string close, string extra = null)
         {
-            structures.Add(type, new Structure(type, open, close));
+            structures.Add(type, new Structure(type, open, close, extra));
         }
 
         static Structure()
         {
-            register(Type.OBJEQT, "{", "}");
-            register(Type.QOLLECTION, "[", "]");
-            register(Type.GROUP, "(", ")");
+            register(Type.BODY, "{", "}", ",");
+            register(Type.QOLLECTION, "[", "]", ",");
+            register(Type.GROUP, "(", ")", ",");
         }
     }
 }

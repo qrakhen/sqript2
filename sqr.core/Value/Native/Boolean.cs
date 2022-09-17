@@ -8,7 +8,7 @@ namespace Qrakhen.Sqr.Core
 {
     public class Boolean : Value<bool>
     {
-        public Boolean(bool value) : base(value, TypeDefinition.Boolean)
+        public Boolean(bool value) : base(value, Type.Boolean)
         {
 
         }

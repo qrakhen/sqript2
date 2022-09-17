@@ -6,16 +6,20 @@ using System.Linq;
 
 namespace Qrakhen.Sqr.Core 
 { 
-    public class TypeDefinition
+    public class Type
     {
-        private static readonly Storage<string, TypeDefinition> definitions = new Storage<string, TypeDefinition>();
+        private static readonly Storage<string, Type> definitions = new Storage<string, Type>();
         public static List<string> typeList => definitions.Keys.ToList();
 
-        public static readonly TypeDefinition
+        public static readonly Type
             Value = definitions["Value"],
             Boolean = definitions["Boolean"],
+            Float = definitions["Float"],
+            Integer = definitions["Integer"],
             Number = definitions["Number"],
             String = definitions["String"],
+            Array = definitions["Array"],
+            List = definitions["List"],
             Qollection = definitions["Qollection"],
             Qallable = definitions["Qallable"],
             Objeqt = definitions["Objeqt"];
@@ -25,7 +29,7 @@ namespace Qrakhen.Sqr.Core
         public readonly string id;
         public readonly string name;
         public readonly Module module;
-        public readonly TypeDefinition extends;
+        public readonly Type extends;
         public readonly NativeType nativeType;
         public readonly Storage<string, Field> fields;
         public readonly Storage<string, Method> methods;
@@ -33,7 +37,8 @@ namespace Qrakhen.Sqr.Core
         public bool isPrimitive => (nativeType & NativeType.Primitive) > nativeType;
         public bool isNative => (nativeType != NativeType.Instance);
 
-        private TypeDefinition(Args args)
+        public Type() { }
+        private Type(Args args)
         {
             name = args.name;
             module = args.module;
@@ -53,24 +58,20 @@ namespace Qrakhen.Sqr.Core
                 extend();
         }
 
-        public TypeDefinition() { }
-
         private void extend()
         {
-            foreach (var f in extends.fields)
-            {
+            foreach (var f in extends.fields) {
                 if (fields[f.Key] == null)
                     fields[f.Key] = f.Value;
             }
 
-            foreach (var m in extends.methods)
-            {
+            foreach (var m in extends.methods) {
                 if (methods[m.Key] == null)
                     methods[m.Key] = m.Value;
             }
         }
 
-        // natives types are instantiated by just using new() since theyre hard coded
+        // native types are instantiated by just using new() since theyre hard coded
         public Instance spawn(Funqtion.ProvidedParam[] parameters)
         {
             return new Instance(this);
@@ -80,27 +81,27 @@ namespace Qrakhen.Sqr.Core
         {
             return method.funqtion.execute(parameters, qontext, invoker);
         }
+
         public override string ToString()
         {
             return id;
         }
 
-        public static TypeDefinition get(string name)
+        public static Type get(string name)
         {
             return definitions[name];
         }
 
-        public static TypeDefinition register(Args args)
+        public static Type register(Args args)
         {
-            return new TypeDefinition(args);
+            return new Type(args);
         }
 
-        public static string buildTypeId(TypeDefinition type)
+        public static string buildTypeId(Type type)
         {
             var id = type.name;
             var m = type.module;
-            while(m != null)
-            {
+            while(m != null)  {
                 id = m.name + "/" + id;
                 m = m.parent;
             }
@@ -110,9 +111,9 @@ namespace Qrakhen.Sqr.Core
         public class Field
         {
             public readonly Access access;
-            public readonly string type;
+            public readonly Type type;
 
-            public Field(Access access, string type)
+            public Field(Access access, Type type)
             {
                 this.type = type;
                 this.access = access;
@@ -130,7 +131,7 @@ namespace Qrakhen.Sqr.Core
                 this.access = access;
             }
 
-            public Value makeValue() => new Value<Funqtion>(funqtion, TypeDefinition.Qallable);
+            public Value makeValue() => new Value<Funqtion>(funqtion, Type.Qallable);
         }
 
         public enum Access
@@ -144,13 +145,13 @@ namespace Qrakhen.Sqr.Core
         {
             public string name;
             public Module module;
-            public TypeDefinition extends;
+            public Type extends;
             public NativeType nativeType;
             public Storage<string, Field> fields;
             public Storage<string, Method> methods;
         }
 
-        static TypeDefinition()
+        static Type()
         {
             var val = register(new Args
             {

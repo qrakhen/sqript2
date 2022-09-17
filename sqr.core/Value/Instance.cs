@@ -8,7 +8,7 @@ namespace Qrakhen.Sqr.Core
 {
     public class Instance : Value
     {
-        public Instance(TypeDefinition definition) : base(definition)
+        public Instance(Type definition) : base(definition)
         {
 
         }

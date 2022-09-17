@@ -6,13 +6,15 @@ namespace Qrakhen.Sqr.Core
 {  
     public class Token : ITyped<Token.Type>
     {
+        public readonly string raw;
         public readonly object value;
         public new Type type => base.type;
 
-        private Token(object value, Type type)
+        private Token(object value, Type type, string raw)
         {
             this.value = value;
             base.type = type;
+            this.raw = raw;
         }
 
         public T get<T>()
@@ -63,7 +65,7 @@ namespace Qrakhen.Sqr.Core
             if (value.GetType() == typeof(Keyword))
                 type = Type.Keyword;
 
-            return new Token(value, type);
+            return new Token(value, type, raw);
         }
 
         public static object parse(string raw, Type type)

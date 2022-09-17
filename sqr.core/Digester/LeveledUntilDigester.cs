@@ -6,9 +6,9 @@ using System.Text.RegularExpressions;
 namespace Qrakhen.Sqr.Core
 {
     [Injectable]
-    public class StructureDigester : Digester<Stack<Token>, Token[]>
+    public class LeveledUntilDigester : Digester<Stack<Token>, Token[]>
     {
-        public override Token[] digest(Stack<Token> input, Qontext qontext)
+        public override Token[] digest(Stack<Token> input, Qontext qontext, object until)
         {
             log.spam("in " + GetType().Name);
             int level = 0;

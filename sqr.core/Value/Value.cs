@@ -9,13 +9,14 @@ namespace Qrakhen.Sqr.Core
         public static Value Null => null;
 
         public readonly Storage<string, Variable> fields;
-        public readonly TypeDefinition type;
+        public readonly Type type;
 
-        public Value(TypeDefinition definition)
+        public Value(Qrakhen.Sqr.Core.Type type)
         {
-            if (definition == null)
-                definition = TypeDefinition.Value;
-            this.type = definition;
+            if (type == null)
+                type = Type.Value;
+
+            this.type = type;
         }
 
         public virtual Value accessMember(string name)
@@ -40,6 +41,15 @@ namespace Qrakhen.Sqr.Core
             return v;
         }
 
+        public bool isCompatibleType(Value other)
+        {
+            if (other.type == type) {
+                // mit vererbung weitermachen, Type.extends
+                return true;
+            }
+            return false;
+        }
+
         public virtual String toString()
         {
             return new String("Value"); 
@@ -50,10 +60,12 @@ namespace Qrakhen.Sqr.Core
     {
         protected T __value;
 
-        public Value(T value = default(T), TypeDefinition definition = null) : base(definition)
+        public Value(T value = default(T), Qrakhen.Sqr.Core.Type type = null) : base(type)
         {
             __value = value;
         }
+
+        public T get() => __value;
 
         public override bool Equals(object obj)
         {

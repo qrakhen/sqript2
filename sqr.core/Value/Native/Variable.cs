@@ -8,7 +8,7 @@ namespace Qrakhen.Sqr.Core
 
         public Value value { get => get(); set => set(value); }
 
-        public new TypeDefinition definition => value?.type;
+        public new Type type => value?.type;
 
         public bool isReference { get; private set; }
         public readonly bool isStrictType;
@@ -35,8 +35,8 @@ namespace Qrakhen.Sqr.Core
             if (!asReference && value.GetType() == typeof(Variable))
                 value = (value as Variable).__value;
 
-            if (isStrictType && type?.name != value.type?.name)
-                throw new SqrError("can not assign type of " + value.type + " to type of " + type, this);
+            if (isStrictType && base.type?.name != value.type?.name)
+                throw new SqrError("can not assign type of " + value.type + " to type of " + base.type, this);
 
             // reference logic
             if (asReference) {

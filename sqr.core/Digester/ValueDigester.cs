@@ -16,8 +16,6 @@ namespace Qrakhen.Sqr.Core
         {
             log.spam("in " + GetType().Name);
             Token t = input.peek();
-            if (t.isType(Token.Type.Structure)) // bei [] array und bei () group => value durch execute (node)
-                return null;// structureDigester.digest(input, qontext);
 
             if (!t.isType(Token.Type.Value))
                 throw new SqrError("token is not a value: " + t);
@@ -26,9 +24,9 @@ namespace Qrakhen.Sqr.Core
                 return input.digest().makeValue();
 
             List<string> name = new List<string>();
-            input.process(() => input.peek().isType(Token.Type.Identifier), (v) => {
+            input.process(() => input.peek().isType(Token.Type.Identifier), (current) => {
                 name.Add(input.digest().value.ToString());
-                if (input.peek() != null && input.peek().isType(Token.Type.Accessor)) {
+                if (current() != null && current().isType(Token.Type.Accessor)) {
                     input.digest();
                 }
             });
