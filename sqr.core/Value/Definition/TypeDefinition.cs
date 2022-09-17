@@ -20,7 +20,7 @@ namespace Qrakhen.Sqr.Core
             Qallable = definitions["Qallable"],
             Objeqt = definitions["Objeqt"];
 
-        public static readonly Module coreModule = new Module("Core", new Module("Sqript", null));
+        private static readonly Module coreModule = new Module("Core", new Module("Sqript", null));
 
         public readonly string id;
         public readonly string name;
@@ -149,6 +149,7 @@ namespace Qrakhen.Sqr.Core
             public Storage<string, Field> fields;
             public Storage<string, Method> methods;
         }
+
         static TypeDefinition()
         {
             var val = register(new Args

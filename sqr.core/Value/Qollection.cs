@@ -12,7 +12,6 @@ namespace Qrakhen.Sqr.Core
         {
         }
 
-        // override names with indexes
         public void add(Value value) { }
     }
 }
