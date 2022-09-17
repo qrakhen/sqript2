@@ -9,7 +9,7 @@ namespace Qrakhen.Sqr.Core
     public abstract class ItemSet : Value
     {
         [Native]
-        public int length { get; protected set; }
+        public abstract int length { get; }
 
         [Native]
         public Type itemType { get; protected set; }

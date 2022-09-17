@@ -106,10 +106,7 @@ namespace Qrakhen.Sqr.Core
         }
 
         private void handleValue(Value value, Node node)
-        {
-            if (value is Variable)
-                value = (value as Variable).get();
-
+        {            
             if (!node.put(value)) { 
                 throw new SqrError("unexpected value after full operation node " + node);
             } else if (node.done && node.op == null) {

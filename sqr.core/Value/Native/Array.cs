@@ -8,6 +8,7 @@ namespace Qrakhen.Sqr.Core
 {
     public class Array : ItemSet
     {
+        public override int length => items.Length;
         protected Value[] items;
 
         public Array() : base(Type.Array)

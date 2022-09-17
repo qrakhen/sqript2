@@ -69,6 +69,8 @@ namespace Qrakhen.Sqr.Core
             }
         }
 
+        public void process(Action callback, Func<bool> condition = null) => process((a, b, c) => callback(), condition);
+        public void process(Action<int> callback, Func<bool> condition = null) => process((a, b, c) => callback(b), condition);
         public void process(Func<bool> condition, Action<Func<T>, int, Action> callback) => process(callback, condition);
     }
 }

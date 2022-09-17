@@ -11,18 +11,17 @@ namespace Qrakhen.Sqr.Core
         private static readonly Storage<string, Type> definitions = new Storage<string, Type>();
         public static List<string> typeList => definitions.Keys.ToList();
 
-        public static readonly Type
-            Value = definitions["Value"],
-            Boolean = definitions["Boolean"],
-            Float = definitions["Float"],
-            Integer = definitions["Integer"],
-            Number = definitions["Number"],
-            String = definitions["String"],
-            Array = definitions["Array"],
-            List = definitions["List"],
-            Qollection = definitions["Qollection"],
-            Qallable = definitions["Qallable"],
-            Objeqt = definitions["Objeqt"];
+        public static Type Value => definitions["Value"];
+        public static Type Boolean => definitions["Boolean"];
+        public static Type Float => definitions["Float"];
+        public static Type Integer => definitions["Integer"];
+        public static Type Number => definitions["Number"];
+        public static Type String => definitions["String"];
+        public static Type Array => definitions["Array"];
+        public static Type List => definitions["List"];
+        public static Type Qollection => definitions["Qollection"];
+        public static Type Qallable => definitions["Qallable"];
+        public static Type Objeqt => definitions["Objeqt"];
 
         private static readonly Module coreModule = new Module("Core", new Module("Sqript", null));
 
@@ -153,7 +152,7 @@ namespace Qrakhen.Sqr.Core
 
         static Type()
         {
-            var val = register(new Args
+            var value = register(new Args
             {
                 name = "Value",
                 nativeType = NativeType.None,
@@ -164,15 +163,67 @@ namespace Qrakhen.Sqr.Core
                 }
             });
 
-            var str = register(new Args
+            var _string = register(new Args
             {
                 name = "String",
-                nativeType = NativeType.None,
+                nativeType = NativeType.String,
                 fields = null,
-                extends = val,
+                extends = value,
                 methods = new Storage<string, Method>() {
                 { "span", new Method(
                     new InternalFunqtion((p, self) => (self as Core.String).span(p[0].value, p[1].value))) }
+                }
+            });
+
+            var number = register(new Args {
+                name = "Number",
+                nativeType = NativeType.Number,
+                fields = null,
+                extends = value,
+                methods = new Storage<string, Method>() {
+                { "xxx", new Method(
+                    new InternalFunqtion((p, self) => Core.Value.Null)) }
+                }
+            });
+
+            var boolean = register(new Args {
+                name = "Boolean",
+                nativeType = NativeType.Boolean,
+                fields = null,
+                extends = value,
+                methods = null
+            });
+
+            var qollection = register(new Args {
+                name = "Qollection",
+                nativeType = NativeType.Qollection,
+                fields = null,
+                extends = value,
+                methods = new Storage<string, Method>() {
+                { "length", new Method(
+                    new InternalFunqtion((p, self) => new Number((self as Qollection).length))) }
+                }
+            });
+
+            var objeqt = register(new Args {
+                name = "Objeqt",
+                nativeType = NativeType.Objeqt,
+                fields = null,
+                extends = value,
+                methods = new Storage<string, Method>() {
+                { "xxx", new Method(
+                    new InternalFunqtion((p, self) => Core.Value.Null)) }
+                }
+            });
+
+            var array = register(new Args {
+                name = "Array",
+                nativeType = NativeType.Array,
+                fields = null,
+                extends = value,
+                methods = new Storage<string, Method>() {
+                { "xxx", new Method(
+                    new InternalFunqtion((p, self) => Core.Value.Null)) }
                 }
             });
         }

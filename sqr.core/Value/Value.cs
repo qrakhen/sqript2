@@ -23,7 +23,7 @@ namespace Qrakhen.Sqr.Core
         {
             if (type.methods.contains(name))
                 return type.methods[name].makeValue();
-            else if (fields.contains(name))
+            else if (fields != null && fields.contains(name))
                 return fields[name];
             else
                 return Null;
