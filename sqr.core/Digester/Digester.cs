@@ -10,6 +10,7 @@ namespace Qrakhen.Sqr.Core
 
         public virtual TOut digest(TIn input) { throw new SqrError("digest overload not implemented"); }
         public virtual TOut digest(TIn input, Qontext context) { throw new SqrError("digest overload not implemented"); }
-        public virtual TOut digest(TIn input, Qontext context, object recursor) { throw new SqrError("digest overload not implemented"); }
+        public virtual TOut digest(TIn input, Qontext context, object modifier) { throw new SqrError("digest overload not implemented"); }
+        public virtual TOut digestUntil(TIn input, Qontext context, string until) { throw new SqrError("digest overload not implemented"); }
     }
 }

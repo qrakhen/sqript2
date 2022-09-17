@@ -11,6 +11,8 @@ namespace Qrakhen.Sqr.Core
     {
         public Level loggingLevel { get; private set; } = Level.DEBUG;
 
+        public static Logger TEMP_STATIC_DEBUG { get; private set; }
+
         public enum Level
         {
             MUFFLE = 0,
@@ -19,6 +21,11 @@ namespace Qrakhen.Sqr.Core
             INFO = 3,
             DEBUG = 4,
             VERBOSE = 5
+        }
+
+        public Logger()
+        {
+            TEMP_STATIC_DEBUG = this;
         }
 
         public void logToFile(string name, string content)

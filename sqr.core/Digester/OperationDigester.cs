@@ -14,7 +14,7 @@ namespace Qrakhen.Sqr.Core
     {
         private readonly Logger log;
         private readonly ValueDigester valueDigester;
-        private readonly ValueDigester structureDigester;
+        private readonly StructureDigester structureDigester;
 
         public override Operation digest(Stack<Token> input, Qontext qontext)
         {
@@ -35,13 +35,7 @@ namespace Qrakhen.Sqr.Core
                 log.spam("token peeked: " + t);
                 if (t.isType(Token.Type.Value)) {
                     Value v = valueDigester.digest(input, qontext);
-                    if (v is Variable)
-                        v = (v as Variable).get();
-                    if (!node.put(v)) {
-                        throw new SqrError("unexpected value after full operation node " + node);
-                    } else if (node.done && node.op == null) {
-                        throw new SqrError("unexpected operator-less node " + node);
-                    }
+                    handleValue(v, node);
                 } else if (t.isType(Token.Type.Keyword)) {
                     if (!node.empty || level > 0) {
                         throw new SqrError("unexpected keyword " + t);
@@ -82,20 +76,38 @@ namespace Qrakhen.Sqr.Core
                                 node = build(input, qontext, new Node(node, null, op), level + 1);
                             }
                         } else {
-                            throw new SqrError("2 ops? " + node);
+                            throw new SqrError("2 operators? " + node);
                         }
                     }
-                } else if (
-                        t.isType(Token.Type.Structure) &&
-                        t.get<string>() == Structure.get(Structure.Type.GROUP).open) {
-                    if (node.done) log.error("nap");
-                    //var n = digest();
+                } else if (t.isType(Token.Type.Structure)) {
+                    if (t.raw != t.get<Structure>().open)
+                        throw new SqrError("unexpected structure symbol: " + t.raw + ". if anything, structure.open symbol is expected.");
+
+                    if (node.done)
+                        throw new SqrError("a structure does not belong here after a done node: " + t.raw + ".");
+
+                    var s = structureDigester.digest(input, qontext);
+                    var op = digest(new Stack<Token>(s), qontext);
+                    var r = op.execute();
+                    handleValue(r, node);
                 } else if (t.isType(Token.Type.End)) {
                     input.digest();
                     break;
                 }
             } while (!input.done);
             return node;
+        }
+
+        private void handleValue(Value value, Node node)
+        {
+            if (value is Variable)
+                value = (value as Variable).get();
+
+            if (!node.put(value)) { 
+                throw new SqrError("unexpected value after full operation node " + node);
+            } else if (node.done && node.op == null) {
+                throw new SqrError("unexpected operator-less node " + node);
+            }
         }
     }
 }

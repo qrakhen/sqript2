@@ -55,14 +55,20 @@ namespace Qrakhen.Sqr.Core
 
         public T[] digestRange(int amount) => digestRange(index, amount);
 
-        public void process(Action<Func<T>, int> callback, Func<bool> condition = null)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="callback">(currentFunc, index, abortFunc) => { currentFunc(); ...if (index > 0); ...abortFunc(); }</param>
+        /// <param name="condition"></param>
+        public void process(Action<Func<T>, int, Action> callback, Func<bool> condition = null)
         {
             int relativeIndex = 0;
-            while (!done && (condition != null ? condition() : true)) {
-                callback(() => peek(), relativeIndex++);
+            bool aborted = false;
+            while (!aborted && !done && (condition != null ? condition() : true)) {
+                callback(() => peek(), relativeIndex++, () => aborted = true);
             }
         }
 
-        public void process(Func<bool> condition, Action<Func<T>, int> callback) => process(callback, condition);
+        public void process(Func<bool> condition, Action<Func<T>, int, Action> callback) => process(callback, condition);
     }
 }

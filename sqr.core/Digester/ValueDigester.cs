@@ -24,7 +24,7 @@ namespace Qrakhen.Sqr.Core
                 return input.digest().makeValue();
 
             List<string> name = new List<string>();
-            input.process(() => input.peek().isType(Token.Type.Identifier), (current) => {
+            input.process(() => input.peek().isType(Token.Type.Identifier), (current, index, abort) => {
                 name.Add(input.digest().value.ToString());
                 if (current() != null && current().isType(Token.Type.Accessor)) {
                     input.digest();

@@ -117,7 +117,7 @@ namespace Qrakhen.Sqr.Core
             });
 
             register(Type.LIST_ADD, "<+", 0, (left, right) => {
-                (left as Qollection).add(right);
+                (left as List).add(right);
                 return left;
             });
 

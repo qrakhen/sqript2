@@ -1,11 +1,14 @@
-﻿using System;
+﻿using Qrakhen.Dependor;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Operation
+    public class Operation : Injector
     {
+        protected readonly Logger log;
+
         public Node head { get; protected set; }
         public bool isReturning => head?.isReturning ?? false;
 
@@ -16,6 +19,7 @@ namespace Qrakhen.Sqr.Core
 
         public Value execute()
         {
+            log.spam("executing operation");
             return head.execute();
         }
 
@@ -43,6 +47,8 @@ namespace Qrakhen.Sqr.Core
                         else _right = (Value)right;
                         if (left is Node) _left = (left as Node).execute();
                         else _left = (Value)left;
+                        Logger.TEMP_STATIC_DEBUG.spam("resolving " + this);
+                        Logger.TEMP_STATIC_DEBUG.spam("result " + op.resolve(_left, _right));
                         return op.resolve(_left, _right);
                     } else {
                         return (Value)left;
