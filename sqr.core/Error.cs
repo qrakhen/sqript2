@@ -6,11 +6,11 @@ namespace Qrakhen.Sqr.Core
 {
     public class SqrError : Exception
     {
-        public Value value;
+        public object data;
 
-        public SqrError(string message, Value value = null) : base(message)
+        public SqrError(string message, object data = null) : base(message)
         {
-            this.value = value;
+            this.data = data;
         }
     }
 }

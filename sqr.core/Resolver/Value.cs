@@ -13,13 +13,13 @@ namespace Qrakhen.Sqr.Core
         private readonly StructureResolver structureResolver;
         private readonly QollectionResolver qollectionResolver;
 
-        public override Value digest(Stack<Token> input, Qontext qontext)
+        public override Value resolve(Stack<Token> input, Qontext qontext)
         {
             log.spam("in " + GetType().Name);
             Token t = input.peek();
 
             if (!t.isType(Token.Type.Value))
-                throw new SqrError("token is not a value: " + t);
+                throw new SqrError("token is not a value: " + t, t);
 
             string full = "", member = null;
             Value value = null, parent = null;
@@ -49,13 +49,13 @@ namespace Qrakhen.Sqr.Core
                 full += t.raw;
 
                 if (input.done)
-                    end();
+                    return;
 
                 // check if it's a function call and resolve
                 if (!input.done && input.peek().raw == Structure.get(Structure.Type.GROUP).open) {
                     log.verbose("funqtion is being called: " + value);
-                    var parameters = qollectionResolver.digest(
-                        structureResolver.digest(
+                    var parameters = qollectionResolver.resolve(
+                        structureResolver.resolve(
                             input,
                             qontext),
                         qontext, Structure.get(Structure.Type.GROUP).separator);
@@ -64,7 +64,7 @@ namespace Qrakhen.Sqr.Core
                 }
 
                 if (input.done)
-                    end();
+                    return;
 
                 // get potential members by scanning for accessor ":"
                 t = current();

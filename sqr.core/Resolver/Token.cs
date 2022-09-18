@@ -11,7 +11,7 @@ namespace Qrakhen.Sqr.Core
     {
         private readonly Logger log;
 
-        public override Stack<Token> digest(Stack<char> input)
+        public override Stack<Token> resolve(Stack<char> input)
         {
             log.spam("in " + GetType().Name);
             var result = new List<Token>();
@@ -145,19 +145,19 @@ namespace Qrakhen.Sqr.Core
         public Value makeValue()
         {
             if (!isType(Type.Value))
-                throw new SqrError("can not make value out of token: not a value token" + this);
+                throw new SqrError("can not make value out of token: not a value token" + this, this);
 
             if (type == Type.Boolean) return new Boolean((bool)value);
             if (type == Type.Float) return new Number((float)value);
             if (type == Type.Number) return new Number((double)value);
             if (type == Type.String) return new String((string)value);
-            throw new SqrError("no known native type applied to token " + this);
+            throw new SqrError("no known native type applied to token " + this, this);
         }
 
         public Variable makeVariable(bool isReference = false, bool isStrictType = false, bool isReadonly = false)
         {
             if (!isType(Type.Identifier))
-                throw new SqrError("can not make variable out of token: not an identifier token" + this);
+                throw new SqrError("can not make variable out of token: not an identifier token" + this, this);
 
             return new Variable(null, isReference, isStrictType, isReadonly);
         }

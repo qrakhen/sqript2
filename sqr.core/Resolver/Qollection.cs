@@ -19,15 +19,16 @@ namespace Qrakhen.Sqr.Core
         /// <param name="input"></param>
         /// <param name="qontext"></param>
         /// <returns></returns>
-        public override Qollection digest(Stack<Token> input, Qontext qontext, object separator)
+        public override Qollection resolve(Stack<Token> input, Qontext qontext)
         {
             log.spam("in " + GetType().Name);
             var qollection = new Qollection();
+            var separator = Structure.get(Structure.Type.QOLLECTION).separator;
             input.process((current, take, index, abort) => {
                 // outsourcing the entire level/structure logic, should do that more often
-                var sub = structureResolver.digestUntil(input, qontext, (string)separator);
+                var sub = structureResolver.resolveUntil(input, qontext, separator);
                 log.spam("digested sub (until " + separator + "): " + string.Join(' ', sub.items.Select(_ => _.ToString())));
-                var op = operationResolver.digest(sub, qontext);
+                var op = operationResolver.resolve(sub, qontext);
                 var r = op.execute();
                 log.spam("adding result: " + r);
                 qollection.add(r.getValue() as Value);

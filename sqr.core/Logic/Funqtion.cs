@@ -23,7 +23,7 @@ namespace Qrakhen.Sqr.Core
             var stack = new Stack<Token>(body.content);
             while (!stack.done)
             {
-                var op = operationResolver.digest(stack, eq);
+                var op = operationResolver.resolve(stack, eq);
                 var r = op.execute();
                 if (op.isReturning)
                     return r;

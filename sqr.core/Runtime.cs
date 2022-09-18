@@ -31,8 +31,9 @@ namespace Qrakhen.Sqr.Core
                     execute(Console.ReadLine());
 
                 } catch (SqrError e) {
-                    log.error(log.loggingLevel > Logger.Level.INFO ? e : (object)e.Message);
-                    log.warn("are you by any chance stupid?");
+                    log.warn(log.loggingLevel > Logger.Level.INFO ? e : (object)e.Message);
+                    if (e.data != null && log.loggingLevel >= Logger.Level.DEBUG) 
+                        log.warn(json(e.data));
                 } /* catch (Exception e) {
                     log.error("### system exceptions need to be completely eradicated ###");
                     log.error(e);
@@ -52,8 +53,8 @@ namespace Qrakhen.Sqr.Core
                 return;
             }
 
-            var tokenStack = tokenResolver.digest(new Core.Stack<char>(applyAliases(input).ToCharArray()));
-            var operation = operationResolver.digest(tokenStack, Qontext.globalContext);
+            var tokenStack = tokenResolver.resolve(new Core.Stack<char>(applyAliases(input).ToCharArray()));
+            var operation = operationResolver.resolve(tokenStack, Qontext.globalContext);
             log.success(operation.execute());
         }
 
