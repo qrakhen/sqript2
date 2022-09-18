@@ -86,17 +86,13 @@ namespace Qrakhen.Sqr.Core
                 throw new SqrError("value is not a reference", this);
         }
 
-        public override object getValue()
-        {
-            return get();
-        }
-
         public override string ToString()
         {
-            return base.ToString() + 
+            return __value?.ToString();
+            /*return base.ToString() + 
                 "\nisReference: " + isReference + 
                 "\nisReadonly: " + isReadonly + 
-                "\nisStrictType: " + isStrictType;
+                "\nisStrictType: " + isStrictType;*/
         }
     }
 }

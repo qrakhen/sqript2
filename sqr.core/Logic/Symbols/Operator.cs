@@ -10,6 +10,7 @@ namespace Qrakhen.Sqr.Core
 
         public string symbol;
         public int weight;
+        public bool isMutator;
         public Func<Value, Value, Value> resolve;
 
         public Operator(Type type, string symbol, int weight, Func<Value, Value, Value> resolve)

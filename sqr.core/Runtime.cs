@@ -93,17 +93,17 @@ namespace Qrakhen.Sqr.Core
 
         private string applyAliases(string value)
         {
-            log.debug("applying aliases:");
+            log.verbose("applying aliases:");
             foreach (var alias in aliases) {
                 if (alias.Key.Contains("$")) {
-                    log.debug("  + " + alias.Key + " > " + alias.Value);
+                    log.verbose("  + " + alias.Key + " > " + alias.Value);
                     var pattern = Regex.Escape(alias.Key).Replace("\\$", "(.+?)");
                     var m = Regex.Matches(value, pattern);
                     for (var i = 0; i < m.Count; i++) {
                         value = value.Replace(m[i].Groups[0].Value, alias.Value.Replace("$", m[i].Groups[1].Value));
                     }
                 } else {
-                    log.debug("  + " + alias.Key + " > " + alias.Value);
+                    log.verbose("  + " + alias.Key + " > " + alias.Value);
                     value = value.Replace(alias.Key, " " + alias.Value + " ");
                 }                
             }

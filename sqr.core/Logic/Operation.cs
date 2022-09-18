@@ -53,8 +53,7 @@ namespace Qrakhen.Sqr.Core
                         if (op.isType(Operator.Type.ASSIGN_REF)) {
 
                         } else if (op.isType(Operator.Type.ASSIGN)) {
-                            if (_right is Variable)
-                                _right = (_right as Variable).get();
+
                         } else {
                             if (_left is Variable)
                                 _left = (_left as Variable).get();

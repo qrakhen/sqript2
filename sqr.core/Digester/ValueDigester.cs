@@ -17,25 +17,31 @@ namespace Qrakhen.Sqr.Core
         {
             log.spam("in " + GetType().Name);
             Token t = input.peek();
-            Value value = null, parent = null;
 
             if (!t.isType(Token.Type.Value))
                 throw new SqrError("token is not a value: " + t);
 
-            string full = "";
+            string full = "", member = null;
+            Value value = null, parent = null;
             input.process((current, take, index, end) => {
                 t = current();
                 parent = value; // trace back for calls
-                if (!t.isType(Token.Type.Identifier)) {
-                    log.spam("got primitive " + t);
-                    value = take().makeValue();
+                if (value == null) {
+                    if (!t.isType(Token.Type.Identifier)) {
+                        log.spam("got primitive " + t);
+                        if (value == null)
+                            value = take().makeValue();
+                    } else {
+                        log.spam("got identifier " + t.raw);
+                        if (value == null) // root identifier of possible member chain
+                            value = qontext.resolveName(take().raw);
+                    }
                 } else {
-                    log.spam("got identifier " + t.raw);
-                    if (value == null) // root identifier of possible member chain
-                        value = qontext.resolveName(take().raw);
-                    else
-                        value = value.obj.accessMember(take().raw);
+                    member = take().raw;
                 }
+
+                if (parent != null)
+                    value = parent.obj.accessMember(member);
 
                 full += t.raw;
 

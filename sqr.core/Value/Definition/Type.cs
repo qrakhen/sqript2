@@ -159,8 +159,8 @@ namespace Qrakhen.Sqr.Core
                 nativeType = NativeType.None,
                 fields = null,
                 methods = new Storage<string, Method>() {
-                { "toString", new Method(
-                    new InternalFunqtion((p, self) => self.toString())) }
+                    { "toString", new Method(new InternalFunqtion((p, self) => self.toString())) },
+                    { "type", new Method(new InternalFunqtion((p, self) => new String(self.type.ToString()))) }
                 }
             });
 
