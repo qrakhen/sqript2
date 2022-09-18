@@ -38,6 +38,7 @@ namespace Qrakhen.Sqr.Core
             CALC_SUB = 2,
             CALC_MULT = 4,
             CALC_DIV = 8,
+            CALC = CALC_ADD | CALC_SUB | CALC_MULT | CALC_DIV,
             COND_AND = 16,
             COND_OR = 32,
             COMP_EQUAL = 64,

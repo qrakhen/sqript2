@@ -10,12 +10,12 @@ using static Qrakhen.Sqr.Core.Token;
 namespace Qrakhen.Sqr.Core
 {
     [Injectable]
-    public class OperationDigester : Digester<Stack<Token>, Operation>
+    public class OperationResolver : Resolver<Stack<Token>, Operation>
     {
         private readonly Logger log;
-        private readonly ValueDigester valueDigester;
-        private readonly StructureDigester structureDigester;
-        private readonly QollectionDigester qollectionDigester;
+        private readonly ValueResolver valueResolver;
+        private readonly StructureResolver structureResolver;
+        private readonly QollectionResolver qollectionResolver;
 
         public override Operation digest(Stack<Token> input, Qontext qontext)
         {
@@ -64,7 +64,7 @@ namespace Qrakhen.Sqr.Core
 
         private void handleValue(Stack<Token> input, ref Node node, Qontext qontext, int level = 0)
         {
-            Value value = valueDigester.digest(input, qontext);
+            Value value = valueResolver.digest(input, qontext);
 
             if (!node.put(value)) { 
                 throw new SqrError("unexpected value after full operation node " + node);
@@ -139,9 +139,9 @@ namespace Qrakhen.Sqr.Core
             if (node.done)
                 throw new SqrError("a structure does not belong here after a done node: " + t.raw + ".");
 
-            var innerStack = structureDigester.digest(input, qontext);
+            var innerStack = structureResolver.digest(input, qontext);
             if (Structure.get(t.raw).type == Structure.Type.QOLLECTION) {
-                var qollection = qollectionDigester.digest(
+                var qollection = qollectionResolver.digest(
                     innerStack,
                     qontext,
                     Structure.get(Structure.Type.QOLLECTION).separator);

@@ -8,7 +8,7 @@ namespace Qrakhen.Sqr.Core
 {
     public class Funqtion
     {
-        private readonly OperationDigester operationDigester;
+        private readonly OperationResolver operationResolver;
 
         public DeclaredParam[] declaredParameters = new DeclaredParam[0];
         public Type returnType;
@@ -23,7 +23,7 @@ namespace Qrakhen.Sqr.Core
             var stack = new Stack<Token>(body.content);
             while (!stack.done)
             {
-                var op = operationDigester.digest(stack, eq);
+                var op = operationResolver.digest(stack, eq);
                 var r = op.execute();
                 if (op.isReturning)
                     return r;

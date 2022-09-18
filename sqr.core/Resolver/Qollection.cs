@@ -7,11 +7,11 @@ using System.Text.RegularExpressions;
 namespace Qrakhen.Sqr.Core
 {
     [Injectable]
-    public class QollectionDigester : Digester<Stack<Token>, Qollection>
+    public class QollectionResolver : Resolver<Stack<Token>, Qollection>
     {
-        private readonly ValueDigester valueDigester;
-        private readonly StructureDigester structureDigester;
-        private readonly OperationDigester operationDigester;
+        private readonly ValueResolver valueResolver;
+        private readonly StructureResolver structureResolver;
+        private readonly OperationResolver operationResolver;
 
         /// <summary>
         /// expects a trimmed token list (no encloding structures)
@@ -25,9 +25,9 @@ namespace Qrakhen.Sqr.Core
             var qollection = new Qollection();
             input.process((current, take, index, abort) => {
                 // outsourcing the entire level/structure logic, should do that more often
-                var sub = structureDigester.digestUntil(input, qontext, (string)separator);
+                var sub = structureResolver.digestUntil(input, qontext, (string)separator);
                 log.spam("digested sub (until " + separator + "): " + string.Join(' ', sub.items.Select(_ => _.ToString())));
-                var op = operationDigester.digest(sub, qontext);
+                var op = operationResolver.digest(sub, qontext);
                 var r = op.execute();
                 log.spam("adding result: " + r);
                 qollection.add(r.getValue() as Value);

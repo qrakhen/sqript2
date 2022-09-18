@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 namespace Qrakhen.Sqr.Core
 {
     [Injectable]
-    public class QonditionDigester : Digester<Stack<Token>, Qondition>
+    public class QonditionResolver : Resolver<Stack<Token>, Qondition>
     {
         public Qondition digest(Stack<Token> input)
         {

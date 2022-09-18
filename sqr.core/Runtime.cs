@@ -10,8 +10,8 @@ namespace Qrakhen.Sqr.Core
     public class Runtime
     {
         private readonly Logger log;
-        private readonly TokenDigester tokenDigester;
-        private readonly OperationDigester operationDigester;
+        private readonly TokenResolver tokenResolver;
+        private readonly OperationResolver operationResolver;
 
         public bool alive { get; private set; } = true;
 
@@ -23,7 +23,7 @@ namespace Qrakhen.Sqr.Core
                 try {
 
                     //var breaktest = ": a ! x ooo p ? ! 'astr\\'ing' asd 5 / 3 * 10 - 43 asdasdasasdas true*** falseaaaa true ':asd:dAD'adAS:Asd:[]3414:As ! 231 111 12.321 1,1,1,";
-                    //new List<Token>(tokenDigester.digest(new Core.Stack<char>(breaktest.ToCharArray()))).ForEach(Console.WriteLine);
+                    //new List<Token>(tokenResolver.digest(new Core.Stack<char>(breaktest.ToCharArray()))).ForEach(Console.WriteLine);
 
                     var op = "*~ a <~ 5;"; // 2 - 3 + 3 * 3 / 5 + test:von:mama:her";
 
@@ -52,8 +52,8 @@ namespace Qrakhen.Sqr.Core
                 return;
             }
 
-            var tokenStack = tokenDigester.digest(new Core.Stack<char>(applyAliases(input).ToCharArray()));
-            var operation = operationDigester.digest(tokenStack, Qontext.globalContext);
+            var tokenStack = tokenResolver.digest(new Core.Stack<char>(applyAliases(input).ToCharArray()));
+            var operation = operationResolver.digest(tokenStack, Qontext.globalContext);
             log.success(operation.execute());
         }
 

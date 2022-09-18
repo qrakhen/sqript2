@@ -7,11 +7,11 @@ using System.Linq;
 namespace Qrakhen.Sqr.Core
 {  
     [Injectable]
-    public class ValueDigester : Digester<Stack<Token>, Value>
+    public class ValueResolver : Resolver<Stack<Token>, Value>
     {
         private readonly Logger log;
-        private readonly StructureDigester structureDigester;
-        private readonly QollectionDigester qollectionDigester;
+        private readonly StructureResolver structureResolver;
+        private readonly QollectionResolver qollectionResolver;
 
         public override Value digest(Stack<Token> input, Qontext qontext)
         {
@@ -61,8 +61,8 @@ namespace Qrakhen.Sqr.Core
 
             if (!input.done && input.peek().raw == Structure.get(Structure.Type.GROUP).open) {
                 log.verbose("funqtion is being called: " + value);
-                var parameters = qollectionDigester.digest(
-                    structureDigester.digest(
+                var parameters = qollectionResolver.digest(
+                    structureResolver.digest(
                         input, 
                         qontext),
                     qontext, Structure.get(Structure.Type.GROUP).separator);
@@ -111,8 +111,8 @@ namespace Qrakhen.Sqr.Core
             // method call?
             if (!input.done && input.peek().raw == Structure.get(Structure.Type.GROUP).open) {
                 log.verbose("funqtion is being called: " + _member);
-                var parameters = qollectionDigester.digest(
-                    structureDigester.digest(
+                var parameters = qollectionResolver.digest(
+                    structureResolver.digest(
                         input, 
                         qontext),
                     qontext, Structure.get(Structure.Type.GROUP).separator);

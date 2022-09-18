@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 { 
-    public abstract class Digester<TIn, TOut>
+    public abstract class Resolver<TIn, TOut>
     {
         protected readonly Logger log;
 
