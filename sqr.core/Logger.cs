@@ -11,6 +11,8 @@ namespace Qrakhen.Sqr.Core
     {
         public Level loggingLevel { get; private set; } = Level.DEBUG;
 
+        public static Logger TEMP_STATIC_DEBUG { get; private set; }
+
         public enum Level
         {
             MUFFLE = 0,
@@ -18,7 +20,13 @@ namespace Qrakhen.Sqr.Core
             WARNINGS = 2,
             INFO = 3,
             DEBUG = 4,
-            VERBOSE = 5
+            VERBOSE = 5,
+            SPAM = 6
+        }
+
+        public Logger()
+        {
+            TEMP_STATIC_DEBUG = this;
         }
 
         public void logToFile(string name, string content)
@@ -49,15 +57,19 @@ namespace Qrakhen.Sqr.Core
         private void writeOut(object message, ConsoleColor color = ConsoleColor.White)
         {
             Value v = null;
-            if (message.GetType() == typeof(SqrError))
-                v = (message as SqrError).value;
+            if (message == null)
+                message = "null";
+            else {
+                if (message.GetType() == typeof(SqrError))
+                    v = (message as SqrError).value;
+            }
 
             var _color = Console.ForegroundColor;
 
             string[] lines = (message + (v != null ? "\n" + v : "")).ToString().Split(new char[] { '\n' });
             foreach (string line in lines) {
                 Console.ForegroundColor = color;
-                Console.Write(" ~> ");
+                Console.Write("    ~: ");
                 write(line, color);
             }
 
@@ -92,11 +104,16 @@ namespace Qrakhen.Sqr.Core
         public void debug(object message, ConsoleColor color = ConsoleColor.Gray)
         {
             if (((int)loggingLevel >= (int)Level.DEBUG)) writeOut(message, color);
+        }        
+
+        public void verbose(object message, ConsoleColor color = ConsoleColor.DarkGray)
+        {
+            if (((int)loggingLevel >= (int)Level.VERBOSE)) writeOut(message, color);
         }
 
         public void spam(object message, ConsoleColor color = ConsoleColor.DarkGray)
         {
-            if (((int)loggingLevel >= (int)Level.VERBOSE)) writeOut(message, color);
+            if (((int)loggingLevel >= (int)Level.SPAM)) writeOut(message, color);
         }
     }
 }

@@ -6,13 +6,13 @@ using System.Text.RegularExpressions;
 namespace Qrakhen.Sqr.Core
 {
     [Injectable]
-    public class ObjeqtDigester : Digester<Stack<Token>, Objeqt>
+    public class ObjeqtResolver : Resolver<Stack<Token>, Objeqt>
     {
-        public Objeqt digest(Stack<Token> input)
+        public override Objeqt digest(Stack<Token> input)
         {
             log.spam("in " + GetType().Name);
 
-            input.process((current) => { 
+            input.process((current, take, index, abort) => { 
                 if (!current().isType(Token.Type.Identifier))
                     throw new SqrError("identifier expected");
                 

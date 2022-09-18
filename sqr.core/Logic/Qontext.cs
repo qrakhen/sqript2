@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {  
-    public class Qontext : Value
+    public class Qontext
     {
         [JsonProperty]
         protected Storage<string, Variable> names = new Storage<string, Variable>();
@@ -16,7 +16,7 @@ namespace Qrakhen.Sqr.Core
 
         public Qontext parent { get; protected set; }
 
-        public Qontext(Qontext parent = null) : base(Value.Type.Qontext, false)
+        public Qontext(Qontext parent = null)
         {
             this.parent = parent;
         }
@@ -39,15 +39,18 @@ namespace Qrakhen.Sqr.Core
             return names[name] = new Variable(value, isReference, isStrictType, isReadonly);
         }
 
-        public Variable resolveName(string name) => resolveName(new string[] { name });
+        public Value resolveName(string name) => resolveName(new string[] { name });
 
-        public Variable resolveName(string[] name)
+        public Value resolveName(string[] name)
         {
             var qontext = lookUp(name[0]);
-            return qontext.lookAhead(name);
+            var value = qontext.get(name[0]);
+            if (name.Length > 1)
+                return value.lookAhead(name.AsSpan(1).ToArray());
+            return value;
         }
 
-        protected Qontext lookUp(string name)
+        public Qontext lookUp(string name)
         {
             if (names.ContainsKey(name))
                 return this;
@@ -55,24 +58,6 @@ namespace Qrakhen.Sqr.Core
                 return parent.lookUp(name);
             else
                 throw new SqrError("could not find the name " + name[0] + " within the current qontext (recursive lookup)");
-        }
-
-        protected Variable lookAhead(string[] name)
-        {
-            Qontext q = this;
-            for (int i = 0; i < name.Length - 1; i++) {
-                var v = q.get(name[i])?.get();
-                if (v is Qontext)
-                    q = v as Qontext;                
-                else if (v is Value) {
-                    // native function/extensions not final
-                    var m = v.GetType().GetMethod(name[i + 1]);
-                    m.Invoke(v, new Value[0]);
-                } else
-                    throw new SqrError("could not find name " + name + " in the current qontext (recursive look ahead)");
-            }
-
-            return (q != null ? q.get(name[name.Length - 1]) : null);
         }
     }
 }

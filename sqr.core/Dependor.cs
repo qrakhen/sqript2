@@ -15,7 +15,7 @@ namespace Qrakhen.Dependor
 
     public static class Dependor
     {
-        private static Storage<Type, object> injectables = new Storage<Type, object>();
+        private static Storage<System.Type, object> injectables = new Storage<System.Type, object>();
 
         static Dependor()
         {
@@ -49,7 +49,7 @@ namespace Qrakhen.Dependor
                 if (injectables.ContainsKey(t))
                     continue;
 
-                if (t.GetConstructor(Type.EmptyTypes) == null)
+                if (t.GetConstructor(System.Type.EmptyTypes) == null)
                     throw new Exception("DI Error: " + t.Name + " needs to have either no, or one empty public constructor.");
 
                 injectables.Add(t, Activator.CreateInstance(t));

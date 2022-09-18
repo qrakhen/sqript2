@@ -10,6 +10,7 @@ namespace Qrakhen.Sqr.Core
 
         public string symbol;
         public int weight;
+        public bool isMutator;
         public Func<Value, Value, Value> resolve;
 
         public Operator(Type type, string symbol, int weight, Func<Value, Value, Value> resolve)
@@ -30,27 +31,29 @@ namespace Qrakhen.Sqr.Core
             return operators.findOne(_ => _.symbol == symbol);
         }
 
+        [Flags]
         public enum Type
         {
-            CALC_ADD,
-            CALC_SUB,
-            CALC_MULT,
-            CALC_DIV,
-            COND_AND,
-            COND_OR,
-            COMP_EQUAL,
-            COMP_NOTEQUAL,
-            COMP_GT,
-            COMP_GTEQUAL,
-            COMP_LT,
-            COMP_LTEQUAL,
-            LOGIC_NOT,
-            LOGIC_OR,
-            LOGIC_AND,
-            LOGIC_XOR,
-            LIST_ADD,
-            ASSIGN,
-            ASSIGN_REF
+            CALC_ADD = 1,
+            CALC_SUB = 2,
+            CALC_MULT = 4,
+            CALC_DIV = 8,
+            CALC = CALC_ADD | CALC_SUB | CALC_MULT | CALC_DIV,
+            COND_AND = 16,
+            COND_OR = 32,
+            COMP_EQUAL = 64,
+            COMP_NOTEQUAL = 128,
+            COMP_GT = 246,
+            COMP_GTEQUAL = 512,
+            COMP_LT = 1024,
+            COMP_LTEQUAL = 2048,
+            LOGIC_NOT = 4096,
+            LOGIC_OR = 8192,
+            LOGIC_AND = 16384,
+            LOGIC_XOR = 32768,
+            QOLLECTION_ADD = 65536,
+            ASSIGN = 131072,
+            ASSIGN_REF = 262144
         }
 
         public static void register(Type type, string symbol, int weight, Func<Value, Value, Value> resolve)
@@ -116,7 +119,7 @@ namespace Qrakhen.Sqr.Core
                 return new Boolean((left as Number) <= (right as Number));
             });
 
-            register(Type.LIST_ADD, "<+", 0, (left, right) => {
+            register(Type.QOLLECTION_ADD, "<+", 0, (left, right) => {
                 (left as Qollection).add(right);
                 return left;
             });
@@ -127,12 +130,12 @@ namespace Qrakhen.Sqr.Core
             });
 
             register(Type.ASSIGN_REF, "<&", 0, (left, right) => {
-                (left as Variable).set(right, true);
+                (left as Variable).set((right as Variable), true);
                 return left;
             });
 
             register(Type.LOGIC_NOT, "!", 0, (left, right) => {
-                return null;
+                return new Boolean(!(right as Boolean));
             });
         }
     }
