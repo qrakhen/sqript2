@@ -17,9 +17,9 @@ namespace Qrakhen.Sqr.Core
         public ItemSet(Type type) : base(type) { }
 
         [Native]
-        public abstract void set(Number index, Value value);
+        public abstract void set(Value index, Value value);
 
         [Native]
-        public abstract Value get(Number index);
+        public abstract Value get(Value index);
     }
 }

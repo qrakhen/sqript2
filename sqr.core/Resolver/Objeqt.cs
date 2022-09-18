@@ -13,7 +13,7 @@ namespace Qrakhen.Sqr.Core
         private readonly StructureResolver structureResolver;
         private readonly OperationResolver operationResolver;
 
-        public override Objeqt resolve(Stack<Token> input, Qontext qontext)
+        public Objeqt resolve(Stack<Token> input, Qontext qontext)
         {
             log.spam("in " + GetType().Name);
             var objeqt = new Objeqt();
@@ -26,12 +26,16 @@ namespace Qrakhen.Sqr.Core
                 if (!name.isType(Token.Type.Identifier))
                     throw new SqrError("expected name literal for objeqt key, but got " + name, name);
 
+                var op = sub.digest().get<Operator>();
+                if (!op.isType(Operator.Type.ASSIGN | Operator.Type.ASSIGN_REF))
+                    throw new SqrError("assign operator expected " + op, op);
 
+                var value = operationResolver.resolve(sub, qontext).execute();
+                var property = new Variable(value);
+                property.set(value, op.isType(Operator.Type.ASSIGN_REF));
+                objeqt.properties[name.raw] = property;
 
-                var op = operationResolver.resolve(sub, qontext);
-                var r = op.execute();
-                log.spam("adding result: " + r);
-                qollection.add(r.getValue() as Value);
+                log.spam("adding " + name + " as " + value);
             });
             return objeqt;
         }

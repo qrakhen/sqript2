@@ -16,8 +16,9 @@ namespace Qrakhen.Sqr.Core
         private readonly ValueResolver valueResolver;
         private readonly StructureResolver structureResolver;
         private readonly QollectionResolver qollectionResolver;
+        private readonly ObjeqtResolver objeqtResolver;
 
-        public override Operation resolve(Stack<Token> input, Qontext qontext)
+        public Operation resolve(Stack<Token> input, Qontext qontext)
         {
             return new Operation(build(input, qontext));
         }
@@ -38,17 +39,17 @@ namespace Qrakhen.Sqr.Core
                 if (t.isType(Token.Type.Value))
                     handleValue(input, ref node, qontext, level);
 
-                else if (t.isType(Token.Type.Keyword)) 
+                else if (t.isType(Token.Type.Keyword))
                     handleKeyword(input, ref node, qontext, level);
 
                 else if (t.isType(Token.Type.Operator))
                     handleOperator(input, ref node, qontext, level);
 
-                else if (t.isType(Token.Type.Structure)) 
+                else if (t.isType(Token.Type.Structure))
                     handleStructure(input, ref node, qontext, level);
 
-                //else if (t.isType(Token.Type.End))                 
-                    //handleValue(input, node, qontext, level);         
+                else if (t.isType(Token.Type.End))
+                    input.digest(); // handleValue(input, node, qontext, level);         
                 
                 else throw new SqrError("currently unknown token " + t, t);                
             } while (!input.done);
@@ -141,14 +142,14 @@ namespace Qrakhen.Sqr.Core
 
             var innerStack = structureResolver.resolve(input, qontext);
             if (Structure.get(t.raw).type == Structure.Type.QOLLECTION) {
-                var qollection = qollectionResolver.resolve(
-                    innerStack,
-                    qontext,
-                    Structure.get(Structure.Type.QOLLECTION).separator);
+                var qollection = qollectionResolver.resolve(innerStack, qontext);
                 node.put(qollection);
             } else if (Structure.get(t.raw).type == Structure.Type.GROUP) {
-                var r = resolve(innerStack, qontext).execute();
-                node.put(r);
+                var result = resolve(innerStack, qontext).execute();
+                node.put(result);
+            } else if (Structure.get(t.raw).type == Structure.Type.BODY) {
+                var objeqt = objeqtResolver.resolve(innerStack, qontext);
+                node.put(objeqt);
             }
         }
     }

@@ -11,4 +11,14 @@ namespace Qrakhen.Sqr.Core
         public string name;
         public Type type;
     }
+
+    public class NativeMethod : NativeAttribute
+    {
+        public string[] parameters;
+    }
+
+    public class NativeField : NativeAttribute
+    {
+        
+    }
 }

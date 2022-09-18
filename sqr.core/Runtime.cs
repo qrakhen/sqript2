@@ -12,6 +12,7 @@ namespace Qrakhen.Sqr.Core
         private readonly Logger log;
         private readonly TokenResolver tokenResolver;
         private readonly OperationResolver operationResolver;
+        private readonly ValueResolver valueResolver;
 
         public bool alive { get; private set; } = true;
 
@@ -60,11 +61,19 @@ namespace Qrakhen.Sqr.Core
 
         private void commands(string input)
         {
+            var args = input.Split(" ");
             if (input == "q") {
                 log.cmd(json(Qontext.globalContext));
                 return;
+            } else if (input.StartsWith("p")) {
+                log.cmd(json(
+                    valueResolver.resolve(
+                        new Stack<Token>(
+                            new Token[] { 
+                                Token.create(args[1], Token.Type.Identifier) 
+                            }), Qontext.globalContext)));
+                return;
             } else if (input.StartsWith("alias")) {
-                var args = input.Split(" ");
                 if (args.Length == 1) {
                     log.cmd(aliases);
                 } else if (args.Length == 2) {
@@ -79,7 +88,6 @@ namespace Qrakhen.Sqr.Core
             } else if (input.StartsWith("help")) {
                 log.warn("the help DLC is available on steam for $39.95");
             } else if (input.StartsWith("log")) {
-                var args = input.Split(" ");
                 if (args.Length == 1) {
                     log.cmd("current level: " + (int)log.loggingLevel);
                     foreach (var i in Enum.GetValues(typeof(Logger.Level))) {
@@ -117,7 +125,8 @@ namespace Qrakhen.Sqr.Core
                 any,
                 Formatting.Indented,
                 new JsonSerializerSettings {
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    MaxDepth = 1
                 }
             );
         }

@@ -13,7 +13,7 @@ namespace Qrakhen.Sqr.Core
         private readonly StructureResolver structureResolver;
         private readonly QollectionResolver qollectionResolver;
 
-        public override Value resolve(Stack<Token> input, Qontext qontext)
+        public Value resolve(Stack<Token> input, Qontext qontext)
         {
             log.spam("in " + GetType().Name);
             Token t = input.peek();
@@ -58,7 +58,7 @@ namespace Qrakhen.Sqr.Core
                         structureResolver.resolve(
                             input,
                             qontext),
-                        qontext, Structure.get(Structure.Type.GROUP).separator);
+                        qontext);
                     log.spam("parameters: " + parameters);
                     value = ((value as Value<Funqtion>).raw as InternalFunqtion).execute(new Funqtion.ProvidedParam[0], parent.obj); //@TODO make this less awful
                 }

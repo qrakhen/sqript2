@@ -19,7 +19,7 @@ namespace Qrakhen.Sqr.Core
         /// <param name="input"></param>
         /// <param name="qontext"></param>
         /// <returns></returns>
-        public override Qollection resolve(Stack<Token> input, Qontext qontext)
+        public Qollection resolve(Stack<Token> input, Qontext qontext)
         {
             log.spam("in " + GetType().Name);
             var qollection = new Qollection();

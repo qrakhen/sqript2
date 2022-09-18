@@ -8,7 +8,7 @@ namespace Qrakhen.Sqr.Core
     [Injectable]
     public class StructureResolver : Resolver<Stack<Token>, Stack<Token>>
     {
-        public override Stack<Token> resolve(Stack<Token> input, Qontext qontext)
+        public Stack<Token> resolve(Stack<Token> input, Qontext qontext)
         {
             log.spam("in " + GetType().Name);
             int level = 0;
@@ -47,7 +47,7 @@ namespace Qrakhen.Sqr.Core
         /// <param name="qontext"></param>
         /// <param name="until"></param>
         /// <returns></returns>
-        public override Stack<Token> resolveUntil(Stack<Token> input, Qontext qontext, string until)
+        public Stack<Token> resolveUntil(Stack<Token> input, Qontext qontext, string until)
         {
             log.spam("in " + GetType().Name);
             int level = 0;
