@@ -22,6 +22,7 @@ namespace Qrakhen.Sqr.Core
         public static Type Qollection => definitions["Qollection"];
         public static Type Qallable => definitions["Qallable"];
         public static Type Objeqt => definitions["Objeqt"];
+        public static Type Variable => definitions["Variable"];
 
         private static readonly Module coreModule = new Module("Core", new Module("Sqript", null));
 

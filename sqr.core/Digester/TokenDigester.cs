@@ -11,7 +11,7 @@ namespace Qrakhen.Sqr.Core
     {
         private readonly Logger log;
 
-        public Stack<Token> digest(Stack<char> input)
+        public override Stack<Token> digest(Stack<char> input)
         {
             log.spam("in " + GetType().Name);
             var result = new List<Token>();

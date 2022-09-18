@@ -13,9 +13,9 @@ namespace Qrakhen.Sqr.Core
 
         }
 
-        public double asDouble() => get();
-        public float asFloat() => (float)get();
-        public int asInteger() => (int)get();
+        public double asDouble() => raw;
+        public float asFloat() => (float)raw;
+        public int asInteger() => (int)raw;
 
         public static implicit operator double(Number n) => n.__value;
         public static explicit operator Number(double d) => new Number(d);

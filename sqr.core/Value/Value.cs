@@ -8,6 +8,9 @@ namespace Qrakhen.Sqr.Core
     {
         public static Value Null => null;
 
+        public virtual object raw => null;
+        public virtual Value obj { get => this; }
+
         public readonly Storage<string, Variable> fields;
         public readonly Type type;
 
@@ -57,7 +60,7 @@ namespace Qrakhen.Sqr.Core
 
         public override string ToString()
         {
-            return type.name;
+            return type.name + "\nvalue: " + obj + "\nraw: " + raw;
         }
 
         public virtual String toString()
@@ -70,16 +73,12 @@ namespace Qrakhen.Sqr.Core
     {
         protected T __value;
 
+        public new virtual T raw => __value;
+        public override Value obj { get => this; }
+
         public Value(T value = default(T), Qrakhen.Sqr.Core.Type type = null) : base(type)
         {
             __value = value;
-        }
-
-        public T get() => __value;
-
-        public override object getValue()
-        {
-            return this;
         }
 
         public override bool Equals(object obj)
@@ -92,7 +91,7 @@ namespace Qrakhen.Sqr.Core
 
         public override string ToString()
         {
-            return __value.ToString();
+            return __value?.ToString();
         }
     }
 }

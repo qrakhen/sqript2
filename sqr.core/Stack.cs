@@ -57,22 +57,30 @@ namespace Qrakhen.Sqr.Core
 
         public T[] digestRange(int amount) => digestRange(index, amount);
 
+        public delegate void ProcessCallback(
+                Func<bool> condition,
+                Func<T> current,
+                Func<T> take,
+                int index,
+                Action abort);
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="callback">(currentFunc, index, abortFunc) => { currentFunc(); ...if (index > 0); ...abortFunc(); }</param>
         /// <param name="condition"></param>
-        public void process(Action<Func<T>, int, Action> callback, Func<bool> condition = null)
+        public void process(Action<Func<T>, Func<T>, int, Action> callback, Func<bool> condition = null)
         {
             int relativeIndex = 0;
             bool aborted = false;
             while (!aborted && !done && (condition != null ? condition() : true)) {
-                callback(() => peek(), relativeIndex++, () => aborted = true);
+                callback(() => peek(), digest, relativeIndex++, () => aborted = true);
             }
         }
 
-        public void process(Action callback, Func<bool> condition = null) => process((a, b, c) => callback(), condition);
-        public void process(Action<int> callback, Func<bool> condition = null) => process((a, b, c) => callback(b), condition);
-        public void process(Func<bool> condition, Action<Func<T>, int, Action> callback) => process(callback, condition);
+        public void process(Action callback, Func<bool> condition = null) => process((a, b, c, d) => callback(), condition);
+        public void process(Action<int> callback, Func<bool> condition = null) => process((a, b, c, d) => callback(c), condition);
+        public void process(Action<Action> callback, Func<bool> condition = null) => process((a, b, c, d) => callback(d), condition);
+        public void process(Func<bool> condition, Action<Func<T>, Func<T>, int, Action> callback) => process(callback, condition);
     }
 }

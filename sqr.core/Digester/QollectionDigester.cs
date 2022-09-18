@@ -23,7 +23,7 @@ namespace Qrakhen.Sqr.Core
         {
             log.spam("in " + GetType().Name);
             var qollection = new Qollection();
-            input.process((current, index, abort) => {
+            input.process((current, take, index, abort) => {
                 // outsourcing the entire level/structure logic, should do that more often
                 var sub = structureDigester.digestUntil(input, qontext, (string)separator);
                 log.spam("digested sub (until " + separator + "): " + string.Join(' ', sub.items.Select(_ => _.ToString())));

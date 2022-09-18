@@ -6,9 +6,8 @@ namespace Qrakhen.Sqr.Core
     {
         private bool __set;
 
-        public Value value { get => get(); set => set(value); }
-
-        public new Type type => value?.type;
+        public override Value raw => (Value)obj.raw;
+        public override Value obj { get => get(); }
 
         public bool isReference { get; private set; }
         public readonly bool isStrictType;
@@ -18,7 +17,7 @@ namespace Qrakhen.Sqr.Core
                 Value value = null, 
                 bool isReference = false, 
                 bool isStrictType = false, 
-                bool isReadonly = false) : base(value, value?.type ?? null)
+                bool isReadonly = false) : base(value, Type.Variable)
         {
             this.isReference = isReference;
             this.isStrictType = isStrictType;
@@ -71,7 +70,7 @@ namespace Qrakhen.Sqr.Core
             return (T)(object)get();
         }
 
-        public new Value get()
+        public Value get()
         {
             if (isReference)
                 return (__value as Variable).get();
@@ -94,7 +93,10 @@ namespace Qrakhen.Sqr.Core
 
         public override string ToString()
         {
-            return __value == null ? "null" : __value.ToString();
+            return base.ToString() + 
+                "\nisReference: " + isReference + 
+                "\nisReadonly: " + isReadonly + 
+                "\nisStrictType: " + isStrictType;
         }
     }
 }

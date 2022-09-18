@@ -10,7 +10,7 @@ namespace Qrakhen.Sqr.Core
     {
         public String(string value) : base(value, Type.String)
         {
-
+            
         }
 
         public Number length()
