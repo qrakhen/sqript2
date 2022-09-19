@@ -6,3 +6,4 @@ userMaps/
 Assets/previews/*
 bin/
 Debug/
+.vs/
