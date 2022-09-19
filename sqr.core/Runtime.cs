@@ -2,6 +2,7 @@
 using Qrakhen.Dependor;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace Qrakhen.Sqr.Core
                 "log",
                 new Qallable(new InternalFunqtion((p, s) => { log.setLoggingLevel((Logger.Level)int.Parse(p[0].raw.ToString())); return null; })));
 
-            var t = File.ReadAllText("testing.sqr");
+            var t = File.ReadAllText("tests.sqr");
             execute(t);
             do {
                 try {
@@ -107,11 +108,14 @@ namespace Qrakhen.Sqr.Core
                 return;
             }
 
+            var t = new Stopwatch();
             var tokenStack = tokenResolver.resolve(new Core.Stack<char>(applyAliases(input).ToCharArray()));
             while (!tokenStack.done) {
+                t.Restart();
                 var operation = operationResolver.resolveOne(tokenStack, Qontext.globalContext);
                 var result = operation.execute();
                 if (result != null) log.success(result);
+                log.verbose("operation time " + t.ElapsedMilliseconds + "ms, " + t.ElapsedTicks + " ticks");
             }
         }
 

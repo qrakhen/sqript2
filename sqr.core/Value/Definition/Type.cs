@@ -202,7 +202,7 @@ namespace Qrakhen.Sqr.Core
                 extends = value,
                 methods = new Storage<string, Method>() {
                 { "length", new Method(
-                    new InternalFunqtion((p, self) => new Number((self as Qollection).length))) }
+                    new InternalFunqtion((p, self) => new Number((self.obj as Qollection).length))) }
                 }
             });
 

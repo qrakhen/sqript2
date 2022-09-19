@@ -2,6 +2,7 @@
 using Qrakhen.Dependor;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
@@ -20,7 +21,10 @@ namespace Qrakhen.Sqr.Core
 
         public override string ToString()
         {
-            return "(vollegas leberkas { return komplette totalvernichtung });";
+            if (__value == null)
+                return "Qallable (null)";
+
+            return "(" + string.Join(", ", __value.parameters.ToList().Select(_ => _.name).ToArray()) + " {\n" + "    return @any;\n})";
         }
     }
 }

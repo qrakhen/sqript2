@@ -14,7 +14,7 @@ a <~ 10;
 (cd == 20);
 
 funq f (j, k {
-	return j + k - a;			# <- also test qontext
+	return j + k - a;			# <- also tests qontext
 });
 
 f(5, 3);
@@ -26,6 +26,13 @@ if (a > 1 && cd < 100) {
 		cout("correct");
 	}
 }
+
+funq fib (a, b {
+	cout(a + b);
+	if (a < 99999) {
+		fib(b, a + b);
+	}
+});
 
 cout("nice!");
 
