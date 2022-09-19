@@ -12,6 +12,7 @@ namespace Qrakhen.Sqr.Core
         public int weight;
         public bool isMutator;
         public Func<Value, Value, Value> resolve;
+        public List<string> aliases = new List<string>();
 
         public Operator(Type type, string symbol, int weight, Func<Value, Value, Value> resolve)
         {
@@ -19,6 +20,12 @@ namespace Qrakhen.Sqr.Core
             this.symbol = symbol;
             this.weight = weight;
             this.resolve = resolve;
+        }
+
+        public Operator alias(string alias)
+        {
+            aliases.Add(alias);
+            return this;
         }
 
         public override string ToString()
