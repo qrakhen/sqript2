@@ -9,7 +9,7 @@ namespace Qrakhen.Sqr.Core
     public class Array : ItemSet
     {
         public override int length => items.Length;
-        protected Value[] items;
+        public Value[] items;
 
         public Array() : base(Type.Array)
         {
@@ -28,14 +28,24 @@ namespace Qrakhen.Sqr.Core
             return member;
         }
 
-        public override Value get(Number index)
+        public override Value get(Value index)
         {
-            return items[index.asInteger()];
+            return items[(index as Number).asInteger()];
         }
 
-        public override void set(Number index, Value value)
+        public override void set(Value index, Value value)
         {
-            items[index.asInteger()] = value;
+            items[(index as Number).asInteger()] = value;
+        }
+
+        public override string ToString()
+        {
+            var r = "[\n";
+            var index = 0;
+            foreach (var i in items) {
+                r += "    " + (index++).ToString() + ": " + i.ToString() + "\n";
+            }
+            return r + "]";
         }
     }
 }

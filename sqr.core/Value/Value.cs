@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,7 +13,7 @@ namespace Qrakhen.Sqr.Core
         public virtual Value obj { get => this; }
 
         public readonly Storage<string, Variable> fields;
-        public readonly Type type;
+        [JsonIgnore] public readonly Type type;
 
         public Value(Type type)
         {
@@ -60,7 +61,7 @@ namespace Qrakhen.Sqr.Core
 
         public override string ToString()
         {
-            return type.name + "\nvalue: " + obj + "\nraw: " + raw;
+            return type.name;
         }
 
         public virtual String toString()

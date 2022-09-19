@@ -8,9 +8,9 @@ namespace Qrakhen.Sqr.Core
     {
         protected readonly Logger log;
 
-        public virtual TOut digest(TIn stack) { throw new SqrError("digest overload not implemented"); }
-        public virtual TOut digest(TIn stack, Qontext context) { throw new SqrError("digest overload not implemented"); }
-        public virtual TOut digest(TIn stack, Qontext context, object modifier) { throw new SqrError("digest overload not implemented"); }
-        public virtual TOut digestUntil(TIn stack, Qontext context, string until) { throw new SqrError("digest overload not implemented"); }
+        /*public virtual TOut resolve(TIn stack) { throw new SqrError("digest overload not implemented"); }
+        public virtual TOut resolve(TIn stack, Qontext context) { throw new SqrError("digest overload not implemented"); }
+        public virtual TOut resolve(TIn stack, Qontext context, object modifier) { throw new SqrError("digest overload not implemented"); }
+        public virtual TOut resolveUntil(TIn stack, Qontext context, string until) { throw new SqrError("digest overload not implemented"); }*/
     }
 }

@@ -9,7 +9,7 @@ namespace Qrakhen.Sqr.Core
 {
     public class Qollection : ItemSet
     {
-        protected List<Value> items = new List<Value>();
+        public List<Value> items = new List<Value>();
         public override int length => items.Count;
         public Type itemType { get; protected set; }
 
@@ -38,20 +38,25 @@ namespace Qrakhen.Sqr.Core
         }
 
         [Native]
-        public override Value get(Number index)
+        public override Value get(Value index)
         {
-            return items[index.asInteger()];
+            return items[(index as Number).asInteger()];
         }
 
         [Native]
-        public override void set(Number index, Value value)
+        public override void set(Value index, Value value)
         {
-            items[index.asInteger()] = value;
+            items[(index as Number).asInteger()] = value;
         }
 
         public override string ToString()
         {
-            return "[\n" + string.Join("\n", items?.Select(_ => "    " + _?.ToString())) + "\n]"; 
+            var r = "[\n";
+            var index = 0;
+            foreach (var i in items) {
+                r += "    " + (index++).ToString() + ": " + i.ToString() + "\n";
+            }
+            return r + "]";
         }
     }
 }

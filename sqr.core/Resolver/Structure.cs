@@ -8,14 +8,14 @@ namespace Qrakhen.Sqr.Core
     [Injectable]
     public class StructureResolver : Resolver<Stack<Token>, Stack<Token>>
     {
-        public override Stack<Token> digest(Stack<Token> input, Qontext qontext)
+        public Stack<Token> resolve(Stack<Token> input, Qontext qontext)
         {
             log.spam("in " + GetType().Name);
             int level = 0;
             List<Token> buffer = new List<Token>();
             var t = input.peek();
             if (!t.isType(Token.Type.Structure))
-                throw new SqrError("nop");
+                throw new SqrError("not a structure: " + t, t);
 
             var structure = input.digest().get<Structure>();
             log.spam("starting to read structure beginning from " + structure.open);
@@ -47,7 +47,7 @@ namespace Qrakhen.Sqr.Core
         /// <param name="qontext"></param>
         /// <param name="until"></param>
         /// <returns></returns>
-        public override Stack<Token> digestUntil(Stack<Token> input, Qontext qontext, string until)
+        public Stack<Token> resolveUntil(Stack<Token> input, Qontext qontext, string until)
         {
             log.spam("in " + GetType().Name);
             int level = 0;

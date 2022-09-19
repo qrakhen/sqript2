@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 
 namespace Qrakhen.Sqr.Core
 {  
@@ -6,8 +7,8 @@ namespace Qrakhen.Sqr.Core
     {
         private bool __set;
 
-        public override Value raw => (Value)obj.raw;
-        public override Value obj { get => get(); }
+        [JsonIgnore] public override Value raw => (Value)obj?.raw;
+        [JsonIgnore] public override Value obj { get => get(); }
 
         public bool isReference { get; private set; }
         public readonly bool isStrictType;

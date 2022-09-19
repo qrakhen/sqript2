@@ -13,17 +13,19 @@ namespace Qrakhen.Sqr.Core
         private readonly StructureResolver structureResolver;
         private readonly QollectionResolver qollectionResolver;
 
-        public override Value digest(Stack<Token> input, Qontext qontext)
+        public Value resolve(Stack<Token> input, Qontext qontext)
         {
             log.spam("in " + GetType().Name);
             Token t = input.peek();
 
             if (!t.isType(Token.Type.Value))
-                throw new SqrError("token is not a value: " + t);
+                throw new SqrError("token is not a value: " + t, t);
 
             string full = "", member = null;
             Value value = null, parent = null;
             input.process((current, take, index, end) => {
+
+                // get name/literal
                 t = current();
                 parent = value; // trace back for calls
                 if (value == null) {
@@ -40,6 +42,7 @@ namespace Qrakhen.Sqr.Core
                     member = take().raw;
                 }
 
+                // access member if we're beyond first loop
                 if (parent != null)
                     value = parent.obj.accessMember(member);
 
@@ -48,6 +51,22 @@ namespace Qrakhen.Sqr.Core
                 if (input.done)
                     return;
 
+                // check if it's a function call and resolve
+                if (!input.done && input.peek().raw == Structure.get(Structure.Type.GROUP).open) {
+                    log.verbose("funqtion is being called: " + value);
+                    var parameters = qollectionResolver.resolve(
+                        structureResolver.resolve(
+                            input,
+                            qontext),
+                        qontext);
+                    log.spam("parameters: " + parameters);
+                    value = ((value as Value<Funqtion>).raw as InternalFunqtion).execute(new Funqtion.ProvidedParam[0], parent.obj); //@TODO make this less awful
+                }
+
+                if (input.done)
+                    return;
+
+                // get potential members by scanning for accessor ":"
                 t = current();
                 if (t.isType(Token.Type.Accessor)) {                    
                     log.spam("accessor found: " + t.raw);
@@ -57,73 +76,9 @@ namespace Qrakhen.Sqr.Core
                 }
             });
 
-            log.spam(full + " is a " + value.type.name + " with the value " + value);
-
-            if (!input.done && input.peek().raw == Structure.get(Structure.Type.GROUP).open) {
-                log.verbose("funqtion is being called: " + value);
-                var parameters = qollectionResolver.digest(
-                    structureResolver.digest(
-                        input, 
-                        qontext),
-                    qontext, Structure.get(Structure.Type.GROUP).separator);
-                log.spam("parameters: " + parameters);
-                value = ((value as Value<Funqtion>).raw as InternalFunqtion).execute(new Funqtion.ProvidedParam[0], parent.obj);
-            }
+            log.spam(full + " is a " + value.type.name + " with the value " + value);            
 
             return value;
         }
-
-        /*
-         * public override Value digest(Stack<Token> input, Qontext qontext)
-        {
-            log.spam("in " + GetType().Name);
-            Token t = input.peek();
-            Value value = null;
-            Value _member = null;
-
-            if (!t.isType(Token.Type.Value))
-                throw new SqrError("token is not a value: " + t);
-
-            if (!t.isType(Token.Type.Identifier)) {
-                log.spam("got primitive " + t.makeValue());
-                value = input.digest().makeValue();
-                if (input.done)
-                    return value;
-
-                if (input.peek().isType(Token.Type.Accessor)) {
-                    input.digest();
-                    _member = value.accessMember(input.digest().raw);
-                } else
-                    throw new SqrError("weird accessor " + t);
-            } else {
-                log.spam("got identifier " + t.raw);
-                List<string> name = new List<string>();
-                input.process(() => input.peek().isType(Token.Type.Identifier), (current, index, abort) => {
-                    name.Add(input.digest().value.ToString());
-                    if (current() != null && current().isType(Token.Type.Accessor)) {
-                        input.digest();
-                    }
-                });
-                log.spam("name " + string.Join(":", name));
-                value = qontext.resolveName(name.ToArray());
-            }
-
-            // method call?
-            if (!input.done && input.peek().raw == Structure.get(Structure.Type.GROUP).open) {
-                log.verbose("funqtion is being called: " + _member);
-                var parameters = qollectionResolver.digest(
-                    structureResolver.digest(
-                        input, 
-                        qontext),
-                    qontext, Structure.get(Structure.Type.GROUP).separator);
-                log.spam("parameters: " + parameters);
-                value = ((_member as Value<Funqtion>).get() as InternalFunqtion).execute(new Funqtion.ProvidedParam[0], value);
-            } else {
-                if (_member != null)
-                    value = _member;
-            }
-
-            return value;
-        }*/
     }
 }
