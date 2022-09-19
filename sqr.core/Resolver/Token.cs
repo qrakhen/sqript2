@@ -82,7 +82,7 @@ namespace Qrakhen.Sqr.Core
             if (type == Token.Type.String)
                 return readString(input);
 
-            if (type == Token.Type.Type) {
+            if (type == Token.Type.Type) { 
                 var r = input.digest() + readType(input, Token.Type.Identifier);
                 if (input.peek() == '&')
                     return r + input.digest();

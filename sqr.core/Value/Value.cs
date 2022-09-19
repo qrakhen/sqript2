@@ -54,11 +54,6 @@ namespace Qrakhen.Sqr.Core
             return false;
         }
 
-        public virtual object getValue()
-        {
-            return this;
-        }
-
         public override string ToString()
         {
             return type.name;

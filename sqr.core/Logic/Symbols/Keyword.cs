@@ -10,11 +10,18 @@ namespace Qrakhen.Sqr.Core
 
         public string symbol;
         public Func<object, Stack<Token>> resolve;
+        public List<string> aliases = new List<string>();
 
         public Keyword(Type type, string symbol)
         {
             this.type = type;
             this.symbol = symbol;
+        }
+
+        public Keyword alias(string alias)
+        {
+            aliases.Add(alias);
+            return this;
         }
 
         public override string ToString()
