@@ -109,14 +109,18 @@ namespace Qrakhen.Sqr.Core
             }
 
             var t = new Stopwatch();
+            t.Restart();
+            long _ms = 0, _t = 0;
             var tokenStack = tokenResolver.resolve(new Core.Stack<char>(applyAliases(input).ToCharArray()));
             while (!tokenStack.done) {
-                t.Restart();
                 var operation = operationResolver.resolveOne(tokenStack, Qontext.globalContext);
                 var result = operation.execute();
                 if (result != null) log.success(result);
-                log.verbose("operation time " + t.ElapsedMilliseconds + "ms, " + t.ElapsedTicks + " ticks");
+                log.verbose("operation time " + (t.ElapsedMilliseconds - _ms) + "ms, " + (t.ElapsedTicks - _t) + " ticks");
+                _ms = t.ElapsedMilliseconds;
+                _t = t.ElapsedTicks;
             }
+            log.info("execution time " + (t.ElapsedMilliseconds) + "ms, " + (t.ElapsedTicks) + " ticks");
         }
 
         private void commands(string input)

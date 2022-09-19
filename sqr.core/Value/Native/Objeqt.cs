@@ -41,11 +41,20 @@ namespace Qrakhen.Sqr.Core
 
         public override string ToString()
         {
-            var r = "{\n";
+            return render();
+        }
+
+        public string render(int __level = 0)
+        {
+            var ident = "".PadLeft(__level * 2);
+            var r = ident + "{\n";
             foreach (var p in properties) {
-                r += "    " + p.Key + ": " + p.Value.toString() + "\n";
+                var v = p.Value.ToString();
+                if (p.Value.obj is Objeqt)
+                    v = (p.Value.obj as Objeqt).render(__level++);
+                r += ident + "  " + p.Key + ": " + v + "\n";
             }
-            return r + "}";
+            return r + ident + "}";
         }
     }
 }
