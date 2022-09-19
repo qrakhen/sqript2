@@ -22,9 +22,12 @@ namespace Qrakhen.Sqr.Core
         public Operation resolveOne(Stack<Token> input, Qontext qontext)
         {
             bool isReturning = false;
-            if (    
+            if ((    
                     input.peek().type == Token.Type.Keyword && 
-                    input.peek().get<Keyword>().type == Keyword.Type.FUNQTION_RETURN) {
+                    input.peek().get<Keyword>().type == Keyword.Type.FUNQTION_RETURN) || ((
+                    input.peek().type == Token.Type.Operator &&
+                    input.peek().get<Operator>().type == Operator.Type.ASSIGN))) {
+                input.digest();
                 isReturning = true;
             }
             return new Operation(build(input, qontext), isReturning);

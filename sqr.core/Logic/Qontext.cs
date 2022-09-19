@@ -57,7 +57,7 @@ namespace Qrakhen.Sqr.Core
             else if (parent != null)
                 return parent.lookUp(name);
             else
-                throw new SqrError("could not find the name " + name[0] + " within the current qontext (recursive lookup)");
+                throw new SqrError("could not find the name " + name + " within the current qontext (recursive lookup)");
         }
     }
 }

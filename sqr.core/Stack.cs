@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
@@ -62,6 +63,11 @@ namespace Qrakhen.Sqr.Core
 
         public T[] digestRange(int amount) => digestRange(index, amount);
 
+        public override string ToString()
+        {
+            return string.Join(", ", items);
+        }
+
         public delegate void ProcessCallback(
                 Func<bool> condition,
                 Func<T> current,
@@ -99,6 +105,5 @@ namespace Qrakhen.Sqr.Core
 
             }
         }
-
     }
 }

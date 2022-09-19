@@ -195,7 +195,7 @@ namespace Qrakhen.Sqr.Core
             if (value == null)
                 throw new SqrError("could not parse value " + raw + ", it's not a known " + type);
 
-            if (value.GetType() == typeof(Boolean))
+            if (value.GetType() == typeof(bool))
                 type = Type.Boolean;
 
             if (value.GetType() == typeof(Keyword))

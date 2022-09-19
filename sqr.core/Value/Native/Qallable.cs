@@ -17,5 +17,10 @@ namespace Qrakhen.Sqr.Core
         {
             return __value.execute(parameters, qontext, self);
         }
+
+        public override string ToString()
+        {
+            return "(vollegas leberkas { return komplette totalvernichtung });";
+        }
     }
 }
