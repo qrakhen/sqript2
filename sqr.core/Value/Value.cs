@@ -9,8 +9,8 @@ namespace Qrakhen.Sqr.Core
     {
         public static Value Null => null;
 
-        public virtual object raw => null;
-        public virtual Value obj { get => this; }
+        public virtual object raw => this;
+        public virtual Value obj => this;
 
         public readonly Storage<string, Variable> fields;
         [JsonIgnore] public readonly Type type;

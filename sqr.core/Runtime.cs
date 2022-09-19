@@ -3,6 +3,7 @@ using Qrakhen.Dependor;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -23,6 +24,9 @@ namespace Qrakhen.Sqr.Core
         {
             log.setLoggingLevel(Logger.Level.SPAM);
             log.success("welcome to Sqript2.0, or simply sqr. Enjoy thyself.");
+            var t = File.ReadAllText("testing.sqr");
+            Console.Write(t);
+            execute(t);
             do {
                 try {
 
@@ -103,8 +107,10 @@ namespace Qrakhen.Sqr.Core
             }
 
             var tokenStack = tokenResolver.resolve(new Core.Stack<char>(applyAliases(input).ToCharArray()));
-            var operation = operationResolver.resolve(tokenStack, Qontext.globalContext);
-            log.success(operation.execute());
+            while (!tokenStack.done) {
+                var operation = operationResolver.resolveOne(tokenStack, Qontext.globalContext);
+                log.success(operation.execute());
+            }
         }
 
         private void commands(string input)

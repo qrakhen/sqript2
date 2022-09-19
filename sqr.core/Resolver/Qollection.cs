@@ -28,7 +28,7 @@ namespace Qrakhen.Sqr.Core
                 // outsourcing the entire level/structure logic, should do that more often
                 var sub = structureResolver.resolveUntil(input, qontext, separator);
                 log.spam("digested sub (until " + separator + "): " + string.Join(' ', sub.items.Select(_ => _.ToString())));
-                var op = operationResolver.resolve(sub, qontext);
+                var op = operationResolver.resolveOne(sub, qontext);
                 var r = op.execute();
                 log.spam("adding result: " + r);
                 qollection.add(r.obj);

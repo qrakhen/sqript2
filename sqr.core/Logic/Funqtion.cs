@@ -32,7 +32,7 @@ namespace Qrakhen.Sqr.Core
             var stack = body.getStack();
             while (!stack.done)
             {
-                var op = operationResolver.resolve(stack, eq);
+                var op = operationResolver.resolveOne(stack, eq);
                 var r = op.execute();
                 if (op.isReturning)
                     return r;

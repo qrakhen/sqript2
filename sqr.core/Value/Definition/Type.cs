@@ -227,6 +227,28 @@ namespace Qrakhen.Sqr.Core
                     new InternalFunqtion((p, self) => Core.Value.Null)) }
                 }
             });
+
+            var qallable = register(new Args {
+                name = "Qallable",
+                nativeType = NativeType.Funqtion,
+                fields = null,
+                extends = value,
+                methods = new Storage<string, Method>() {
+                { "xxx", new Method(
+                    new InternalFunqtion((p, self) => Core.Value.Null)) }
+                }
+            });
+
+            var variable = register(new Args {
+                name = "Variable",
+                nativeType = NativeType.Variable,
+                fields = null,
+                extends = value,
+                methods = new Storage<string, Method>() {
+                { "xxx", new Method(
+                    new InternalFunqtion((p, self) => Core.Value.Null)) }
+                }
+            });
         }
     }
 
