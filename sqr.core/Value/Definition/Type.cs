@@ -160,7 +160,7 @@ namespace Qrakhen.Sqr.Core
                 fields = null,
                 methods = new Storage<string, Method>() {
                     { "toString", new Method(new InternalFunqtion((p, self) => self.toString())) },
-                    { "type", new Method(new InternalFunqtion((p, self) => new String(self.type.ToString()))) }
+                    { "type", new Method(new InternalFunqtion((p, self) => new String(self.type.name))) }
                 }
             });
 
@@ -246,7 +246,9 @@ namespace Qrakhen.Sqr.Core
                 extends = value,
                 methods = new Storage<string, Method>() {
                 { "xxx", new Method(
-                    new InternalFunqtion((p, self) => Core.Value.Null)) }
+                    new InternalFunqtion((p, self) => Core.Value.Null)) },
+                { "type", new Method(
+                    new InternalFunqtion((p, self) => new String(self.type.name + "<" + self.obj.type.name + ">"))) }
                 }
             });
         }
