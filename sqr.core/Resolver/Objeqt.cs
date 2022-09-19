@@ -1,8 +1,5 @@
 ﻿using Qrakhen.Dependor;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {

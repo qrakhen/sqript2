@@ -60,7 +60,7 @@ namespace Qrakhen.Sqr.Core
                             qontext),
                         qontext);
                     log.spam("parameters: " + parameters);
-                    value = ((value as Value<Funqtion>).raw as InternalFunqtion).execute(new Funqtion.ProvidedParam[0], parent.obj); //@TODO make this less awful
+                    value = ((value.obj as Value<Funqtion>).raw as InternalFunqtion).execute(new Funqtion.ProvidedParam[0], (parent == null ? value : parent).obj); //@TODO make this less awful
                 }
 
                 if (input.done)
