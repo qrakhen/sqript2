@@ -1,6 +1,6 @@
 ﻿# quick test file to check integrity
 
-log(4);
+log(6);
 cout("sqr test");
 *~ a <~ 5;
 *~ b <& a;

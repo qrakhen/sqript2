@@ -42,10 +42,7 @@ namespace Qrakhen.Sqr.Core
 
             log.spam("digesting operation at level " + level);
             if (node == null) node = new Node();
-            do {
-                if (level == 0 && node.done)
-                    return node;
-
+            do {         
                 log.spam("current node: " + node);
                 Token t = input.peek();
                 log.spam("token peeked: " + t);
@@ -62,12 +59,10 @@ namespace Qrakhen.Sqr.Core
                 else if (t.isType(Token.Type.Structure))
                     handleStructure(input, ref node, qontext, level);
 
-                else if (t.isType(Token.Type.End)) {
-                    input.digest();
+                else if (input.peek().isType(Token.Type.End)) {
+                    if (level == 0) input.digest();
                     break;
                 }
-
-                else throw new SqrError("currently unknown token " + t, t);                
             } while (!input.done);
 
             if (level == 0) {

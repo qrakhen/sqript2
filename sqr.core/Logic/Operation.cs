@@ -28,7 +28,6 @@ namespace Qrakhen.Sqr.Core
 
         public class Node
         {
-            public bool isReturning;
             public object left;
             public object right;
             public Operator op;
