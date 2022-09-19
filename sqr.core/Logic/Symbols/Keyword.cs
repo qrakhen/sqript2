@@ -16,6 +16,7 @@ namespace Qrakhen.Sqr.Core
         {
             this.type = type;
             this.symbol = symbol;
+            alias(symbol);
         }
 
         public Keyword alias(string alias)
@@ -31,7 +32,7 @@ namespace Qrakhen.Sqr.Core
 
         public static Keyword get(string symbol)
         {
-            return keywords.findOne(_ => _.symbol == symbol);
+            return keywords.findOne(_ => _.aliases.Contains(symbol));
         }
 
         [Flags]
@@ -51,16 +52,20 @@ namespace Qrakhen.Sqr.Core
             FUNQTION_RETURN,
         }
 
-        public static void register(Type type, string symbol)
+        public static Keyword register(Type type, string symbol)
         {
-            keywords.Add(type, new Keyword(type, symbol));
+            var word = new Keyword(type, symbol);
+            keywords.Add(type, word);
+            return word;
         }
 
         static Keyword()
         {
             register(Type.DECLARE_DYN, "var"); 
             register(Type.DECLARE_REF, "ref");
-            register(Type.DECLARE_FUNQTION, "funqtion");
+            register(Type.DECLARE_FUNQTION, "funqtion")
+                .alias("funq")
+                .alias("fn");
             register(Type.DECLARE_QLASS, "qlass");
             register(Type.IMPORT, "import");
             register(Type.QONDITION_IF, "if");

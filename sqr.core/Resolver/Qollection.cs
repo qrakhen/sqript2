@@ -31,7 +31,7 @@ namespace Qrakhen.Sqr.Core
                 var op = operationResolver.resolve(sub, qontext);
                 var r = op.execute();
                 log.spam("adding result: " + r);
-                qollection.add(r.getValue() as Value);
+                qollection.add(r.obj as Value);
             });
             return qollection;
         }

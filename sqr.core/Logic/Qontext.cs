@@ -10,7 +10,7 @@ namespace Qrakhen.Sqr.Core
     public class Qontext
     {
         [JsonProperty]
-        protected Storage<string, Variable> names = new Storage<string, Variable>();
+        public Storage<string, Variable> names { get; protected set; } = new Storage<string, Variable>();
 
         public static readonly Qontext globalContext = new Qontext();
 

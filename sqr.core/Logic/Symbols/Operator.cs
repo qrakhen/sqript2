@@ -20,6 +20,7 @@ namespace Qrakhen.Sqr.Core
             this.symbol = symbol;
             this.weight = weight;
             this.resolve = resolve;
+            alias(symbol);
         }
 
         public Operator alias(string alias)
@@ -35,7 +36,7 @@ namespace Qrakhen.Sqr.Core
 
         public static Operator get(string symbol)
         {
-            return operators.findOne(_ => _.symbol == symbol);
+            return operators.findOne(_ => _.aliases.Contains(symbol));
         }
 
         [Flags]
