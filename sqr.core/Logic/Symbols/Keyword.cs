@@ -35,6 +35,11 @@ namespace Qrakhen.Sqr.Core
             return keywords.findOne(_ => _.aliases.Contains(symbol));
         }
 
+        public static Keyword get(Type type)
+        {
+            return keywords[type];
+        }
+
         [Flags]
         public enum Type
         {

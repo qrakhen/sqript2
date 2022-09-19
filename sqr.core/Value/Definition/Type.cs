@@ -131,7 +131,7 @@ namespace Qrakhen.Sqr.Core
                 this.access = access;
             }
 
-            public Value makeValue() => new Value<Funqtion>(funqtion, Type.Qallable);
+            public Value makeValue() => new Qallable(funqtion);
         }
 
         public enum Access

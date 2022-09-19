@@ -24,22 +24,23 @@ namespace Qrakhen.Sqr.Core
         {
             log.setLoggingLevel(Logger.Level.SPAM);
             log.success("welcome to Sqript2.0, or simply sqr. Enjoy thyself.");
+
+            Qontext.globalContext.register(
+                "cout",
+                new Qallable(new InternalFunqtion((p, s) => { log.success(p[0].raw); return null; })));
+            Qontext.globalContext.register(
+                "log",
+                new Qallable(new InternalFunqtion((p, s) => { log.setLoggingLevel((Logger.Level)int.Parse(p[0].raw.ToString())); return null; })));
+
             var t = File.ReadAllText("testing.sqr");
-            Console.Write(t);
             execute(t);
             do {
                 try {
-
-                    //var breaktest = ": a ! x ooo p ? ! 'astr\\'ing' asd 5 / 3 * 10 - 43 asdasdasasdas true*** falseaaaa true ':asd:dAD'adAS:Asd:[]3414:As ! 231 111 12.321 1,1,1,";
-                    //new List<Token>(tokenResolver.digest(new Core.Stack<char>(breaktest.ToCharArray()))).ForEach(Console.WriteLine);
-
-                    var op = "*~ a <~ 5;"; // 2 - 3 + 3 * 3 / 5 + test:von:mama:her";
-
                     Console.Write("    <: ");
-                    execute(Console.ReadLine()); // doTheConsoleThing()); <- dont, broken attm
+                    execute(Console.ReadLine()); // doTheConsoleThing()); <- dont, broken atm
 
                 } catch (SqrError e) {
-                    log.warn(log.loggingLevel > Logger.Level.INFO ? e : (object)e.Message);
+                    log.error(log.loggingLevel > Logger.Level.INFO ? e : (object)e.Message);
                     if (e.data != null && log.loggingLevel >= Logger.Level.DEBUG) 
                         log.warn(json(e.data));
                 } /* catch (Exception e) {
@@ -109,7 +110,8 @@ namespace Qrakhen.Sqr.Core
             var tokenStack = tokenResolver.resolve(new Core.Stack<char>(applyAliases(input).ToCharArray()));
             while (!tokenStack.done) {
                 var operation = operationResolver.resolveOne(tokenStack, Qontext.globalContext);
-                log.success(operation.execute());
+                var result = operation.execute();
+                if (result != null) log.success(result);
             }
         }
 

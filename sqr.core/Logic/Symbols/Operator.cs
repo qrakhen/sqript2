@@ -95,11 +95,11 @@ namespace Qrakhen.Sqr.Core
                 return new Number(0);
             });
 
-            register(Type.COND_AND, "&&", 1, (left, right) => {
+            register(Type.COND_AND, "&&", 0, (left, right) => {
                 return new Boolean((left as Boolean) && (right as Boolean));
             });
 
-            register(Type.COND_OR, "||", 1, (left, right) => {
+            register(Type.COND_OR, "||", 0, (left, right) => {
                 return new Boolean((left as Boolean) && (right as Boolean));
             });
 

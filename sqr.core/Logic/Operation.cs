@@ -21,6 +21,8 @@ namespace Qrakhen.Sqr.Core
         public Value execute()
         {
             log.spam("executing operation");
+            if (head == null)
+                return null;
             return head.execute();
         }
 

@@ -29,15 +29,7 @@ namespace Qrakhen.Sqr.Core
             if (self != null)
                 eq.register("this", self);
 
-            var stack = body.getStack();
-            while (!stack.done)
-            {
-                var op = operationResolver.resolveOne(stack, eq);
-                var r = op.execute();
-                if (op.isReturning)
-                    return r;
-            }
-            return null;
+            return body.execute(eq);
         }
 
         protected Qontext createExecutionQontext(Value[] parameters, Qontext qontext)
@@ -74,7 +66,7 @@ namespace Qrakhen.Sqr.Core
             this.callback = callback;
         }
 
-        public Value execute(Value[] parameters, Value self = null)
+        public override Value execute(Value[] parameters, Qontext qontext, Value self = null)
         {
             return callback(parameters, self);
         }

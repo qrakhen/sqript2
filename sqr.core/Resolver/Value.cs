@@ -75,9 +75,7 @@ namespace Qrakhen.Sqr.Core
                 } else {
                     end();
                 }
-            });
-
-            log.spam(full + " is a " + value.type.name + " with the value " + value);            
+            });          
 
             return value;
         }

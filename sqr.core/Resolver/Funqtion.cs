@@ -23,7 +23,7 @@ namespace Qrakhen.Sqr.Core
             log.spam("in " + GetType().Name);
             var bodyStructure = Structure.get(Structure.Type.BODY);
             var header = resolveHeader(structureResolver.resolveUntil(input, qontext, bodyStructure.open));
-            input.setCursor(input.index - 1); // not nice. gotta find a way to make this consistent and tidy. (geht um (a b c { }) das { wird mitgegessen bei readStructure
+            input.move(-1); // not nice. gotta find a way to make this consistent and tidy. (geht um (a b c { }) das { wird mitgegessen bei readStructure
             var body = new Body(structureResolver.resolve(input, qontext).items);
             return new Funqtion(body, header.ToArray(), NativeType.None);
         }

@@ -18,6 +18,7 @@ namespace Qrakhen.Sqr.Core
         private readonly QollectionResolver qollectionResolver;
         private readonly FunqtionResolver funqtionResolver;
         private readonly ObjeqtResolver objeqtResolver;
+        private readonly QonditionResolver qonditionResolver;
 
         public Operation resolveOne(Stack<Token> input, Qontext qontext)
         {
@@ -41,7 +42,10 @@ namespace Qrakhen.Sqr.Core
 
             log.spam("digesting operation at level " + level);
             if (node == null) node = new Node();
-            do { 
+            do {
+                if (level == 0 && node.done)
+                    return node;
+
                 log.spam("current node: " + node);
                 Token t = input.peek();
                 log.spam("token peeked: " + t);
@@ -113,10 +117,10 @@ namespace Qrakhen.Sqr.Core
 
                         log.spam("registered name " + t + " in qontext");
                     }
-                } else if (k.isType(Keyword.Type.FUNQTION_RETURN)) {
-                    if (level > 0)
-                        throw new SqrError("unexpected return");
-                    node.isReturning = true;
+                } else if (k.isType(Keyword.Type.QONDITION_IF)) {
+                    input.move(-1); // it hurts so bad
+                    var qondition = qonditionResolver.resolveIfElse(input, qontext);
+                    qondition.execute();
                 } else {
                     throw new SqrError("not yet implemented: " + t, t);
                 }

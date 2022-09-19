@@ -1,10 +1,32 @@
-﻿*~ a <~ 5;
+﻿# quick test file to check integrity
+
+log(3);
+cout("sqr test");
+*~ a <~ 5;
 *~ b <& a;
+a <~ 10;
+(a == b); # has to be true
+
 *~ c <~ { q <~ 10, w <~ "asd" };
 *~ d <~ [ 2, 5, 10, 32 ];
 
+*~ cd <~ c:q + d:2;
+(cd == 20);
+
 funq f (j, k {
-	return j + k - a;
+	return j + k - a;			# <- also test qontext
 });
 
 f(5, 3);
+
+if (a > 1 && cd < 100) {
+	if (a > 32) {
+		cout("wrong");
+	} else {
+		cout("correct");
+	}
+}
+
+cout("nice!");
+
+
