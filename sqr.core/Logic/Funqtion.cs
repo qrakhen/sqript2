@@ -8,19 +8,28 @@ namespace Qrakhen.Sqr.Core
 {
     public class Funqtion
     {
-        private readonly OperationResolver operationResolver;
+        private static readonly OperationResolver operationResolver = Dependor.Dependor.get<OperationResolver>();
 
-        public DeclaredParam[] declaredParameters = new DeclaredParam[0];
-        public Type returnType;
-        public Body body;
+        public readonly DeclaredParam[] parameters = new DeclaredParam[0];
+        public readonly NativeType returnType;
+        public readonly Body body;
+
+        protected Funqtion() { }
+
+        public Funqtion(Body body, DeclaredParam[] parameters, NativeType returnType = NativeType.None)
+        {
+            this.body = body;
+            this.parameters = parameters;
+            this.returnType = returnType;
+        }
         
-        public virtual Value execute(ProvidedParam[] parameters, Qontext qontext, Value self = null)
+        public virtual Value execute(Value[] parameters, Qontext qontext, Value self = null)
         {
             var eq = createExecutionQontext(parameters, qontext);
             if (self != null)
                 eq.register("this", self);
 
-            var stack = new Stack<Token>(body.content);
+            var stack = body.getStack();
             while (!stack.done)
             {
                 var op = operationResolver.resolve(stack, eq);
@@ -31,26 +40,20 @@ namespace Qrakhen.Sqr.Core
             return null;
         }
 
-        protected Qontext createExecutionQontext(ProvidedParam[] parameters, Qontext qontext)
+        protected Qontext createExecutionQontext(Value[] parameters, Qontext qontext)
         {
             var tempQontext = new Qontext(qontext);
 
-            for (int i = 0; i < declaredParameters.Length; i++) {
-                var p = declaredParameters[i];
+            for (int i = 0; i < this.parameters.Length; i++) {
+                var p = this.parameters[i];
                 if (parameters.Length <= i) {
                     if (p.optional) break;
                     else throw new SqrError("parameter " + p.name + " missing");
                 } 
-                tempQontext.register(parameters[i].name, new Variable(parameters[i].value));
+                tempQontext.register(this.parameters[i].name, new Variable(parameters[i]));
             }
 
             return tempQontext;
-        }
-
-        public struct ProvidedParam
-        {
-            public string name;
-            public Value value;
         }
 
         public struct DeclaredParam
@@ -64,14 +67,14 @@ namespace Qrakhen.Sqr.Core
 
     public class InternalFunqtion : Funqtion
     {
-        protected Func<ProvidedParam[], Value, Value> callback;
+        protected Func<Value[], Value, Value> callback;
 
-        public InternalFunqtion(Func<ProvidedParam[], Value, Value> callback)
+        public InternalFunqtion(Func<Value[], Value, Value> callback)
         {
             this.callback = callback;
         }
 
-        public Value execute(ProvidedParam[] parameters, Value self = null)
+        public Value execute(Value[] parameters, Value self = null)
         {
             return callback(parameters, self);
         }

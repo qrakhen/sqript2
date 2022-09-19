@@ -34,9 +34,14 @@ namespace Qrakhen.Sqr.Core
         public T digest()
         {
             if (done)
-                throw new SqrError("stack is done, can not digest any further.");
+                throw new SqrEndOfStackError("stack is done, can not digest any further.");
 
             return __items[index++];
+        }
+
+        public void setCursor(int index)
+        {
+            this.index = index;
         }
 
         public T[] digestUntil(T value)
@@ -74,7 +79,11 @@ namespace Qrakhen.Sqr.Core
             int relativeIndex = 0;
             bool aborted = false;
             while (!aborted && !done && (condition != null ? condition() : true)) {
-                callback(() => peek(), digest, relativeIndex++, () => aborted = true);
+                try {
+                    callback(() => peek(), digest, relativeIndex++, () => aborted = true);
+                } catch(SqrEndOfStackError e) {
+                    break;
+                }
             }
         }
 
@@ -82,5 +91,14 @@ namespace Qrakhen.Sqr.Core
         public void process(Action<int> callback, Func<bool> condition = null) => process((a, b, c, d) => callback(c), condition);
         public void process(Action<Action> callback, Func<bool> condition = null) => process((a, b, c, d) => callback(d), condition);
         public void process(Func<bool> condition, Action<Func<T>, Func<T>, int, Action> callback) => process(callback, condition);
+
+        public class SqrEndOfStackError : SqrError
+        { 
+            public SqrEndOfStackError(string message, object data = null) : base(message, data)
+            {
+
+            }
+        }
+
     }
 }

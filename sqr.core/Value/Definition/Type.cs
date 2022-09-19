@@ -72,12 +72,12 @@ namespace Qrakhen.Sqr.Core
         }
 
         // native types are instantiated by just using new() since theyre hard coded
-        public Instance spawn(Funqtion.ProvidedParam[] parameters)
+        public Instance spawn(Value[] parameters)
         {
             return new Instance(this);
         }
 
-        public Value invoke(Method method, Value invoker, Funqtion.ProvidedParam[] parameters, Qontext qontext)
+        public Value invoke(Method method, Value invoker, Value[] parameters, Qontext qontext)
         {
             return method.funqtion.execute(parameters, qontext, invoker);
         }
@@ -172,7 +172,7 @@ namespace Qrakhen.Sqr.Core
                 extends = value,
                 methods = new Storage<string, Method>() {
                 { "span", new Method(
-                    new InternalFunqtion((p, self) => (self as Core.String).span(p[0].value, p[1].value))) }
+                    new InternalFunqtion((p, self) => (self as Core.String).span(p[0], p[1]))) }
                 }
             });
 

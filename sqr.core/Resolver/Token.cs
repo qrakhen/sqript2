@@ -32,7 +32,7 @@ namespace Qrakhen.Sqr.Core
                     result.Add(token);
                 }
             }
-            log.spam(string.Join(",", result.Select(_ => _.type + ": " + _.raw)));
+            log.spam(string.Join(", ", result.Select(_ => _.type + ": '" + _.raw + "'")));
             count = input.length;
             return new Stack<Token>(result.ToArray());
         }
@@ -67,6 +67,19 @@ namespace Qrakhen.Sqr.Core
             return buffer;
         }
 
+        private string readIdentifier(Stack<char> input)
+        {
+            string buffer = "";
+            while (
+                    matchType(input.peek()) == Token.Type.Identifier ||
+                    Regex.IsMatch(input.peek().ToString(), @"\d")) {
+                buffer += input.digest();
+                if (input.done)
+                    break;
+            }
+            return buffer;
+        }
+
         private string readValue(Token.Type type, Stack<char> input)
         {
             if (type == Token.Type.Comment) {
@@ -89,6 +102,9 @@ namespace Qrakhen.Sqr.Core
                 else
                     return r;
             }
+
+            if (type == Token.Type.Identifier)
+                return readIdentifier(input);
 
             string buffer = "";
             while (type == matchType(input.peek())) {
@@ -115,7 +131,7 @@ namespace Qrakhen.Sqr.Core
             { Token.Type.String, "[\"']" },
             { Token.Type.Structure, @"[{}()[\],]" },
             { Token.Type.End, @";" },
-            { Token.Type.Accessor, @"[.:]" },
+            { Token.Type.Accessor, @"[:]" },
             { Token.Type.Type, "@" },
             { Token.Type.Whitespace, @"\s" },
             { Token.Type.Comment, @"#" },

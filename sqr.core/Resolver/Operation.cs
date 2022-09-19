@@ -16,6 +16,7 @@ namespace Qrakhen.Sqr.Core
         private readonly ValueResolver valueResolver;
         private readonly StructureResolver structureResolver;
         private readonly QollectionResolver qollectionResolver;
+        private readonly FunqtionResolver funqtionResolver;
         private readonly ObjeqtResolver objeqtResolver;
 
         public Operation resolve(Stack<Token> input, Qontext qontext)
@@ -91,6 +92,10 @@ namespace Qrakhen.Sqr.Core
                             node.left = qontext.register(t.raw);
                         } else if (k.isType(Keyword.Type.DECLARE_REF)) {
                             node.left = qontext.register(t.raw, null, true);
+                        } else if (k.isType(Keyword.Type.DECLARE_FUNQTION)) {
+                            var funqtion = funqtionResolver.resolve(
+                                structureResolver.resolve(input, qontext), qontext);
+                            node.left = qontext.register(t.raw, new Qallable(funqtion));
                         } else {
                             throw new SqrError("not yet implemented: " + k.symbol);
                         }

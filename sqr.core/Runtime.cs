@@ -32,7 +32,7 @@ namespace Qrakhen.Sqr.Core
                     var op = "*~ a <~ 5;"; // 2 - 3 + 3 * 3 / 5 + test:von:mama:her";
 
                     Console.Write("    <: ");
-                    execute(doTheConsoleThing());
+                    execute(Console.ReadLine()); // doTheConsoleThing()); <- dont, broken attm
 
                 } catch (SqrError e) {
                     log.warn(log.loggingLevel > Logger.Level.INFO ? e : (object)e.Message);
