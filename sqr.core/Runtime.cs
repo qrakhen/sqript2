@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
-using Qrakhen.Dependor;
+using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -24,22 +25,21 @@ namespace Qrakhen.Sqr.Core
         {
             log.setLoggingLevel(Logger.Level.SPAM);
             log.success("welcome to Sqript2.0, or simply sqr. Enjoy thyself.");
-            var t = File.ReadAllText("testing.sqr");
-            Console.Write(t);
-            execute(t);
+
+            Qontext.globalContext.register(
+                "cout",
+                new Qallable(new InternalFunqtion((p, q, s) => { log.success(p[0].raw); return null; })));
+            Qontext.globalContext.register(
+                "log",
+                new Qallable(new InternalFunqtion((p, q, s) => { log.setLoggingLevel((Logger.Level)int.Parse(p[0].raw.ToString())); return null; })));
+
             do {
                 try {
-
-                    //var breaktest = ": a ! x ooo p ? ! 'astr\\'ing' asd 5 / 3 * 10 - 43 asdasdasasdas true*** falseaaaa true ':asd:dAD'adAS:Asd:[]3414:As ! 231 111 12.321 1,1,1,";
-                    //new List<Token>(tokenResolver.digest(new Core.Stack<char>(breaktest.ToCharArray()))).ForEach(Console.WriteLine);
-
-                    var op = "*~ a <~ 5;"; // 2 - 3 + 3 * 3 / 5 + test:von:mama:her";
-
                     Console.Write("    <: ");
-                    execute(Console.ReadLine()); // doTheConsoleThing()); <- dont, broken attm
+                    execute(Console.ReadLine()); // doTheConsoleThing()); <- dont, broken atm
 
                 } catch (SqrError e) {
-                    log.warn(log.loggingLevel > Logger.Level.INFO ? e : (object)e.Message);
+                    log.error(log.loggingLevel > Logger.Level.INFO ? e : (object)e.Message);
                     if (e.data != null && log.loggingLevel >= Logger.Level.DEBUG) 
                         log.warn(json(e.data));
                 } /* catch (Exception e) {
@@ -106,11 +106,19 @@ namespace Qrakhen.Sqr.Core
                 return;
             }
 
+            var t = new Stopwatch();
+            t.Restart();
+            long _ms = 0, _t = 0;
             var tokenStack = tokenResolver.resolve(new Core.Stack<char>(applyAliases(input).ToCharArray()));
             while (!tokenStack.done) {
                 var operation = operationResolver.resolveOne(tokenStack, Qontext.globalContext);
-                log.success(operation.execute());
+                var result = operation.execute();
+                if (result != null) log.success(result);
+                log.verbose("operation time " + (t.ElapsedMilliseconds - _ms) + "ms, " + (t.ElapsedTicks - _t) + " ticks");
+                _ms = t.ElapsedMilliseconds;
+                _t = t.ElapsedTicks;
             }
+            log.info("execution time " + (t.ElapsedMilliseconds) + "ms, " + (t.ElapsedTicks) + " ticks");
         }
 
         private void commands(string input)
@@ -151,6 +159,12 @@ namespace Qrakhen.Sqr.Core
                     log.setLoggingLevel((Logger.Level)int.Parse(args[1]));
                     log.cmd("set logging level to " + log.loggingLevel);
                 }
+            } else if (input ==  "t") {
+                var t = File.ReadAllText("tests.sqr");
+                execute(t);
+            } else if (input == "c") {
+                Qontext.globalContext.names.clear();
+                log.cmd("cleared global qontext");
             }
         }
 
@@ -189,8 +203,7 @@ namespace Qrakhen.Sqr.Core
             { "*~", "var" },
             { "*&", "ref" },
             { "*$~", "@$" },
-            { "*$&", "@$&" },
-            { ":(", "funq(" }
+            { "*$&", "@$&" }
         };
     }
 }

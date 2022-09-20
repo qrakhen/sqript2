@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Qrakhen.Dependor;
+using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +9,8 @@ namespace Qrakhen.Sqr.Core
 {
     public class Qollection : ItemSet
     {
-        public List<Value> items = new List<Value>();
-        public override int length => items.Count;
-        public Type itemType { get; protected set; }
+        [NativeField] public List<Value> items = new List<Value>();
+        [NativeField] public override int length => items.Count;
 
         public Qollection() : base(Type.Qollection)
         {
@@ -31,19 +30,19 @@ namespace Qrakhen.Sqr.Core
             return member;
         }
 
-        [Native]
+        [NativeMethod]
         public void add(Value value)
         {
             items.Add(value);
         }
 
-        [Native]
+        [NativeMethod]
         public override Value get(Value index)
         {
             return items[(index as Number).asInteger()];
         }
 
-        [Native]
+        [NativeMethod]
         public override void set(Value index, Value value)
         {
             items[(index as Number).asInteger()] = value;

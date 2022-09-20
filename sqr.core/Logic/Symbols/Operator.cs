@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Operator : ITyped<Operator.Type>
+    internal class Operator : ITyped<Operator.Type>
     {
         private static readonly Storage<Type, Operator> operators = new Storage<Type, Operator>();
 
@@ -42,26 +42,27 @@ namespace Qrakhen.Sqr.Core
         [Flags]
         public enum Type
         {
-            CALC_ADD = 1,
-            CALC_SUB = 2,
-            CALC_MULT = 4,
-            CALC_DIV = 8,
+            CALC_ADD = BitFlag._1,
+            CALC_SUB = BitFlag._2,
+            CALC_MULT = BitFlag._3,
+            CALC_DIV = BitFlag._4,
             CALC = CALC_ADD | CALC_SUB | CALC_MULT | CALC_DIV,
-            COND_AND = 16,
-            COND_OR = 32,
-            COMP_EQUAL = 64,
-            COMP_NOTEQUAL = 128,
-            COMP_GT = 246,
-            COMP_GTEQUAL = 512,
-            COMP_LT = 1024,
-            COMP_LTEQUAL = 2048,
-            LOGIC_NOT = 4096,
-            LOGIC_OR = 8192,
-            LOGIC_AND = 16384,
-            LOGIC_XOR = 32768,
-            QOLLECTION_ADD = 65536,
-            ASSIGN = 131072,
-            ASSIGN_REF = 262144
+            COND_AND = BitFlag._5,
+            COND_OR = BitFlag._6,
+            COMP_EQUAL = BitFlag._7,
+            COMP_NOTEQUAL = BitFlag._8,
+            COMP_GT = BitFlag._9,
+            COMP_GTEQUAL = BitFlag._10,
+            COMP_LT = BitFlag._11,
+            COMP_LTEQUAL = BitFlag._12,
+            LOGIC_NOT = BitFlag._13,
+            LOGIC_OR = BitFlag._14,
+            LOGIC_AND = BitFlag._15,
+            LOGIC_XOR = BitFlag._16,
+            QOLLECTION_ADD = BitFlag._17,
+            ASSIGN = BitFlag._18,
+            ASSIGN_REF = BitFlag._19,
+            NULLABLE = BitFlag._20
         }
 
         public static void register(Type type, string symbol, int weight, Func<Value, Value, Value> resolve)
@@ -95,11 +96,11 @@ namespace Qrakhen.Sqr.Core
                 return new Number(0);
             });
 
-            register(Type.COND_AND, "&&", 1, (left, right) => {
+            register(Type.COND_AND, "&&", 0, (left, right) => {
                 return new Boolean((left as Boolean) && (right as Boolean));
             });
 
-            register(Type.COND_OR, "||", 1, (left, right) => {
+            register(Type.COND_OR, "||", 0, (left, right) => {
                 return new Boolean((left as Boolean) && (right as Boolean));
             });
 
@@ -142,8 +143,30 @@ namespace Qrakhen.Sqr.Core
                 return left;
             });
 
+            register(Type.NULLABLE, "?", 0, (left, right) => {
+                return null;
+            });
+
             register(Type.LOGIC_NOT, "!", 0, (left, right) => {
                 return new Boolean(!(right as Boolean));
+            });
+
+            register(Type.LOGIC_AND, "&", 0, (left, right) => {
+                if (left is Number && right is Number)
+                    return new Number((left as Number).asInteger() & (right as Number).asInteger());
+                return new Number(0);
+            });
+
+            register(Type.LOGIC_OR, "|", 0, (left, right) => {
+                if (left is Number && right is Number)
+                    return new Number((left as Number).asInteger() | (right as Number).asInteger());
+                return new Number(0);
+            });
+
+            register(Type.LOGIC_XOR, "^", 0, (left, right) => {
+                if (left is Number && right is Number)
+                    return new Number((left as Number).asInteger() ^ (right as Number).asInteger());
+                return new Number(0);
             });
         }
     }

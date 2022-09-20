@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Stack<T>
+    internal class Stack<T>
     {
         protected T[] __items;
         public int index { get; protected set; }
@@ -40,9 +40,9 @@ namespace Qrakhen.Sqr.Core
             return __items[index++];
         }
 
-        public void setCursor(int index)
+        public void move(int delta = 1)
         {
-            this.index = index;
+            index += delta;
         }
 
         public T[] digestUntil(T value)

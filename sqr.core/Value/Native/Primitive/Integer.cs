@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Qrakhen.Dependor;
+using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -14,6 +14,6 @@ namespace Qrakhen.Sqr.Core
         }
 
         public static implicit operator int(Integer n) => n.__value;
-        public static explicit operator Integer(int d) => new Integer(d);
+        public static implicit operator Integer(int d) => new Integer(d);
     }
 }

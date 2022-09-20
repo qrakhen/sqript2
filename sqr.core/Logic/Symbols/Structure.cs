@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Structure : ITyped<Structure.Type>
+    internal class Structure : ITyped<Structure.Type>
     {
         private static readonly Storage<Type, Structure> structures = new Storage<Type, Structure>();
 
@@ -39,12 +39,13 @@ namespace Qrakhen.Sqr.Core
             return open + " " + close;
         }
 
+        [Flags]
         public enum Type
         {
-            BODY,
-            QOLLECTION,
-            ARRAY,
-            GROUP
+            BODY = 1,
+            QOLLECTION = 2,
+            ARRAY = 4,
+            GROUP = 8
         }
 
         public static void register(Type type, string open, string close, string separator = null)

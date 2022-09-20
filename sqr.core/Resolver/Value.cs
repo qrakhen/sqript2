@@ -1,4 +1,4 @@
-﻿using Qrakhen.Dependor;
+﻿using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -7,7 +7,7 @@ using System.Linq;
 namespace Qrakhen.Sqr.Core
 {  
     [Injectable]
-    public class ValueResolver : Resolver<Stack<Token>, Value>
+    internal class ValueResolver : Resolver<Stack<Token>, Value>
     {
         private readonly Logger log;
         private readonly StructureResolver structureResolver;
@@ -75,9 +75,7 @@ namespace Qrakhen.Sqr.Core
                 } else {
                     end();
                 }
-            });
-
-            log.spam(full + " is a " + value.type.name + " with the value " + value);            
+            });          
 
             return value;
         }

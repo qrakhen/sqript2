@@ -4,12 +4,11 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Keyword : ITyped<Keyword.Type>
+    internal class Keyword : ITyped<Keyword.Type>
     {
         private static readonly Storage<Type, Keyword> keywords = new Storage<Type, Keyword>();
 
         public string symbol;
-        public Func<object, Stack<Token>> resolve;
         public List<string> aliases = new List<string>();
 
         public Keyword(Type type, string symbol)
@@ -32,24 +31,31 @@ namespace Qrakhen.Sqr.Core
 
         public static Keyword get(string symbol)
         {
+            if (symbol.StartsWith("@")) return keywords[Type.DECLARE_TYPED];
             return keywords.findOne(_ => _.aliases.Contains(symbol));
+        }
+
+        public static Keyword get(Type type)
+        {
+            return keywords[type];
         }
 
         [Flags]
         public enum Type
         {
-            DECLARE_DYN = 1,
-            DECLARE_REF = 2,
-            DECLARE_FUNQTION = 4,
-            DECLARE_QLASS = 8,
+            DECLARE_DYN = BitFlag._1,
+            DECLARE_REF = BitFlag._2,
+            DECLARE_TYPED = BitFlag._3,
+            DECLARE_FUNQTION = BitFlag._4,
+            DECLARE_QLASS = BitFlag._5,
             DECLARE = DECLARE_DYN | DECLARE_REF | DECLARE_FUNQTION | DECLARE_QLASS,
-            IMPORT = 16,
-            QONDITION_IF = 32,
-            QONDITION_ELSE = 64,
-            LOOP_FOR = 128,
-            LOOP_WHILE = 256,
-            LOOP_DO = 512,
-            FUNQTION_RETURN = 1024,
+            IMPORT = BitFlag._6,
+            QONDITION_IF = BitFlag._7,
+            QONDITION_ELSE = BitFlag._8,
+            LOOP_FOR = BitFlag._9,
+            LOOP_WHILE = BitFlag._10,
+            LOOP_DO = BitFlag._11,
+            FUNQTION_RETURN = BitFlag._12
         }
 
         public static Keyword register(Type type, string symbol)
@@ -62,7 +68,8 @@ namespace Qrakhen.Sqr.Core
         static Keyword()
         {
             register(Type.DECLARE_DYN, "var"); 
-            register(Type.DECLARE_REF, "ref");
+            register(Type.DECLARE_REF, "ref DISCONTINUED, use var& name instead");
+            register(Type.DECLARE_TYPED, "@");
             register(Type.DECLARE_FUNQTION, "funqtion")
                 .alias("funq")
                 .alias("fn");

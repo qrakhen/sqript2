@@ -6,11 +6,10 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Instance : Value
+    public class Qlass : Value
     {
-        public Instance(Type definition) : base(definition)
-        {
+        public Type declaringType;
 
-        }
+        public Qlass() : base(Type.Qlass) { }
     }
 }
