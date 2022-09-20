@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Qrakhen.Dependor;
+using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -10,7 +10,7 @@ using static Qrakhen.Sqr.Core.Token;
 namespace Qrakhen.Sqr.Core
 {
     [Injectable]
-    public class OperationResolver : Resolver<Stack<Token>, Operation>
+    internal class OperationResolver : Resolver<Stack<Token>, Operation>
     {
         private readonly Logger log;
         private readonly ValueResolver valueResolver;
@@ -19,6 +19,7 @@ namespace Qrakhen.Sqr.Core
         private readonly FunqtionResolver funqtionResolver;
         private readonly ObjeqtResolver objeqtResolver;
         private readonly QonditionResolver qonditionResolver;
+        private readonly DeclarationResolver declarationResolver;
 
         public Operation resolveOne(Stack<Token> input, Qontext qontext)
         {
@@ -50,7 +51,7 @@ namespace Qrakhen.Sqr.Core
                 if (t.isType(Token.Type.Value))
                     handleValue(input, ref node, qontext, level);
 
-                else if (t.isType(Token.Type.Keyword))
+                else if (t.isType(Token.Type.Keyword | Token.Type.Type))
                     handleKeyword(input, ref node, qontext, level);
 
                 else if (t.isType(Token.Type.Operator))
@@ -62,7 +63,7 @@ namespace Qrakhen.Sqr.Core
                 else if (input.peek().isType(Token.Type.End)) {
                     if (level == 0) input.digest();
                     break;
-                }
+                } else throw new SqrError("unknown or entirely unexpected token " + t, t);
             } while (!input.done);
 
             if (level == 0) {
@@ -92,32 +93,20 @@ namespace Qrakhen.Sqr.Core
             if (!node.empty || level > 0) {
                 throw new SqrError("unexpected keyword " + t, t);
             } else {
-                var k = input.digest().get<Keyword>();
-                if (k.isType(Keyword.Type.DECLARE)) {
-                    t = input.digest();
-                    if (!t.isType(Token.Type.Identifier)) {
-                        throw new SqrError("identifier expected after keyword " + k.symbol + ", got " + t + "instead", t);
-                    } else {
-                        if (k.isType(Keyword.Type.DECLARE_DYN)) {
-                            node.left = qontext.register(t.raw);
-                        } else if (k.isType(Keyword.Type.DECLARE_REF)) {
-                            node.left = qontext.register(t.raw, null, true);
-                        } else if (k.isType(Keyword.Type.DECLARE_FUNQTION)) {
-                            var funqtion = funqtionResolver.resolve(
-                                structureResolver.resolve(input, qontext), qontext);
-                            node.left = qontext.register(t.raw, new Qallable(funqtion));
-                        } else {
-                            throw new SqrError("not yet implemented: " + k.symbol);
-                        }
-
-                        log.spam("registered name " + t + " in qontext");
-                    }
-                } else if (k.isType(Keyword.Type.QONDITION_IF)) {
-                    input.move(-1); // it hurts so bad
+                var k = input.peek().get<Keyword>();
+                if (k != null && k.isType(Keyword.Type.QONDITION_IF)) {
                     var qondition = qonditionResolver.resolveIfElse(input, qontext);
                     qondition.execute();
                 } else {
-                    throw new SqrError("not yet implemented: " + t, t);
+                    var info = declarationResolver.resolve(input, qontext);
+                    if (info.isFunqtion) {
+                        var funqtion = funqtionResolver.resolve(
+                            structureResolver.resolve(input, qontext), qontext, info);
+                        node.left = qontext.register(info.name, new Qallable(funqtion));
+                    } else {
+                        node.left = qontext.register(info.name, null, info.isReference, info.type, info.isReadonly);
+                    }
+                    log.spam("registered name " + t + " in qontext");
                 }
             }
         }
@@ -160,8 +149,8 @@ namespace Qrakhen.Sqr.Core
                 var qollection = qollectionResolver.resolve(innerStack, qontext);
                 node.put(qollection);
             } else if (Structure.get(t.raw).type == Structure.Type.GROUP) {
-                var result = resolveOne(innerStack, qontext).execute();
-                node.put(result);
+                var result = resolveOne(innerStack, qontext);//.execute(); // we dont have to execute right away. why would we do that even.
+                node.put(result.head);
             } else if (Structure.get(t.raw).type == Structure.Type.BODY) {
                 var objeqt = objeqtResolver.resolve(innerStack, qontext);
                 node.put(objeqt);

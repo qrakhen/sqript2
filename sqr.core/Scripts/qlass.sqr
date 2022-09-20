@@ -1,0 +1,27 @@
+﻿import 'sqript/core/console';
+import 'sqript/core/math';
+
+# @type:name = same as *~ name for dynamic types (just a declare)
+# .x is alias for this:x
+
+qlass Vector3 
+{
+	@number x;
+	@number y;
+	@number z;
+
+	funq init (@number x, @number y, @number z {
+		.x <~ x;
+		.y <~ y;
+		.z <~ z;
+	});
+
+	@Vector3:funq clone({
+		<~ new Vector3(.x, .y, .z);
+	});
+
+	@number:funq distance(@Vector3 to {
+		*~ delta <~ new Vector3(to:x - .x, to:y - .y, to:z - .z);
+		return math:sqrt((delta:x * delta:x) + (delta:y + delta:y) + (delta:z + delta:z));
+	});
+}

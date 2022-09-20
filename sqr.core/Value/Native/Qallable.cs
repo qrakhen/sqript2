@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Qrakhen.Dependor;
+using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +11,10 @@ namespace Qrakhen.Sqr.Core
     {
         public Qallable(Funqtion value) : base(value, Type.Qallable)
         {
-            
+            xxx("asd");
         }
+
+        public void xxx(String a) { }
 
         public Value execute(Value[] parameters, Qontext qontext, Value self = null)
         {

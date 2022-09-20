@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
-using Qrakhen.Dependor;
+using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
-{  
+{
     public class Qontext
     {
         [JsonProperty]
@@ -30,13 +30,13 @@ namespace Qrakhen.Sqr.Core
                 string name, 
                 Value value = null, 
                 bool isReference = false, 
-                bool isStrictType = false, 
+                Type strictType = null, 
                 bool isReadonly = false)
         {
             if (names[name] != null) {
                 throw new SqrError("name " + name + " already declared in qontext");
             }
-            return names[name] = new Variable(value, isReference, isStrictType, isReadonly);
+            return names[name] = new Variable(value, isReference, strictType, isReadonly);
         }
 
         public Value resolveName(string name) => resolveName(new string[] { name });

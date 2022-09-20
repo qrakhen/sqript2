@@ -1,4 +1,4 @@
-﻿using Qrakhen.Dependor;
+﻿using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -6,25 +6,28 @@ using System.Text.RegularExpressions;
 namespace Qrakhen.Sqr.Core
 {
     [Injectable]
-    public class QonditionResolver : Resolver<Stack<Token>, Qondition>
+    internal class QonditionResolver : Resolver<Stack<Token>, Qondition>
     {
         private readonly ValueResolver valueResolver;
         private readonly StructureResolver structureResolver;
         private readonly OperationResolver operationResolver;
 
-        public IfQondition resolveIfElse(Stack<Token> input, Qontext qontext)
-        {
-            var qondition = new IfQondition(resolve(input, qontext));
-            if (!input.done && input.peek().raw == Keyword.get(Keyword.Type.QONDITION_ELSE).symbol) {
-                qondition.chainElseIf(resolveIfElse(input, qontext));
-            }
-            return qondition;
-        }
-
         public Qondition resolve(Stack<Token> input, Qontext qontext)
         {
-            log.spam("in " + GetType().Name);
+            var type = input.peek().get<Keyword>();
+            if (type.type == Keyword.Type.QONDITION_IF)
+                return resolveIfElse(input, qontext);
+            if (type.type == Keyword.Type.LOOP_DO)
+                return resolveDoWhile(input, qontext);
+            if (type.type == Keyword.Type.LOOP_WHILE)
+                return resolveWhile(input, qontext);
+            if (type.type == Keyword.Type.LOOP_FOR)
+                return resolveFor(input, qontext);
+            return null;
+        }
 
+        public IfQondition resolveIfElse(Stack<Token> input, Qontext qontext)
+        {
             var type = input.digest().get<Keyword>();
             log.spam("resolving " + type.symbol + " condition");
 
@@ -49,7 +52,31 @@ namespace Qrakhen.Sqr.Core
 
             var body = new Body(structureResolver.resolve(input, qontext).items);
 
-            return new Qondition(condition, body, qontext);
+            var qondition = new IfQondition(condition, body, qontext);
+            if (!input.done && input.peek().raw == Keyword.get(Keyword.Type.QONDITION_ELSE).symbol) {
+                qondition.chainElseIf(resolveIfElse(input, qontext));
+            }
+            return qondition;
+        }
+
+        public Qondition resolveDoWhile(Stack<Token> input, Qontext qontext)
+        {
+            return null;
+        }
+
+        public Qondition resolveWhile(Stack<Token> input, Qontext qontext)
+        {
+            return null;
+        }
+
+        public Qondition resolveFor(Stack<Token> input, Qontext qontext)
+        {
+            return null;
+        }
+
+        public Qondition resolveTryCatch(Stack<Token> input, Qontext qontext)
+        {
+            return null;
         }
     }
 }
