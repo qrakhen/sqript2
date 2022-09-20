@@ -263,23 +263,26 @@ namespace Qrakhen.Sqr.Core
     public enum NativeType
     {
         None = default,
-        Boolean = 1,
-        Byte = 2,
-        Float = 4,
-        Integer = 8,
+        Boolean,
+        Byte,
+        Float,
+        Integer,
+
         Number = Float | Integer,
 
-        String = 16,
+        String,
+
         Primitive = Boolean | Number | String,
 
-        Array = 32,
-        List = 64,
+        Array,
+        List,
         Qollection = Array | List,
 
-        Objeqt = 128,
-        Instance = 256,
-        Variable = 512,
-        Funqtion = 1024,
-        Null = 2048
+        Objeqt,
+        Instance,
+        Variable,
+        Funqtion,
+        Null,
+
     }
 }

@@ -44,19 +44,20 @@ namespace Qrakhen.Sqr.Core
         [Flags]
         public enum Type
         {
-            DECLARE_DYN = 1,
-            DECLARE_REF = 2,
-            DECLARE_TYPED = 4,
-            DECLARE_FUNQTION = 8,
-            DECLARE_QLASS = 16,
+            DECLARE_DYN,
+            DECLARE_REF,
+            DECLARE_TYPED,
+            DECLARE_FUNQTION,
+            DECLARE_QLASS,
             DECLARE = DECLARE_DYN | DECLARE_REF | DECLARE_FUNQTION | DECLARE_QLASS,
-            IMPORT = 64,
-            QONDITION_IF = 128,
-            QONDITION_ELSE = 256,
-            LOOP_FOR = 512,
-            LOOP_WHILE = 1024,
-            LOOP_DO = 2049,
-            FUNQTION_RETURN = 4096,
+            IMPORT,
+            QONDITION_IF,
+            QONDITION_ELSE,
+            LOOP_FOR,
+            LOOP_WHILE,
+            LOOP_DO,
+            FUNQTION_RETURN,
+
         }
 
         public static Keyword register(Type type, string symbol)

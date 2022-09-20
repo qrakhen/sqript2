@@ -10,7 +10,7 @@ namespace Qrakhen.Sqr.Core
 
         public bool isType(T types)
         {
-            return (((int)(object)type & (int)(object)types) >= (int)(object)type);
+            return type.Equals(types);
         }
     }
 }

@@ -39,6 +39,7 @@ namespace Qrakhen.Sqr.Core
             return open + " " + close;
         }
 
+        [Flags]
         public enum Type
         {
             BODY,
