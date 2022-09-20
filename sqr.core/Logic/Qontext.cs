@@ -10,7 +10,7 @@ namespace Qrakhen.Sqr.Core
     public class Qontext
     {
         [JsonProperty]
-        protected Storage<string, Variable> names = new Storage<string, Variable>();
+        public Storage<string, Variable> names { get; protected set; } = new Storage<string, Variable>();
 
         public static readonly Qontext globalContext = new Qontext();
 
@@ -57,7 +57,7 @@ namespace Qrakhen.Sqr.Core
             else if (parent != null)
                 return parent.lookUp(name);
             else
-                throw new SqrError("could not find the name " + name[0] + " within the current qontext (recursive lookup)");
+                throw new SqrError("could not find the name " + name + " within the current qontext (recursive lookup)");
         }
     }
 }

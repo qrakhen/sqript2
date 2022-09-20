@@ -32,7 +32,7 @@ namespace Qrakhen.Sqr.Core
                     result.Add(token);
                 }
             }
-            log.spam(string.Join(",", result.Select(_ => _.type + ": " + _.raw)));
+            log.spam(string.Join(", ", result.Select(_ => _.type + ": '" + _.raw + "'")));
             count = input.length;
             return new Stack<Token>(result.ToArray());
         }
@@ -67,6 +67,19 @@ namespace Qrakhen.Sqr.Core
             return buffer;
         }
 
+        private string readIdentifier(Stack<char> input)
+        {
+            string buffer = "";
+            while (
+                    matchType(input.peek()) == Token.Type.Identifier ||
+                    Regex.IsMatch(input.peek().ToString(), @"\d")) {
+                buffer += input.digest();
+                if (input.done)
+                    break;
+            }
+            return buffer;
+        }
+
         private string readValue(Token.Type type, Stack<char> input)
         {
             if (type == Token.Type.Comment) {
@@ -82,13 +95,16 @@ namespace Qrakhen.Sqr.Core
             if (type == Token.Type.String)
                 return readString(input);
 
-            if (type == Token.Type.Type) {
+            if (type == Token.Type.Type) { 
                 var r = input.digest() + readType(input, Token.Type.Identifier);
                 if (input.peek() == '&')
                     return r + input.digest();
                 else
                     return r;
             }
+
+            if (type == Token.Type.Identifier)
+                return readIdentifier(input);
 
             string buffer = "";
             while (type == matchType(input.peek())) {
@@ -115,7 +131,7 @@ namespace Qrakhen.Sqr.Core
             { Token.Type.String, "[\"']" },
             { Token.Type.Structure, @"[{}()[\],]" },
             { Token.Type.End, @";" },
-            { Token.Type.Accessor, @"[.:]" },
+            { Token.Type.Accessor, @"[:]" },
             { Token.Type.Type, "@" },
             { Token.Type.Whitespace, @"\s" },
             { Token.Type.Comment, @"#" },
@@ -179,7 +195,7 @@ namespace Qrakhen.Sqr.Core
             if (value == null)
                 throw new SqrError("could not parse value " + raw + ", it's not a known " + type);
 
-            if (value.GetType() == typeof(Boolean))
+            if (value.GetType() == typeof(bool))
                 type = Type.Boolean;
 
             if (value.GetType() == typeof(Keyword))

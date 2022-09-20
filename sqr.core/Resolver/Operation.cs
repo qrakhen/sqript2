@@ -16,11 +16,21 @@ namespace Qrakhen.Sqr.Core
         private readonly ValueResolver valueResolver;
         private readonly StructureResolver structureResolver;
         private readonly QollectionResolver qollectionResolver;
+        private readonly FunqtionResolver funqtionResolver;
         private readonly ObjeqtResolver objeqtResolver;
 
-        public Operation resolve(Stack<Token> input, Qontext qontext)
+        public Operation resolveOne(Stack<Token> input, Qontext qontext)
         {
-            return new Operation(build(input, qontext));
+            bool isReturning = false;
+            if ((    
+                    input.peek().type == Token.Type.Keyword && 
+                    input.peek().get<Keyword>().type == Keyword.Type.FUNQTION_RETURN) || ((
+                    input.peek().type == Token.Type.Operator &&
+                    input.peek().get<Operator>().type == Operator.Type.ASSIGN))) {
+                input.digest();
+                isReturning = true;
+            }
+            return new Operation(build(input, qontext), isReturning);
         }
 
         protected Node build(Stack<Token> input, Qontext qontext, Node node = null, int level = 0)
@@ -48,9 +58,11 @@ namespace Qrakhen.Sqr.Core
                 else if (t.isType(Token.Type.Structure))
                     handleStructure(input, ref node, qontext, level);
 
-                else if (t.isType(Token.Type.End))
-                    input.digest(); // handleValue(input, node, qontext, level);         
-                
+                else if (t.isType(Token.Type.End)) {
+                    input.digest();
+                    break;
+                }
+
                 else throw new SqrError("currently unknown token " + t, t);                
             } while (!input.done);
 
@@ -91,6 +103,10 @@ namespace Qrakhen.Sqr.Core
                             node.left = qontext.register(t.raw);
                         } else if (k.isType(Keyword.Type.DECLARE_REF)) {
                             node.left = qontext.register(t.raw, null, true);
+                        } else if (k.isType(Keyword.Type.DECLARE_FUNQTION)) {
+                            var funqtion = funqtionResolver.resolve(
+                                structureResolver.resolve(input, qontext), qontext);
+                            node.left = qontext.register(t.raw, new Qallable(funqtion));
                         } else {
                             throw new SqrError("not yet implemented: " + k.symbol);
                         }
@@ -145,7 +161,7 @@ namespace Qrakhen.Sqr.Core
                 var qollection = qollectionResolver.resolve(innerStack, qontext);
                 node.put(qollection);
             } else if (Structure.get(t.raw).type == Structure.Type.GROUP) {
-                var result = resolve(innerStack, qontext).execute();
+                var result = resolveOne(innerStack, qontext).execute();
                 node.put(result);
             } else if (Structure.get(t.raw).type == Structure.Type.BODY) {
                 var objeqt = objeqtResolver.resolve(innerStack, qontext);

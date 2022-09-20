@@ -2,6 +2,10 @@
 using Qrakhen.Dependor;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
@@ -20,6 +24,9 @@ namespace Qrakhen.Sqr.Core
         {
             log.setLoggingLevel(Logger.Level.SPAM);
             log.success("welcome to Sqript2.0, or simply sqr. Enjoy thyself.");
+            var t = File.ReadAllText("testing.sqr");
+            Console.Write(t);
+            execute(t);
             do {
                 try {
 
@@ -29,7 +36,7 @@ namespace Qrakhen.Sqr.Core
                     var op = "*~ a <~ 5;"; // 2 - 3 + 3 * 3 / 5 + test:von:mama:her";
 
                     Console.Write("    <: ");
-                    execute(Console.ReadLine());
+                    execute(Console.ReadLine()); // doTheConsoleThing()); <- dont, broken attm
 
                 } catch (SqrError e) {
                     log.warn(log.loggingLevel > Logger.Level.INFO ? e : (object)e.Message);
@@ -44,6 +51,51 @@ namespace Qrakhen.Sqr.Core
             } while (alive);
         }
 
+        // das alles in eine console klasse
+        private void clearLine()
+        {
+            var c = Console.CursorTop;
+            Console.SetCursorPosition(0, Console.CursorTop);
+            Console.Write(new string(' ', Console.WindowWidth));
+            Console.SetCursorPosition(0, c);
+        }
+
+        private string doTheConsoleThing()
+        {
+            var builder = new StringBuilder();
+            var input = Console.ReadKey(true);
+
+            while ((input = Console.ReadKey(true)).Key != ConsoleKey.Enter) {
+                var c = builder.ToString();
+                if (input.Key == ConsoleKey.Tab) {
+                    var match = Qontext.globalContext.names.Keys
+                        .FirstOrDefault(item => item != c && item.StartsWith(c, true, CultureInfo.InvariantCulture));
+                    if (string.IsNullOrEmpty(match)) {
+                        continue;
+                    }
+
+                    clearLine();
+                    builder.Clear();
+                    Console.Write("    <:" + match);
+                    builder.Append(match);
+                } else {
+                    if (input.Key == ConsoleKey.Backspace && c.Length > 0) {
+                        builder.Remove(builder.Length - 1, 1);
+                        clearLine();
+
+                        c = c.Remove(c.Length - 1);
+                        Console.Write("    <:" + c);
+                    } else {
+                        var key = input.KeyChar;
+                        builder.Append(key);
+                        Console.Write(key);
+                    }
+                }
+            }
+           
+            return builder.ToString();
+        }
+
         private void execute(string input)
         {
             if (input.StartsWith("/")) {
@@ -55,8 +107,10 @@ namespace Qrakhen.Sqr.Core
             }
 
             var tokenStack = tokenResolver.resolve(new Core.Stack<char>(applyAliases(input).ToCharArray()));
-            var operation = operationResolver.resolve(tokenStack, Qontext.globalContext);
-            log.success(operation.execute());
+            while (!tokenStack.done) {
+                var operation = operationResolver.resolveOne(tokenStack, Qontext.globalContext);
+                log.success(operation.execute());
+            }
         }
 
         private void commands(string input)
@@ -135,7 +189,8 @@ namespace Qrakhen.Sqr.Core
             { "*~", "var" },
             { "*&", "ref" },
             { "*$~", "@$" },
-            { "*$&", "@$&" }
+            { "*$&", "@$&" },
+            { ":(", "funq(" }
         };
     }
 }

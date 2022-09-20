@@ -6,7 +6,16 @@ namespace Qrakhen.Sqr.Core
 {
     public class Body
     {
-        public Qontext qontext { get; protected set; }
-        public Token[] content { get; protected set; }
+        protected readonly Token[] content;
+
+        public Body(Token[] content)
+        {
+            this.content = content;
+        }
+
+        public Stack<Token> getStack()
+        {
+            return new Stack<Token>(content);
+        }
     }
 }

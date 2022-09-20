@@ -10,11 +10,12 @@ namespace Qrakhen.Sqr.Core
         protected readonly Logger log;
 
         public Node head { get; protected set; }
-        public bool isReturning => head?.isReturning ?? false;
+        public bool isReturning { get; protected set; }
 
-        public Operation(Node head = null)
+        public Operation(Node head = null, bool isReturning = false)
         {
             this.head = head;
+            this.isReturning = isReturning;
         }
 
         public Value execute()

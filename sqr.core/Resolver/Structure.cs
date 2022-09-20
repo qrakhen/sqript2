@@ -57,7 +57,7 @@ namespace Qrakhen.Sqr.Core
             do {
                 t = input.digest();
                 log.spam(t);
-                if (t.raw == until)
+                if (t.raw == until && level == 0)
                     break;
 
                 if (Structure.openers.Contains(t.raw)) {

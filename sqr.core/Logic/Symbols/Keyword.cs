@@ -10,11 +10,19 @@ namespace Qrakhen.Sqr.Core
 
         public string symbol;
         public Func<object, Stack<Token>> resolve;
+        public List<string> aliases = new List<string>();
 
         public Keyword(Type type, string symbol)
         {
             this.type = type;
             this.symbol = symbol;
+            alias(symbol);
+        }
+
+        public Keyword alias(string alias)
+        {
+            aliases.Add(alias);
+            return this;
         }
 
         public override string ToString()
@@ -24,36 +32,40 @@ namespace Qrakhen.Sqr.Core
 
         public static Keyword get(string symbol)
         {
-            return keywords.findOne(_ => _.symbol == symbol);
+            return keywords.findOne(_ => _.aliases.Contains(symbol));
         }
 
         [Flags]
         public enum Type
         {
-            DECLARE_DYN,
-            DECLARE_REF,
-            DECLARE_FUNQTION,
-            DECLARE_QLASS,
+            DECLARE_DYN = 1,
+            DECLARE_REF = 2,
+            DECLARE_FUNQTION = 4,
+            DECLARE_QLASS = 8,
             DECLARE = DECLARE_DYN | DECLARE_REF | DECLARE_FUNQTION | DECLARE_QLASS,
-            IMPORT,
-            QONDITION_IF,
-            QONDITION_ELSE,
-            LOOP_FOR,
-            LOOP_WHILE,
-            LOOP_DO,
-            FUNQTION_RETURN,
+            IMPORT = 16,
+            QONDITION_IF = 32,
+            QONDITION_ELSE = 64,
+            LOOP_FOR = 128,
+            LOOP_WHILE = 256,
+            LOOP_DO = 512,
+            FUNQTION_RETURN = 1024,
         }
 
-        public static void register(Type type, string symbol)
+        public static Keyword register(Type type, string symbol)
         {
-            keywords.Add(type, new Keyword(type, symbol));
+            var word = new Keyword(type, symbol);
+            keywords.Add(type, word);
+            return word;
         }
 
         static Keyword()
         {
             register(Type.DECLARE_DYN, "var"); 
             register(Type.DECLARE_REF, "ref");
-            register(Type.DECLARE_FUNQTION, "funqtion");
+            register(Type.DECLARE_FUNQTION, "funqtion")
+                .alias("funq")
+                .alias("fn");
             register(Type.DECLARE_QLASS, "qlass");
             register(Type.IMPORT, "import");
             register(Type.QONDITION_IF, "if");
