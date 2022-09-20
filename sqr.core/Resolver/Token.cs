@@ -1,4 +1,4 @@
-﻿using Qrakhen.Dependor;
+﻿using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -7,7 +7,7 @@ using System.Linq;
 namespace Qrakhen.Sqr.Core
 {  
     [Injectable]
-    public class TokenResolver : Resolver<Stack<char>, Stack<Token>>
+    internal class TokenResolver : Resolver<Stack<char>, Stack<Token>>
     {
         private readonly Logger log;
 

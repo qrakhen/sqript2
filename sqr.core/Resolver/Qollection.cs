@@ -1,4 +1,4 @@
-﻿using Qrakhen.Dependor;
+﻿using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 namespace Qrakhen.Sqr.Core
 {
     [Injectable]
-    public class QollectionResolver : Resolver<Stack<Token>, Qollection>
+    internal class QollectionResolver : Resolver<Stack<Token>, Qollection>
     {
         private readonly ValueResolver valueResolver;
         private readonly StructureResolver structureResolver;

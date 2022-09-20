@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Qondition
+    internal class Qondition
     {
         public readonly Operation condition;
         public readonly Body body;
@@ -20,7 +20,7 @@ namespace Qrakhen.Sqr.Core
         public virtual void execute() { }
     }
 
-    public class IfQondition : Qondition
+    internal class IfQondition : Qondition
     {
         protected IfQondition elseIf;
 

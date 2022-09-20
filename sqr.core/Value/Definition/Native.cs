@@ -21,4 +21,9 @@ namespace Qrakhen.Sqr.Core
     {
         
     }
+
+    public static class Natives
+    {
+
+    }
 }

@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Qrakhen.Dependor;
+using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,10 +28,10 @@ namespace Qrakhen.Sqr.Core
 
             Qontext.globalContext.register(
                 "cout",
-                new Qallable(new InternalFunqtion((p, s) => { log.success(p[0].raw); return null; })));
+                new Qallable(new InternalFunqtion((p, q, s) => { log.success(p[0].raw); return null; })));
             Qontext.globalContext.register(
                 "log",
-                new Qallable(new InternalFunqtion((p, s) => { log.setLoggingLevel((Logger.Level)int.Parse(p[0].raw.ToString())); return null; })));
+                new Qallable(new InternalFunqtion((p, q, s) => { log.setLoggingLevel((Logger.Level)int.Parse(p[0].raw.ToString())); return null; })));
 
             do {
                 try {

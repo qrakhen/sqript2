@@ -10,7 +10,7 @@ namespace Qrakhen.Sqr.shell
         static void Main(string[] args)
         {
             Console.ForegroundColor = ConsoleColor.White;
-            Dependor.Dependor.get<Runtime>().run();
+            SqrDI.Dependor.get<Runtime>().run();
         }
     }
 }

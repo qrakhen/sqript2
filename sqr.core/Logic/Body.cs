@@ -7,7 +7,7 @@ namespace Qrakhen.Sqr.Core
     public class Body
     {
         private static readonly OperationResolver operationResolver = 
-            Dependor.Dependor.get<OperationResolver>(); // use static fields for these kinds of injectors
+            SqrDI.Dependor.get<OperationResolver>(); // use static fields for these kinds of injectors
 
         protected readonly Token[] content;
 
@@ -16,7 +16,7 @@ namespace Qrakhen.Sqr.Core
             this.content = content;
         }
 
-        public Stack<Token> getStack()
+        internal Stack<Token> getStack()
         {
             return new Stack<Token>(content);
         }

@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Qrakhen.Dependor;
+using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -10,7 +10,7 @@ using static Qrakhen.Sqr.Core.Token;
 namespace Qrakhen.Sqr.Core
 {
     [Injectable]
-    public class OperationResolver : Resolver<Stack<Token>, Operation>
+    internal class OperationResolver : Resolver<Stack<Token>, Operation>
     {
         private readonly Logger log;
         private readonly ValueResolver valueResolver;

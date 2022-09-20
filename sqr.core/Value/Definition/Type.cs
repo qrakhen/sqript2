@@ -179,8 +179,8 @@ namespace Qrakhen.Sqr.Core
                 fields = null,
                 module = coreModule,
                 methods = new Storage<string, Method>() {
-                    { "toString", new Method(new InternalFunqtion((p, self) => self.toString())) },
-                    { "type", new Method(new InternalFunqtion((p, self) => new String(self.type.name))) }
+                    { "toString", new Method(new InternalFunqtion((p, q, self) => self.toString())) },
+                    { "type", new Method(new InternalFunqtion((p, q, self) => new String(self.type.name))) }
                 }
             });
 
@@ -193,7 +193,7 @@ namespace Qrakhen.Sqr.Core
                 module = coreModule,
                 methods = new Storage<string, Method>() {
                 { "span", new Method(
-                    new InternalFunqtion((p, self) => (self as Core.String).span(p[0], p[1]))) }
+                    new InternalFunqtion((p, q, self) => (self as Core.String).span(p[0], p[1]))) }
                 }
             });
 
@@ -205,7 +205,7 @@ namespace Qrakhen.Sqr.Core
                 module = coreModule,
                 methods = new Storage<string, Method>() {
                 { "xxx", new Method(
-                    new InternalFunqtion((p, self) => Core.Value.Null)) }
+                    new InternalFunqtion((p, q, self) => Core.Value.Null)) }
                 }
             });
 
@@ -226,7 +226,7 @@ namespace Qrakhen.Sqr.Core
                 module = coreModule,
                 methods = new Storage<string, Method>() {
                 { "length", new Method(
-                    new InternalFunqtion((p, self) => new Number((self.obj as Qollection).length))) }
+                    new InternalFunqtion((p, q, self) => new Number((self.obj as Qollection).length))) }
                 }
             });
 
@@ -238,7 +238,7 @@ namespace Qrakhen.Sqr.Core
                 module = coreModule,
                 methods = new Storage<string, Method>() {
                 { "xxx", new Method(
-                    new InternalFunqtion((p, self) => Core.Value.Null)) }
+                    new InternalFunqtion((p, q, self) => Core.Value.Null)) }
                 }
             });
 
@@ -250,7 +250,7 @@ namespace Qrakhen.Sqr.Core
                 module = coreModule,
                 methods = new Storage<string, Method>() {
                 { "xxx", new Method(
-                    new InternalFunqtion((p, self) => Core.Value.Null)) }
+                    new InternalFunqtion((p, q, self) => Core.Value.Null)) }
                 }
             });
 
@@ -262,7 +262,7 @@ namespace Qrakhen.Sqr.Core
                 module = coreModule,
                 methods = new Storage<string, Method>() {
                 { "xxx", new Method(
-                    new InternalFunqtion((p, self) => Core.Value.Null)) }
+                    new InternalFunqtion((p, q, self) => Core.Value.Null)) }
                 }
             });
 
@@ -274,9 +274,9 @@ namespace Qrakhen.Sqr.Core
                 module = coreModule,
                 methods = new Storage<string, Method>() {
                 { "xxx", new Method(
-                    new InternalFunqtion((p, self) => Core.Value.Null)) },
+                    new InternalFunqtion((p, q, self) => Core.Value.Null)) },
                 { "type", new Method(
-                    new InternalFunqtion((p, self) => new String(self.type.name + "<" + self.obj.type.name + ">"))) }
+                    new InternalFunqtion((p, q, self) => new String(self.type.name + "<" + self.obj.type.name + ">"))) }
                 }
             });
         }

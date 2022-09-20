@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Qrakhen.Dependor;
+using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -8,7 +8,7 @@ namespace Qrakhen.Sqr.Core
 {
     public class Funqtion
     {
-        private static readonly OperationResolver operationResolver = Dependor.Dependor.get<OperationResolver>();
+        private static readonly OperationResolver operationResolver = SqrDI.Dependor.get<OperationResolver>();
 
         public readonly DeclaredParam[] parameters = new DeclaredParam[0];
         public readonly Type returnType;
@@ -59,16 +59,21 @@ namespace Qrakhen.Sqr.Core
 
     public class InternalFunqtion : Funqtion
     {
-        protected Func<Value[], Value, Value> callback;
+        protected Func<Value[], Qontext, Value, Value> callback;
 
-        public InternalFunqtion(Func<Value[], Value, Value> callback)
+        public InternalFunqtion(Func<Value[], Qontext, Value, Value> callback)
         {
             this.callback = callback;
         }
 
         public override Value execute(Value[] parameters, Qontext qontext, Value self = null)
         {
-            return callback(parameters, self);
+            return callback(parameters, qontext, self);
+        }
+
+        public Value execute(Value[] parameters, Value self = null)
+        {
+            return execute(parameters, null, self);
         }
     }
 }

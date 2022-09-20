@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 { 
-    public class StringDrawer
+    internal class StringDrawer
     {
         private char[,] canvas;
 

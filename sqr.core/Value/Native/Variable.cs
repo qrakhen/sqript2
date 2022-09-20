@@ -92,10 +92,6 @@ namespace Qrakhen.Sqr.Core
         public override string ToString()
         {
             return __value?.ToString();
-            /*return base.ToString() + 
-                "\nisReference: " + isReference + 
-                "\nisReadonly: " + isReadonly + 
-                "\nisStrictType: " + isStrictType;*/
         }
     }
 }

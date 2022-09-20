@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Operator : ITyped<Operator.Type>
+    internal class Operator : ITyped<Operator.Type>
     {
         private static readonly Storage<Type, Operator> operators = new Storage<Type, Operator>();
 

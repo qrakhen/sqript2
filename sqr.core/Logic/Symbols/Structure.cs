@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Structure : ITyped<Structure.Type>
+    internal class Structure : ITyped<Structure.Type>
     {
         private static readonly Storage<Type, Structure> structures = new Storage<Type, Structure>();
 
