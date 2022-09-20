@@ -14,6 +14,6 @@ namespace Qrakhen.Sqr.Core
         }
 
         public static implicit operator int(Integer n) => n.__value;
-        public static explicit operator Integer(int d) => new Integer(d);
+        public static implicit operator Integer(int d) => new Integer(d);
     }
 }

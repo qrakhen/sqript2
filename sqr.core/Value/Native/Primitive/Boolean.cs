@@ -14,6 +14,6 @@ namespace Qrakhen.Sqr.Core
         }
 
         public static implicit operator bool(Boolean b) => b.__value;
-        public static explicit operator Boolean(bool b) => new Boolean(b);
+        public static implicit operator Boolean(bool b) => new Boolean(b);
     }
 }

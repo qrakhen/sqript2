@@ -66,7 +66,6 @@ namespace Qrakhen.Sqr.Core
             } while (!input.done);
 
             if (level == 0) {
-                Console.Write(node.render());
                 if (node.check(011)) {
                     node.left = new Value(Type.Value);
                 }

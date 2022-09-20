@@ -190,30 +190,46 @@ namespace Qrakhen.Sqr.Core
 
         public static Token create(string raw, Type type)
         {
-            var value = parse(raw, type);
+            Type parsedType;
+            var value = parse(raw, type, out parsedType);
 
             if (value == null)
                 throw new SqrError("could not parse value " + raw + ", it's not a known " + type);
 
-            if (value.GetType() == typeof(bool))
-                type = Type.Boolean;
-
-            if (value.GetType() == typeof(Keyword))
-                type = Type.Keyword;
-
-            return new Token(value, type, raw);
+            return new Token(value, parsedType, raw);
         }
 
-        public static object parse(string raw, Type type)
+        public static object parse(string raw, Type type, out Type parsedType)
         {
             try {
-                if (raw == "true" || raw == "false") return (raw == "true" ? true : false);
-                if (type == Type.Number) return double.Parse(raw, System.Globalization.NumberFormatInfo.InvariantInfo);
-                if (type == Type.Operator) return Operator.get(raw);
-                if (type == Type.Structure) return Structure.get(raw);
-                if (type == Type.Keyword || type == Type.Identifier) {
+                parsedType = type;
+                if (raw == "true" || raw == "false") {
+                    parsedType = Type.Boolean;
+                    return (raw == "true" ? true : false);
+                }
+                if (type == Type.Number) {
+                    parsedType = Type.Number;
+                    return double.Parse(raw, System.Globalization.NumberFormatInfo.InvariantInfo);
+                }
+                if (type == Type.Operator) {
+                    parsedType = Type.Operator;
+                    return Operator.get(raw);
+                }
+                if (type == Type.Structure) {
+                    parsedType = Type.Structure;
+                    return Structure.get(raw); 
+                }
+                if (type == Type.Keyword || type == Type.Type || type == Type.Identifier) {
                     var v = Keyword.get(raw);
-                    if (v != null) return v;
+                    if (v != null) {
+                        parsedType = Type.Keyword;
+                        return v;
+                    }
+                    var t = Core.Type.get(raw);
+                    if (t != null) { 
+                        parsedType = Type.Type;
+                        return v;
+                    }
                 }
                 return raw;
             } catch (Exception e) {

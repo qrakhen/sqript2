@@ -14,6 +14,7 @@ namespace Qrakhen.Sqr.Core
 
         public Operation(Node head = null, bool isReturning = false)
         {
+            Console.Write(head.render());
             this.head = head;
             this.isReturning = isReturning;
         }
@@ -97,24 +98,43 @@ namespace Qrakhen.Sqr.Core
                 return "{ " + (left ?? "null") + " " + (op == null ? "noop" : op.symbol) + " " + (right ?? "null") + " }";
             }
 
-            public string render(int __level = 0)
+            public string render()
             {
-                var ident = "".PadLeft(__level * 5);
+                var drawer = new StringDrawer(Console.WindowWidth, Console.WindowHeight / 4);
+                var x = drawer.length / 2;
+                var y = drawer.height - 2;
+                __render(x, y, drawer);
+                return drawer.render();
+            }
 
-                var r = ident;
-                if (left is Node)
-                    r += "\n" + (left as Node).render(__level + 1);
-                else
-                    r += left?.ToString();
+            private void __render(int x = 0, int y = 0, StringDrawer drawer = null)
+            {
+                var e = "";
+                //drawer.draw(x, y, op?.symbol ?? " ");
+                if (left is Node) {
+                    (left as Node).__render(x - 16, y - 1, drawer);
+                } else {
+                    var s = left?.ToString();
+                    if (s != null) {
+                        e += "(" + s + " ";
+                        //drawer.draw(x - s.Length - 2, y, s ?? " ");
+                        //drawer.draw(x - s.Length - 3, y, "("); 
+                    }
+                }
 
-                r += " " + op?.symbol + " ";
+                e += op?.symbol;
 
-                if (right is Node)
-                    r += "\n" + (right as Node).render(__level + 1);
-                else
-                    r += right?.ToString();                
-
-                return r;
+                if (right is Node) {
+                    (right as Node).__render(x + 16, y - 1, drawer);
+                } else {
+                    var s = right?.ToString();
+                    if (s != null) {
+                        e += " " + s + ")";
+                        //drawer.draw(x + 3, y, s ?? " ");
+                        //drawer.draw(x + 4 + s.Length, y, ")");
+                    }
+                }
+                drawer.draw(x - e.Length / 2, y, e);
             }
         }
     }

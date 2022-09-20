@@ -28,6 +28,6 @@ namespace Qrakhen.Sqr.Core
         }
 
         public static implicit operator string(String s) => s.__value;
-        public static explicit operator String(string s) => new String(s);
+        public static implicit operator String(string s) => new String(s);
     }
 }
