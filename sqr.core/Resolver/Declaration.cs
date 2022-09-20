@@ -47,7 +47,7 @@ namespace Qrakhen.Sqr.Core
                     else if (k != null && !k.isType(Keyword.Type.DECLARE_DYN))
                         throw new SqrError("typed or dynamic declaration expected, got " + k.symbol);
                     else if (k == null)
-                        throw new SqrError("typed or dynamic declaration expected, got " + k.symbol);
+                        throw new SqrError("typed or dynamic declaration expected");
                     log.spam("dynamic declaration: " + k.symbol);
                 }
 
