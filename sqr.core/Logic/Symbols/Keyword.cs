@@ -44,20 +44,19 @@ namespace Qrakhen.Sqr.Core
         [Flags]
         public enum Type
         {
-            DECLARE_DYN,
-            DECLARE_REF,
-            DECLARE_TYPED,
-            DECLARE_FUNQTION,
-            DECLARE_QLASS,
+            DECLARE_DYN = BitFlag._1,
+            DECLARE_REF = BitFlag._2,
+            DECLARE_TYPED = BitFlag._3,
+            DECLARE_FUNQTION = BitFlag._4,
+            DECLARE_QLASS = BitFlag._5,
             DECLARE = DECLARE_DYN | DECLARE_REF | DECLARE_FUNQTION | DECLARE_QLASS,
-            IMPORT,
-            QONDITION_IF,
-            QONDITION_ELSE,
-            LOOP_FOR,
-            LOOP_WHILE,
-            LOOP_DO,
-            FUNQTION_RETURN,
-
+            IMPORT = BitFlag._6,
+            QONDITION_IF = BitFlag._7,
+            QONDITION_ELSE = BitFlag._8,
+            LOOP_FOR = BitFlag._9,
+            LOOP_WHILE = BitFlag._10,
+            LOOP_DO = BitFlag._11,
+            FUNQTION_RETURN = BitFlag._12
         }
 
         public static Keyword register(Type type, string symbol)

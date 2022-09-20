@@ -38,7 +38,7 @@ namespace Qrakhen.Sqr.Core
                 value = (value as Variable).__value;
 
             if (isStrictTyped && strictType?.name != value.type?.name)
-                throw new SqrError("can not assign type of " + value.type + " to type of " + base.type, this);
+                throw new SqrError("can not assign type of " + value.type + " to type of " + strictType, this);
 
             // reference logic
             if (asReference) {

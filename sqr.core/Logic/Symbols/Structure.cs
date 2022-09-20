@@ -42,10 +42,10 @@ namespace Qrakhen.Sqr.Core
         [Flags]
         public enum Type
         {
-            BODY,
-            QOLLECTION,
-            ARRAY,
-            GROUP
+            BODY = 1,
+            QOLLECTION = 2,
+            ARRAY = 4,
+            GROUP = 8
         }
 
         public static void register(Type type, string open, string close, string separator = null)

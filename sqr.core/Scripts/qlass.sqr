@@ -6,11 +6,11 @@ import 'sqript/core/math';
 
 qlass Vector3 
 {
-	@number: x;
-	@number: y;
-	@number: z;
+	@number x;
+	@number y;
+	@number z;
 
-	funq init (@number: x, @number: y, @number: z {
+	funq init (@number x, @number y, @number z {
 		.x <~ x;
 		.y <~ y;
 		.z <~ z;
@@ -20,7 +20,7 @@ qlass Vector3
 		<~ new Vector3(.x, .y, .z);
 	});
 
-	@number:funq distance(@Vector3: to {
+	@number:funq distance(@Vector3 to {
 		*~ delta <~ new Vector3(to:x - .x, to:y - .y, to:z - .z);
 		return math:sqrt((delta:x * delta:x) + (delta:y + delta:y) + (delta:z + delta:z));
 	});

@@ -42,26 +42,26 @@ namespace Qrakhen.Sqr.Core
         [Flags]
         public enum Type
         {
-            CALC_ADD,
-            CALC_SUB,
-            CALC_MULT,
-            CALC_DIV,
+            CALC_ADD = BitFlag._1,
+            CALC_SUB = BitFlag._2,
+            CALC_MULT = BitFlag._3,
+            CALC_DIV = BitFlag._4,
             CALC = CALC_ADD | CALC_SUB | CALC_MULT | CALC_DIV,
-            COND_AND,
-            COND_OR,
-            COMP_EQUAL,
-            COMP_NOTEQUAL,
-            COMP_GT,
-            COMP_GTEQUAL,
-            COMP_LT,
-            COMP_LTEQUAL,
-            LOGIC_NOT,
-            LOGIC_OR,
-            LOGIC_AND,
-            LOGIC_XOR,
-            QOLLECTION_ADD,
-            ASSIGN,
-            ASSIGN_REF
+            COND_AND = BitFlag._5,
+            COND_OR = BitFlag._6,
+            COMP_EQUAL = BitFlag._7,
+            COMP_NOTEQUAL = BitFlag._8,
+            COMP_GT = BitFlag._9,
+            COMP_GTEQUAL = BitFlag._10,
+            COMP_LT = BitFlag._11,
+            COMP_LTEQUAL = BitFlag._12,
+            LOGIC_NOT = BitFlag._13,
+            LOGIC_OR = BitFlag._14,
+            LOGIC_AND = BitFlag._15,
+            LOGIC_XOR = BitFlag._16,
+            QOLLECTION_ADD = BitFlag._17,
+            ASSIGN = BitFlag._18,
+            ASSIGN_REF = BitFlag._19
         }
 
         public static void register(Type type, string symbol, int weight, Func<Value, Value, Value> resolve)

@@ -100,7 +100,7 @@ namespace Qrakhen.Sqr.Core
 
             public string render()
             {
-                var drawer = new StringDrawer(Console.WindowWidth / 2, Console.WindowHeight / 4);
+                var drawer = new StringDrawer(Console.WindowWidth - 32, Console.WindowHeight / 4);
                 var x = drawer.length / 2;
                 var y = drawer.height - 2;
                 __render(x, y, drawer);
@@ -112,7 +112,7 @@ namespace Qrakhen.Sqr.Core
                 var e = "";
                 //drawer.draw(x, y, op?.symbol ?? " ");
                 if (left is Node) {
-                    (left as Node).__render(x - 9, y - 1, drawer);
+                    (left as Node).__render(x - 7, y - 1, drawer);
                 } else {
                     var s = left?.ToString();
                     if (s != null) {
@@ -125,7 +125,7 @@ namespace Qrakhen.Sqr.Core
                 e += op?.symbol;
 
                 if (right is Node) {
-                    (right as Node).__render(x + 9, y - 1, drawer);
+                    (right as Node).__render(x + 7, y - 1, drawer);
                 } else {
                     var s = right?.ToString();
                     if (s != null) {

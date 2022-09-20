@@ -256,11 +256,11 @@ namespace Qrakhen.Sqr.Core
             Structure = 32,
             Accessor = 64,
             Keyword = 128,
-            Identifier,
-            Whitespace,
-            Comment,
-            End,
-            Type,
+            Identifier = 256,
+            Whitespace = 512,
+            Comment = 1024,
+            End = 2048,
+            Type = 4096,
 
             Value = Boolean | Float | Number | String | Identifier
         }

@@ -163,6 +163,7 @@ namespace Qrakhen.Sqr.Core
                 name = "Value",
                 nativeType = NativeType.None,
                 fields = null,
+                module = coreModule,
                 methods = new Storage<string, Method>() {
                     { "toString", new Method(new InternalFunqtion((p, self) => self.toString())) },
                     { "type", new Method(new InternalFunqtion((p, self) => new String(self.type.name))) }
@@ -175,6 +176,7 @@ namespace Qrakhen.Sqr.Core
                 nativeType = NativeType.String,
                 fields = null,
                 extends = value,
+                module = coreModule,
                 methods = new Storage<string, Method>() {
                 { "span", new Method(
                     new InternalFunqtion((p, self) => (self as Core.String).span(p[0], p[1]))) }
@@ -186,6 +188,7 @@ namespace Qrakhen.Sqr.Core
                 nativeType = NativeType.Number,
                 fields = null,
                 extends = value,
+                module = coreModule,
                 methods = new Storage<string, Method>() {
                 { "xxx", new Method(
                     new InternalFunqtion((p, self) => Core.Value.Null)) }
@@ -197,6 +200,7 @@ namespace Qrakhen.Sqr.Core
                 nativeType = NativeType.Boolean,
                 fields = null,
                 extends = value,
+                module = coreModule,
                 methods = null
             });
 
@@ -205,6 +209,7 @@ namespace Qrakhen.Sqr.Core
                 nativeType = NativeType.Qollection,
                 fields = null,
                 extends = value,
+                module = coreModule,
                 methods = new Storage<string, Method>() {
                 { "length", new Method(
                     new InternalFunqtion((p, self) => new Number((self.obj as Qollection).length))) }
@@ -216,6 +221,7 @@ namespace Qrakhen.Sqr.Core
                 nativeType = NativeType.Objeqt,
                 fields = null,
                 extends = value,
+                module = coreModule,
                 methods = new Storage<string, Method>() {
                 { "xxx", new Method(
                     new InternalFunqtion((p, self) => Core.Value.Null)) }
@@ -227,6 +233,7 @@ namespace Qrakhen.Sqr.Core
                 nativeType = NativeType.Array,
                 fields = null,
                 extends = value,
+                module = coreModule,
                 methods = new Storage<string, Method>() {
                 { "xxx", new Method(
                     new InternalFunqtion((p, self) => Core.Value.Null)) }
@@ -238,6 +245,7 @@ namespace Qrakhen.Sqr.Core
                 nativeType = NativeType.Funqtion,
                 fields = null,
                 extends = value,
+                module = coreModule,
                 methods = new Storage<string, Method>() {
                 { "xxx", new Method(
                     new InternalFunqtion((p, self) => Core.Value.Null)) }
@@ -249,6 +257,7 @@ namespace Qrakhen.Sqr.Core
                 nativeType = NativeType.Variable,
                 fields = null,
                 extends = value,
+                module = coreModule,
                 methods = new Storage<string, Method>() {
                 { "xxx", new Method(
                     new InternalFunqtion((p, self) => Core.Value.Null)) },

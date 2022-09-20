@@ -32,8 +32,9 @@ namespace Qrakhen.Sqr.Core
 
         public IDeclareInfo resolve(Stack<Token> input, Qontext qontext)
         {
-            // @type[&]:name
+            log.spam("in " + GetType().Name);
 
+            // @type[&]:name
             var info = new IDeclareInfo { };
             info.access = Type.Access.Public;
 
@@ -49,7 +50,7 @@ namespace Qrakhen.Sqr.Core
                 }
             } else {
                 var k = input.digest().get<Keyword>();
-                if (k != null && !k.isType(Keyword.Type.DECLARE_FUNQTION))
+                if (k != null && k.isType(Keyword.Type.DECLARE_FUNQTION))
                     info.isFunqtion = true;
                 else if (k != null && !k.isType(Keyword.Type.DECLARE_DYN))
                     throw new SqrError("typed or dynamic declaration expected, got " + k.symbol);
@@ -65,8 +66,8 @@ namespace Qrakhen.Sqr.Core
                 log.spam("declared name is a reference:" + op.symbol);
             } 
 
-            // when typed, expect : after @type[&]
-            if (info.type != null) {
+            // when typed, expect : after @type[&], nah fuck that @todo
+            if (false && info.type != null) {
                 var a = input.digest();
                 if (!a.isType(Token.Type.Accessor))
                     throw new SqrError("expected accessor : after typed declaration: " + a, a);

@@ -51,7 +51,7 @@ namespace Qrakhen.Sqr.Core
                 if (t.isType(Token.Type.Value))
                     handleValue(input, ref node, qontext, level);
 
-                else if (t.isType(Token.Type.Keyword))
+                else if (t.isType(Token.Type.Keyword | Token.Type.Type))
                     handleKeyword(input, ref node, qontext, level);
 
                 else if (t.isType(Token.Type.Operator))
@@ -94,7 +94,10 @@ namespace Qrakhen.Sqr.Core
                 throw new SqrError("unexpected keyword " + t, t);
             } else {
                 var k = input.peek().get<Keyword>();
-                if (k.isType(Keyword.Type.DECLARE)) {
+                if (k != null && k.isType(Keyword.Type.QONDITION_IF)) {
+                    var qondition = qonditionResolver.resolveIfElse(input, qontext);
+                    qondition.execute();
+                } else {
                     var info = declarationResolver.resolve(input, qontext);
                     if (info.isFunqtion) {
                         var funqtion = funqtionResolver.resolve(
@@ -102,14 +105,8 @@ namespace Qrakhen.Sqr.Core
                         node.left = qontext.register(info.name, new Qallable(funqtion));
                     } else {
                         node.left = qontext.register(info.name, null, info.isReference, info.type, info.isReadonly);
-                    }                     
-                    log.spam("registered name " + t + " in qontext");                    
-                } else if (k.isType(Keyword.Type.QONDITION_IF)) {
-                    input.move(-1); // it hurts so bad
-                    var qondition = qonditionResolver.resolveIfElse(input, qontext);
-                    qondition.execute();
-                } else {
-                    throw new SqrError("not yet implemented: " + t, t);
+                    }
+                    log.spam("registered name " + t + " in qontext");
                 }
             }
         }
