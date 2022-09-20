@@ -12,18 +12,13 @@ namespace Qrakhen.Sqr.Core
         public Type type;
     }
 
-    public class NativeMethod : NativeAttribute
+    public class NativeMethodAttribute : NativeAttribute
     {
         public string[] parameters;
     }
 
-    public class NativeField : NativeAttribute
+    public class NativeFieldAttribute : NativeAttribute
     {
         
-    }
-
-    public static class Natives
-    {
-
     }
 }

@@ -56,9 +56,16 @@ namespace Qrakhen.Sqr.Core
             return type.name;
         }
 
+        [NativeMethod]
         public virtual String toString()
         {
             return new String(ToString());
+        }
+
+        [NativeMethod]
+        public virtual String getType()
+        {
+            return new String(type.name);
         }
     }
 

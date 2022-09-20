@@ -28,11 +28,13 @@ namespace Qrakhen.Sqr.Core
             return member;
         }
 
+        [NativeMethod]
         public override Value get(Value index)
         {
             return items[(index as Number).asInteger()];
         }
 
+        [NativeMethod]
         public override void set(Value index, Value value)
         {
             items[(index as Number).asInteger()] = value;
