@@ -64,8 +64,8 @@ namespace Qrakhen.Sqr.Core
 
         [NativeMethod]
         public virtual String getType()
-        {
-            return new String(type.name);
+        {            
+            return new String(obj == null ? type.render() : obj.type.render()); // ?? i dont even know
         }
     }
 

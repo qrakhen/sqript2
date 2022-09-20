@@ -11,6 +11,7 @@ namespace Qrakhen.Sqr.Core
         public bool isReference;
         public bool isFunqtion;
         public bool isReadonly;
+        public bool isOptional;
         public string name;
     }
 }

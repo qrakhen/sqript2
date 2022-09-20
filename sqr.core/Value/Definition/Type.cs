@@ -146,7 +146,7 @@ namespace Qrakhen.Sqr.Core
                 .Where(_ =>
                     Attribute.GetCustomAttribute(_, typeof(NativeMethodAttribute)) != null)) {
                     methods.Add(new Type.Method(
-                        new InternalFunqtion((v, q, s) => { return m.Invoke(s, v); }),
+                        new InternalFunqtion((v, q, s) => { return (Value)m.Invoke(s.obj, v); }),
                         new IDeclareInfo() {
                             name = m.Name,
                             type = get(m.ReturnType.Name),
@@ -154,6 +154,20 @@ namespace Qrakhen.Sqr.Core
                         }));
             }
             return methods;
+        }
+
+        public string render()
+        {
+            var r = "Type <" + name + ">:\n";
+            r += "  Fields:\n";
+            foreach (var f in fields.Values) {
+                r += "   " + f.access.ToString() + " " + f.name + ": " + f.type.ToString() + "\n";
+            }
+            r += "  Methods:\n";
+            foreach (var m in methods.Values) {
+                r += "   " + m.access.ToString() + " " + m.name + ": " + m.type?.ToString() + " " + m.funqtion.ToString() + "\n";
+            }
+            return r;
         }
 
         public class Field
@@ -167,8 +181,10 @@ namespace Qrakhen.Sqr.Core
             public Field(IDeclareInfo info = new IDeclareInfo())
             {
                 foreach (var f in GetType().GetFields()) {
-                    f.SetValue(this, info.GetType().GetField(f.Name));
+                    f.SetValue(this, info.GetType().GetField(f.Name).GetValue(info));
                 }
+                if (type == null)
+                    type = Type.Value;
             }
         }
 
@@ -185,7 +201,7 @@ namespace Qrakhen.Sqr.Core
                 this.funqtion = funqtion;
                 foreach (var f in GetType().GetFields()) {
                     if (f.Name == "funqtion") continue;
-                    f.SetValue(this, info.GetType().GetField(f.Name));
+                    f.SetValue(this, info.GetType().GetField(f.Name).GetValue(info));
                 }
             }
 

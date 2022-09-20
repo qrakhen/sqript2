@@ -31,6 +31,8 @@ namespace Qrakhen.Sqr.Core
         }
 
         [NativeMethod]
+        public void add(Value[] parameters) => add(parameters[0]);
+
         public void add(Value value)
         {
             items.Add(value);

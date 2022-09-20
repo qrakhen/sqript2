@@ -2,6 +2,7 @@
 using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
@@ -10,13 +11,13 @@ namespace Qrakhen.Sqr.Core
     {
         private static readonly OperationResolver operationResolver = SqrDI.Dependor.get<OperationResolver>();
 
-        public readonly DeclaredParam[] parameters = new DeclaredParam[0];
+        public readonly IDeclareInfo[] parameters = new IDeclareInfo[0];
         public readonly Type returnType;
         public readonly Body body;
 
         protected Funqtion() { }
 
-        public Funqtion(Body body, DeclaredParam[] parameters, Type returnType = null)
+        public Funqtion(Body body, IDeclareInfo[] parameters, Type returnType = null)
         {
             this.body = body;
             this.parameters = parameters;
@@ -39,7 +40,7 @@ namespace Qrakhen.Sqr.Core
             for (int i = 0; i < this.parameters.Length; i++) {
                 var p = this.parameters[i];
                 if (parameters.Length <= i) {
-                    if (p.optional) break;
+                    if (p.isOptional) break;
                     else throw new SqrError("parameter " + p.name + " missing");
                 } 
                 tempQontext.register(this.parameters[i].name, new Variable(parameters[i]));
@@ -48,12 +49,11 @@ namespace Qrakhen.Sqr.Core
             return tempQontext;
         }
 
-        public struct DeclaredParam
+        public override string ToString()
         {
-            public string name;
-            public NativeType type;
-            public Value defaultValue;
-            public bool optional;
+            return "(" + string.Join(", ", parameters.ToList().Select(_ =>
+                (_.type != null ? "@" + _.type.name + " " : "") +
+                _.name)) + ")";
         }
     }
 
