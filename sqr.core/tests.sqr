@@ -1,30 +1,49 @@
 ﻿# quick test file to check integrity
 
-log(6);
-cout("sqr test");
+log(3);
+cout(" # sqr test # ");
+
+cout("dynamic variables and references");
 *~ a <~ 5;
 *~ b <& a;
 a <~ 10;
-(a == b); # has to be true
+if (a == b) {
+	cout("WORKS");
+} else {
+	cout("FAILS");
+}
 
+cout("qollections and objeqts");
 *~ c <~ { q <~ 10, w <~ "asd" };
 *~ d <~ [ 2, 5, 10, 32 ];
 
 *~ cd <~ c:q + d:2;
-(cd == 20);
+if (cd == 20) {
+	cout("WORKS");
+} else {
+	cout("FAILS");
+}
 
+cout("funqtions and weighted operation");
 funq f (j, k {
-	return j + k - a;			# <- also tests qontext
+	return j * k + (cd + 1);			# <- also tests qontext
 });
 
-f(5, 3);
+if (f(4, 2) == 29) {
+	cout("WORKS");
+} else {
+	cout("FAILS");
+}
 
+cout("if else conditions");
 if (a > 1 && cd < 100) {
 	if (a > 32) {
-		cout("wrong");
+		cout("FAILS");
 	} else {
-		cout("correct");
+		cout("WORKS");
 	}
+} else {
+	cout("FAILS");
 }
 
 funq fib (a, b {
@@ -34,6 +53,13 @@ funq fib (a, b {
 	}
 });
 
-cout("nice!");
+cout("types and typing");
+@number num <~ 100;
+@string str <~ 'hello my friends';
+num <~ str;
+
+cout("if an error came, it works. no try catch yet.");
+
+cout("done!");
 
 

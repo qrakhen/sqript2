@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Qrakhen.Dependor;
+using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -30,11 +30,13 @@ namespace Qrakhen.Sqr.Core
             return member;
         }
 
+        [NativeMethod]
         public override Value get(Value index)
         {
             return properties[(string)index.raw].obj;
         }
 
+        [NativeMethod]
         public override void set(Value index, Value value)
         {
             properties[(string)index.raw].set(value);

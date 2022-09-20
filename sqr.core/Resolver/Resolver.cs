@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
-{ 
-    public abstract class Resolver<TIn, TOut>
+{
+    internal abstract class Resolver<TIn, TOut>
     {
         protected readonly Logger log;
 
