@@ -23,6 +23,7 @@ namespace Qrakhen.Sqr.Core
         public static Type Qallable => definitions["Qallable"];
         public static Type Objeqt => definitions["Objeqt"];
         public static Type Variable => definitions["Variable"];
+        public static Type Qlass => definitions["Qlass"];
 
         private static readonly Module coreModule = new Module("Core", new Module("Sqript", null));
 
@@ -52,7 +53,11 @@ namespace Qrakhen.Sqr.Core
             if (definitions.contains(name))
                 throw new SqrError("can not redeclare type " + name);
 
-            definitions[name] = this;
+            if (definitions[args.name] == null) {
+                definitions[name.ToLower()] = this;
+            } else {
+                definitions[id.ToLower()] = this;
+            }
 
             if (extends != null)
                 extend();
@@ -84,12 +89,12 @@ namespace Qrakhen.Sqr.Core
 
         public override string ToString()
         {
-            return id;
+            return name;
         }
 
         public static Type get(string name)
         {
-            return definitions[name];
+            return definitions[name.ToLower()];
         }
 
         public static Type register(Args args)

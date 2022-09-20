@@ -8,6 +8,6 @@ namespace Qrakhen.Sqr.Core
 {
     public class Qlass : Value
     {
-
+        public Qlass() : base(Type.Qlass) { }
     }
 }

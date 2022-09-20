@@ -13,8 +13,8 @@ namespace Qrakhen.Sqr.Core
         public Objeqt resolve(Stack<Token> input, Qontext qontext)
         {
             log.spam("in " + GetType().Name);
-            
-            return objeqt;
+
+            return null; ;
         }
     }
 }

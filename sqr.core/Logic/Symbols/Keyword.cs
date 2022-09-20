@@ -45,16 +45,17 @@ namespace Qrakhen.Sqr.Core
         {
             DECLARE_DYN = 1,
             DECLARE_REF = 2,
-            DECLARE_FUNQTION = 4,
-            DECLARE_QLASS = 8,
+            DECLARE_TYPED = 4,
+            DECLARE_FUNQTION = 8,
+            DECLARE_QLASS = 16,
             DECLARE = DECLARE_DYN | DECLARE_REF | DECLARE_FUNQTION | DECLARE_QLASS,
-            IMPORT = 16,
-            QONDITION_IF = 32,
-            QONDITION_ELSE = 64,
-            LOOP_FOR = 128,
-            LOOP_WHILE = 256,
-            LOOP_DO = 512,
-            FUNQTION_RETURN = 1024,
+            IMPORT = 64,
+            QONDITION_IF = 128,
+            QONDITION_ELSE = 256,
+            LOOP_FOR = 512,
+            LOOP_WHILE = 1024,
+            LOOP_DO = 2049,
+            FUNQTION_RETURN = 4096,
         }
 
         public static Keyword register(Type type, string symbol)
@@ -68,6 +69,7 @@ namespace Qrakhen.Sqr.Core
         {
             register(Type.DECLARE_DYN, "var"); 
             register(Type.DECLARE_REF, "ref");
+            register(Type.DECLARE_TYPED, "@");
             register(Type.DECLARE_FUNQTION, "funqtion")
                 .alias("funq")
                 .alias("fn");
