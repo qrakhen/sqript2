@@ -248,14 +248,14 @@ namespace Qrakhen.Sqr.Core
         [Flags]
         public enum Type
         {
-            Operator,
-            Boolean,
-            Float,
-            Number,
-            String,
-            Structure,
-            Accessor,
-            Keyword,
+            Operator = 1,
+            Boolean = 2,
+            Float = 4,
+            Number = 8,
+            String = 16,
+            Structure = 32,
+            Accessor = 64,
+            Keyword = 128,
             Identifier,
             Whitespace,
             Comment,

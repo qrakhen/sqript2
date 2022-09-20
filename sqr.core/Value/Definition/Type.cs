@@ -263,26 +263,26 @@ namespace Qrakhen.Sqr.Core
     public enum NativeType
     {
         None = default,
-        Boolean,
-        Byte,
-        Float,
-        Integer,
+        Boolean = BitFlag._1,
+        Byte = BitFlag._2,
+        Float = BitFlag._3,
+        Integer = BitFlag._4,
 
         Number = Float | Integer,
 
-        String,
+        String = BitFlag._5,
 
         Primitive = Boolean | Number | String,
 
-        Array,
-        List,
+        Array = BitFlag._6,
+        List = BitFlag._7,
         Qollection = Array | List,
 
-        Objeqt,
-        Instance,
-        Variable,
-        Funqtion,
-        Null,
+        Objeqt = BitFlag._8,
+        Instance = BitFlag._9,
+        Variable = BitFlag._10,
+        Funqtion = BitFlag._11,
+        Null = BitFlag._12,
 
     }
 }
