@@ -10,7 +10,7 @@ using static Qrakhen.Sqr.Core.Token;
 namespace Qrakhen.Sqr.Core
 {
     [Injectable]
-    public class DeclarationResolver : Resolver<Stack<Token>, DeclarationResolver.IDeclareInfo>
+    public class DeclarationResolver : Resolver<Stack<Token>, IDeclareInfo>
     {
         private readonly Logger log;
         private readonly ValueResolver valueResolver;
@@ -19,16 +19,6 @@ namespace Qrakhen.Sqr.Core
         private readonly FunqtionResolver funqtionResolver;
         private readonly ObjeqtResolver objeqtResolver;
         private readonly QonditionResolver qonditionResolver;
-
-        public struct IDeclareInfo
-        {
-            public Type type;
-            public Type.Access access;
-            public bool isReference;
-            public bool isFunqtion;
-            public bool isReadonly;
-            public string name;
-        }
 
         public IDeclareInfo resolve(Stack<Token> input, Qontext qontext)
         {

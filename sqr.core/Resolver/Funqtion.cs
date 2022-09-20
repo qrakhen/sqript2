@@ -18,7 +18,7 @@ namespace Qrakhen.Sqr.Core
         /// <param name="input"></param>
         /// <param name="qontext"></param>
         /// <returns></returns>
-        public Funqtion resolve(Stack<Token> input, Qontext qontext, DeclarationResolver.IDeclareInfo info = new DeclarationResolver.IDeclareInfo())
+        public Funqtion resolve(Stack<Token> input, Qontext qontext, IDeclareInfo info = new IDeclareInfo())
         {
             log.spam("in " + GetType().Name);
             var bodyStructure = Structure.get(Structure.Type.BODY);

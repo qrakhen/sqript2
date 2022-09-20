@@ -115,25 +115,35 @@ namespace Qrakhen.Sqr.Core
 
         public class Field
         {
-            public readonly Access access;
+            public readonly string name;
             public readonly Type type;
+            public readonly Access access;
+            public readonly bool isReference;
+            public readonly bool isReadonly;
 
-            public Field(Access access, Type type)
+            public Field(IDeclareInfo info = new IDeclareInfo())
             {
-                this.type = type;
-                this.access = access;
+                foreach (var f in GetType().GetFields()) {
+                    f.SetValue(this, info.GetType().GetField(f.Name));
+                }
             }
         }
 
         public class Method
         {
+            public readonly string name;
+            public readonly Type type;
             public readonly Access access;
+            public readonly bool isReference;
             public readonly Funqtion funqtion;
 
-            public Method(Funqtion funqtion, Access access = Access.Public)
+            public Method(Funqtion funqtion, IDeclareInfo info = new IDeclareInfo())
             {
                 this.funqtion = funqtion;
-                this.access = access;
+                foreach (var f in GetType().GetFields()) {
+                    if (f.Name == "funqtion") continue;
+                    f.SetValue(this, info.GetType().GetField(f.Name));
+                }
             }
 
             public Value makeValue() => new Qallable(funqtion);
