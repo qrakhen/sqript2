@@ -1,10 +1,10 @@
-﻿using Qrakhen.Dependor;
+﻿using Qrakhen.SqrDI;
 using System.Linq;
 
 namespace Qrakhen.Sqr.Core
 {
     [Injectable]
-    public class ObjeqtResolver : Resolver<Stack<Token>, Objeqt>
+    internal class ObjeqtResolver : Resolver<Stack<Token>, Objeqt>
     {
         private readonly ValueResolver valueResolver;
         private readonly StructureResolver structureResolver;

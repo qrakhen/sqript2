@@ -1,22 +1,23 @@
 ﻿using Newtonsoft.Json;
-using Qrakhen.Dependor;
+using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
     public class Funqtion
     {
-        private static readonly OperationResolver operationResolver = Dependor.Dependor.get<OperationResolver>();
+        private static readonly OperationResolver operationResolver = SqrDI.Dependor.get<OperationResolver>();
 
-        public readonly DeclaredParam[] parameters = new DeclaredParam[0];
+        public readonly IDeclareInfo[] parameters = new IDeclareInfo[0];
         public readonly Type returnType;
         public readonly Body body;
 
         protected Funqtion() { }
 
-        public Funqtion(Body body, DeclaredParam[] parameters, Type returnType = null)
+        public Funqtion(Body body, IDeclareInfo[] parameters, Type returnType = null)
         {
             this.body = body;
             this.parameters = parameters;
@@ -39,7 +40,7 @@ namespace Qrakhen.Sqr.Core
             for (int i = 0; i < this.parameters.Length; i++) {
                 var p = this.parameters[i];
                 if (parameters.Length <= i) {
-                    if (p.optional) break;
+                    if (p.isOptional) break;
                     else throw new SqrError("parameter " + p.name + " missing");
                 } 
                 tempQontext.register(this.parameters[i].name, new Variable(parameters[i]));
@@ -48,27 +49,31 @@ namespace Qrakhen.Sqr.Core
             return tempQontext;
         }
 
-        public struct DeclaredParam
+        public override string ToString()
         {
-            public string name;
-            public NativeType type;
-            public Value defaultValue;
-            public bool optional;
+            return "(" + string.Join(", ", parameters.ToList().Select(_ =>
+                (_.type != null ? "@" + _.type.name + " " : "") +
+                _.name)) + ")";
         }
     }
 
     public class InternalFunqtion : Funqtion
     {
-        protected Func<Value[], Value, Value> callback;
+        protected Func<Value[], Qontext, Value, Value> callback;
 
-        public InternalFunqtion(Func<Value[], Value, Value> callback)
+        public InternalFunqtion(Func<Value[], Qontext, Value, Value> callback)
         {
             this.callback = callback;
         }
 
         public override Value execute(Value[] parameters, Qontext qontext, Value self = null)
         {
-            return callback(parameters, self);
+            return callback(parameters, qontext, self);
+        }
+
+        public Value execute(Value[] parameters, Value self = null)
+        {
+            return execute(parameters, null, self);
         }
     }
 }

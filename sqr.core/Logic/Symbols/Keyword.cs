@@ -4,12 +4,11 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Keyword : ITyped<Keyword.Type>
+    internal class Keyword : ITyped<Keyword.Type>
     {
         private static readonly Storage<Type, Keyword> keywords = new Storage<Type, Keyword>();
 
         public string symbol;
-        public Func<object, Stack<Token>> resolve;
         public List<string> aliases = new List<string>();
 
         public Keyword(Type type, string symbol)

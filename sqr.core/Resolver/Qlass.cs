@@ -1,10 +1,11 @@
-﻿using Qrakhen.Dependor;
+﻿using Qrakhen.SqrDI;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Qrakhen.Sqr.Core
 {
     [Injectable]
-    public class QlassResolver : Resolver<Stack<Token>, Objeqt>
+    internal class QlassResolver : Resolver<Stack<Token>, Objeqt>
     {
         private readonly ValueResolver valueResolver;
         private readonly StructureResolver structureResolver;
@@ -13,6 +14,9 @@ namespace Qrakhen.Sqr.Core
         public Objeqt resolve(Stack<Token> input, Qontext qontext)
         {
             log.spam("in " + GetType().Name);
+
+            var methods = new List<Type.Method>();
+            var fields = new List<Type.Field>();
 
             return null; ;
         }

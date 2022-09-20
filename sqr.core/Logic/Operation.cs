@@ -1,11 +1,11 @@
-﻿using Qrakhen.Dependor;
+﻿using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Operation : Injector
+    internal class Operation : Injector
     {
         protected readonly Logger log;
 

@@ -37,8 +37,7 @@ namespace Qrakhen.Sqr.Core
 
         public bool isPrimitive => (nativeType & NativeType.Primitive) > nativeType;
         public bool isNative => (nativeType != NativeType.Instance);
-
-        public Type() { }
+                
         private Type(Args args)
         {
             name = args.name;
@@ -97,8 +96,18 @@ namespace Qrakhen.Sqr.Core
             return definitions[name.ToLower()];
         }
 
-        public static Type register(Args args)
+        public static Type register(System.Type systemType, Args args)
         {
+            if (args.fields == null)
+                args.fields = new Storage<string, Field>();
+            foreach (var f in buildNativeFields(systemType))
+                args.fields[f.name] = f;
+
+            if (args.methods == null)
+                args.methods = new Storage<string, Method>();
+            foreach (var m in buildNativeMethods(systemType))
+                args.methods[m.name] = m;
+
             return new Type(args);
         }
 
@@ -111,32 +120,96 @@ namespace Qrakhen.Sqr.Core
                 m = m.parent;
             }
             return id;
-        } 
+        }
+
+        private static List<Field> buildNativeFields(System.Type type)
+        {
+            var fields = new List<Type.Field>();
+            foreach (var f in type
+                .GetFields()
+                .Where(_ =>
+                    Attribute.GetCustomAttribute(_, typeof(NativeFieldAttribute)) != null)) {
+                    fields.Add(new Type.Field(new IDeclareInfo() {
+                        name = f.Name,
+                        type = get(f.FieldType.Name),
+                        access = Access.Public
+                    }));
+            }
+            return fields;
+        }
+
+        private static List<Method> buildNativeMethods(System.Type type)
+        {
+            var methods = new List<Method>();
+            foreach (var m in type
+                .GetMethods()
+                .Where(_ =>
+                    Attribute.GetCustomAttribute(_, typeof(NativeMethodAttribute)) != null)) {
+                    methods.Add(new Type.Method(
+                        new InternalFunqtion((v, q, s) => { return (Value)m.Invoke(s.obj, v); }),
+                        new IDeclareInfo() {
+                            name = m.Name,
+                            type = get(m.ReturnType.Name),
+                            access = Access.Public
+                        }));
+            }
+            return methods;
+        }
+
+        public string render()
+        {
+            var r = "Type <" + name + ">:\n";
+            r += "  Fields:\n";
+            foreach (var f in fields.Values) {
+                r += "   " + f.access.ToString() + " " + f.name + ": " + f.type.ToString() + "\n";
+            }
+            r += "  Methods:\n";
+            foreach (var m in methods.Values) {
+                r += "   " + m.access.ToString() + " " + m.name + ": " + m.type?.ToString() + " " + m.funqtion.ToString() + "\n";
+            }
+            return r;
+        }
 
         public class Field
         {
-            public readonly Access access;
+            public readonly string name;
             public readonly Type type;
+            public readonly Access access;
+            public readonly bool isReference;
+            public readonly bool isReadonly;
 
-            public Field(Access access, Type type)
+            public Field(IDeclareInfo info = new IDeclareInfo())
             {
-                this.type = type;
-                this.access = access;
+                foreach (var f in GetType().GetFields()) {
+                    f.SetValue(this, info.GetType().GetField(f.Name).GetValue(info));
+                }
+                if (type == null)
+                    type = Type.Value;
             }
         }
 
         public class Method
         {
+            public readonly string name;
+            public readonly Type type;
             public readonly Access access;
+            public readonly bool isReference;
             public readonly Funqtion funqtion;
 
-            public Method(Funqtion funqtion, Access access = Access.Public)
+            public Method(Funqtion funqtion, IDeclareInfo info = new IDeclareInfo())
             {
                 this.funqtion = funqtion;
-                this.access = access;
+                foreach (var f in GetType().GetFields()) {
+                    if (f.Name == "funqtion") continue;
+                    f.SetValue(this, info.GetType().GetField(f.Name).GetValue(info));
+                }
             }
 
-            public Value makeValue() => new Qallable(funqtion);
+            public Value execute(Value[] parameters, Qontext qontext, Value self = null)
+                => funqtion.execute(parameters, qontext, self);
+
+            public Qallable makeQallable()
+                => new Qallable(funqtion);
         }
 
         public enum Access
@@ -158,112 +231,75 @@ namespace Qrakhen.Sqr.Core
 
         static Type()
         {
-            var value = register(new Args
+            var value = register(typeof(Value), new Args
             {
                 name = "Value",
                 nativeType = NativeType.None,
-                fields = null,
-                module = coreModule,
-                methods = new Storage<string, Method>() {
-                    { "toString", new Method(new InternalFunqtion((p, self) => self.toString())) },
-                    { "type", new Method(new InternalFunqtion((p, self) => new String(self.type.name))) }
-                }
+                module = coreModule
             });
 
-            var _string = register(new Args
+            var _string = register(typeof(String), new Args
             {
                 name = "String",
                 nativeType = NativeType.String,
-                fields = null,
                 extends = value,
-                module = coreModule,
-                methods = new Storage<string, Method>() {
-                { "span", new Method(
-                    new InternalFunqtion((p, self) => (self as Core.String).span(p[0], p[1]))) }
-                }
+                module = coreModule
             });
 
-            var number = register(new Args {
+            var number = register(typeof(Number), new Args {
                 name = "Number",
                 nativeType = NativeType.Number,
-                fields = null,
                 extends = value,
-                module = coreModule,
-                methods = new Storage<string, Method>() {
-                { "xxx", new Method(
-                    new InternalFunqtion((p, self) => Core.Value.Null)) }
-                }
+                module = coreModule
             });
 
-            var boolean = register(new Args {
+            var integer = register(typeof(Integer), new Args {
+                name = "Integer",
+                nativeType = NativeType.Integer,
+                extends = value,
+                module = coreModule,
+            });
+
+            var boolean = register(typeof(Boolean), new Args {
                 name = "Boolean",
                 nativeType = NativeType.Boolean,
-                fields = null,
                 extends = value,
-                module = coreModule,
-                methods = null
+                module = coreModule
             });
 
-            var qollection = register(new Args {
+            var qollection = register(typeof(Qollection), new Args {
                 name = "Qollection",
                 nativeType = NativeType.Qollection,
-                fields = null,
                 extends = value,
-                module = coreModule,
-                methods = new Storage<string, Method>() {
-                { "length", new Method(
-                    new InternalFunqtion((p, self) => new Number((self.obj as Qollection).length))) }
-                }
+                module = coreModule
             });
 
-            var objeqt = register(new Args {
+            var objeqt = register(typeof(Objeqt), new Args {
                 name = "Objeqt",
                 nativeType = NativeType.Objeqt,
-                fields = null,
                 extends = value,
-                module = coreModule,
-                methods = new Storage<string, Method>() {
-                { "xxx", new Method(
-                    new InternalFunqtion((p, self) => Core.Value.Null)) }
-                }
+                module = coreModule                
             });
 
-            var array = register(new Args {
+            var array = register(typeof(Array), new Args {
                 name = "Array",
                 nativeType = NativeType.Array,
-                fields = null,
                 extends = value,
-                module = coreModule,
-                methods = new Storage<string, Method>() {
-                { "xxx", new Method(
-                    new InternalFunqtion((p, self) => Core.Value.Null)) }
-                }
+                module = coreModule
             });
 
-            var qallable = register(new Args {
+            var qallable = register(typeof(Qallable), new Args {
                 name = "Qallable",
                 nativeType = NativeType.Funqtion,
-                fields = null,
                 extends = value,
                 module = coreModule,
-                methods = new Storage<string, Method>() {
-                { "xxx", new Method(
-                    new InternalFunqtion((p, self) => Core.Value.Null)) }
-                }
             });
 
-            var variable = register(new Args {
+            var variable = register(typeof(Variable), new Args {
                 name = "Variable",
                 nativeType = NativeType.Variable,
-                fields = null,
                 extends = value,
-                module = coreModule,
-                methods = new Storage<string, Method>() {
-                { "xxx", new Method(
-                    new InternalFunqtion((p, self) => Core.Value.Null)) },
-                { "type", new Method(
-                    new InternalFunqtion((p, self) => new String(self.type.name + "<" + self.obj.type.name + ">"))) }
-                }
+                module = coreModule
             });
         }
     }
@@ -276,11 +312,9 @@ namespace Qrakhen.Sqr.Core
         Byte = BitFlag._2,
         Float = BitFlag._3,
         Integer = BitFlag._4,
-
         Number = Float | Integer,
 
         String = BitFlag._5,
-
         Primitive = Boolean | Number | String,
 
         Array = BitFlag._6,

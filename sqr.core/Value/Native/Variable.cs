@@ -10,6 +10,8 @@ namespace Qrakhen.Sqr.Core
         [JsonIgnore] public override Value raw => (Value)obj?.raw;
         [JsonIgnore] public override Value obj { get => get(); }
 
+        public new Type type => obj == null ? Type.Variable : obj.type;
+
         public bool isReference { get; private set; }
         public readonly Type strictType;
         public readonly bool isReadonly;
@@ -92,10 +94,6 @@ namespace Qrakhen.Sqr.Core
         public override string ToString()
         {
             return __value?.ToString();
-            /*return base.ToString() + 
-                "\nisReference: " + isReference + 
-                "\nisReadonly: " + isReadonly + 
-                "\nisStrictType: " + isStrictType;*/
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Operator : ITyped<Operator.Type>
+    internal class Operator : ITyped<Operator.Type>
     {
         private static readonly Storage<Type, Operator> operators = new Storage<Type, Operator>();
 
@@ -61,7 +61,8 @@ namespace Qrakhen.Sqr.Core
             LOGIC_XOR = BitFlag._16,
             QOLLECTION_ADD = BitFlag._17,
             ASSIGN = BitFlag._18,
-            ASSIGN_REF = BitFlag._19
+            ASSIGN_REF = BitFlag._19,
+            NULLABLE = BitFlag._20
         }
 
         public static void register(Type type, string symbol, int weight, Func<Value, Value, Value> resolve)
@@ -140,6 +141,10 @@ namespace Qrakhen.Sqr.Core
             register(Type.ASSIGN_REF, "<&", 0, (left, right) => {
                 (left as Variable).set((right as Variable), true);
                 return left;
+            });
+
+            register(Type.NULLABLE, "?", 0, (left, right) => {
+                return null;
             });
 
             register(Type.LOGIC_NOT, "!", 0, (left, right) => {

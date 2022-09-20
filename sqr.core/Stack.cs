@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Stack<T>
+    internal class Stack<T>
     {
         protected T[] __items;
         public int index { get; protected set; }
