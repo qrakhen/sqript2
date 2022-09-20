@@ -47,4 +47,20 @@ namespace Qrakhen.Sqr.Core
             }
         }
     }
+
+    internal class WhileQondition : Qondition
+    {
+        public WhileQondition(Qondition qondition)
+            : base(qondition.condition, qondition.body, qondition.qontext) { }
+
+        public WhileQondition(Operation condition, Body body, Qontext qontext)
+            : base(condition, body, qontext) { }
+
+        public override void execute()
+        {
+            while (condition?.execute() as Boolean) {
+                body.execute(qontext); 
+            }
+        }
+    }
 }
