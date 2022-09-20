@@ -7,6 +7,7 @@ namespace Qrakhen.Sqr.Core
     {
         private Dictionary<K, T> dict { get { return this; } }
 
+        public bool locked { get; private set; }
         public int count { get { return Count; } }
 
         public new T this[K key] {
@@ -15,6 +16,8 @@ namespace Qrakhen.Sqr.Core
                 else return default(T);
             }
             set {
+                if (locked)
+                    throw new SqrError("storage is locked");
                 if (ContainsKey(key)) base[key] = value;
                 else Add(key, value);
             }
@@ -37,6 +40,8 @@ namespace Qrakhen.Sqr.Core
 
         public void set(K key, T value)
         {
+            if (locked)
+                throw new SqrError("storage is locked");
             if (contains(key)) base[key] = value;
             else Add(key, value);
         }
@@ -49,11 +54,15 @@ namespace Qrakhen.Sqr.Core
 
         public void remove(K key)
         {
+            if (locked)
+                throw new SqrError("storage is locked");
             if (ContainsKey(key)) Remove(key);
         }
 
         public void clear()
         {
+            if (locked)
+                throw new SqrError("storage is locked");
             Clear();
         }
 
@@ -73,6 +82,9 @@ namespace Qrakhen.Sqr.Core
 
         public int removeAll(Func<T, bool> callback, int limit = 0)
         {
+            if (locked)
+                throw new SqrError("storage is locked");
+
             int count = 0;
             var list = new List<K>();
             foreach (var item in dict)
@@ -117,6 +129,11 @@ namespace Qrakhen.Sqr.Core
         {
             clear();
             source.forEach((k, v) => this[k] = v);
+        }
+
+        public void lockStorage()
+        {
+            locked = true;
         }
     }
 }

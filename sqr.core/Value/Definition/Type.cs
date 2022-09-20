@@ -146,7 +146,11 @@ namespace Qrakhen.Sqr.Core
                 }
             }
 
-            public Value makeValue() => new Qallable(funqtion);
+            public Value execute(Value[] parameters, Qontext qontext, Value self = null)
+                => funqtion.execute(parameters, qontext, self);
+
+            public Qallable makeQallable()
+                => new Qallable(funqtion);
         }
 
         public enum Access
