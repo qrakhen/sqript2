@@ -1,6 +1,6 @@
 ﻿# quick test file to check integrity
 
-log(2);
+log(3);
 cout(" # sqr test # ");
 
 cout("dynamic variables and references");
@@ -29,7 +29,7 @@ funq f (j, k {
 	return j * k + (cd + 1);			# <- also tests qontext
 });
 
-if (fd(4, 2) == 29) {
+if (f(4, 2) == 29) {
 	cout("WORKS");
 } else {
 	cout("FAILS");
@@ -38,10 +38,12 @@ if (fd(4, 2) == 29) {
 cout("if else conditions");
 if (a > 1 && cd < 100) {
 	if (a > 32) {
-		cout("WORKS");
-	} else {
 		cout("FAILS");
+	} else {
+		cout("WORKS");
 	}
+} else {
+	cout("FAILS");
 }
 
 funq fib (a, b {

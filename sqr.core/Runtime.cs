@@ -162,6 +162,9 @@ namespace Qrakhen.Sqr.Core
             } else if (input ==  "t") {
                 var t = File.ReadAllText("tests.sqr");
                 execute(t);
+            } else if (input == "c") {
+                Qontext.globalContext.names.clear();
+                log.cmd("cleared global qontext");
             }
         }
 
