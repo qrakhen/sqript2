@@ -26,13 +26,13 @@ namespace Qrakhen.Sqr.Core
 
         private static readonly Module coreModule = new Module("Core", new Module("Sqript", null));
 
-        public readonly string id;
-        public readonly string name;
-        public readonly Module module;
-        public readonly Type extends;
-        public readonly NativeType nativeType;
-        public readonly Storage<string, Field> fields;
-        public readonly Storage<string, Method> methods;
+        [NativeField] public readonly string id;
+        [NativeField] public readonly string name;
+        [NativeField] public readonly NativeType nativeType;
+        [NativeField] public readonly Module module;
+        [NativeField] public readonly Type extends;
+        [NativeField] public readonly Storage<string, Field> fields;
+        [NativeField] public readonly Storage<string, Method> methods;
 
         public bool isPrimitive => (nativeType & NativeType.Primitive) > nativeType;
         public bool isNative => (nativeType != NativeType.Instance);

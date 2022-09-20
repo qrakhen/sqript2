@@ -68,7 +68,7 @@ namespace Qrakhen.Sqr.Core
 
                         return op.resolve(_left, _right);
                     } else {
-                        return (Value)left;
+                        return (left is Node ? (left as Node).execute() : (Value)left);
                     }
                 } else {
                     return null;
@@ -95,6 +95,26 @@ namespace Qrakhen.Sqr.Core
             {
                 if (empty) return "{ empty }";
                 return "{ " + (left ?? "null") + " " + (op == null ? "noop" : op.symbol) + " " + (right ?? "null") + " }";
+            }
+
+            public string render(int __level = 0)
+            {
+                var ident = "".PadLeft(__level * 5);
+
+                var r = ident;
+                if (left is Node)
+                    r += "\n" + (left as Node).render(__level + 1);
+                else
+                    r += left?.ToString();
+
+                r += " " + op?.symbol + " ";
+
+                if (right is Node)
+                    r += "\n" + (right as Node).render(__level + 1);
+                else
+                    r += right?.ToString();                
+
+                return r;
             }
         }
     }

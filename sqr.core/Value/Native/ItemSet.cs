@@ -8,18 +8,18 @@ namespace Qrakhen.Sqr.Core
 {
     public abstract class ItemSet : Value
     {
-        [Native]
+        [NativeField]
         public abstract int length { get; }
 
-        [Native]
+        [NativeField]
         public Type itemType { get; protected set; }
 
         public ItemSet(Type type) : base(type) { }
 
-        [Native]
+        [NativeMethod]
         public abstract void set(Value index, Value value);
 
-        [Native]
+        [NativeMethod]
         public abstract Value get(Value index);
     }
 }

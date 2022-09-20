@@ -66,6 +66,7 @@ namespace Qrakhen.Sqr.Core
             } while (!input.done);
 
             if (level == 0) {
+                Console.Write(node.render());
                 if (node.check(011)) {
                     node.left = new Value(Type.Value);
                 }
@@ -160,8 +161,8 @@ namespace Qrakhen.Sqr.Core
                 var qollection = qollectionResolver.resolve(innerStack, qontext);
                 node.put(qollection);
             } else if (Structure.get(t.raw).type == Structure.Type.GROUP) {
-                var result = resolveOne(innerStack, qontext).execute();
-                node.put(result);
+                var result = resolveOne(innerStack, qontext);//.execute(); // we dont have to execute right away. why would we do that even.
+                node.put(result.head);
             } else if (Structure.get(t.raw).type == Structure.Type.BODY) {
                 var objeqt = objeqtResolver.resolve(innerStack, qontext);
                 node.put(objeqt);

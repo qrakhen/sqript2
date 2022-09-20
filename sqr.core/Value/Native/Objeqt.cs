@@ -10,6 +10,7 @@ namespace Qrakhen.Sqr.Core
     {
         public Storage<string, Variable> properties = new Storage<string, Variable>();
 
+        [NativeField]
         public override int length => properties.count;
 
         public Objeqt() : base(Type.Objeqt)

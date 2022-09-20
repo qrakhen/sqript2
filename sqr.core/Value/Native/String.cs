@@ -13,11 +13,13 @@ namespace Qrakhen.Sqr.Core
             
         }
 
+        [NativeMethod]
         public Number length()
         {
             return new Number(__value?.Length ?? 0);
         }
 
+        [NativeMethod]
         public String span(Value from, Value to)
         {
             return new String(__value.Substring(
