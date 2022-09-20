@@ -15,11 +15,10 @@ namespace Qrakhen.Sqr.Core
         {
             log.spam("in " + GetType().Name);
             var result = new List<Token>();
-            long col = 0, row = 0, count = 0, __prev = 0;
+            long row = 0, count = 0, __prev = 0;
             while (!input.done) {
                 if (input.peek() == '\n') {
                     row++;
-                    col = 0;
                     __prev = input.index;
                 }
                 var type = matchType(input.peek());
@@ -97,10 +96,7 @@ namespace Qrakhen.Sqr.Core
 
             if (type == Token.Type.Type) { 
                 var r = input.digest() + readType(input, Token.Type.Identifier);
-                if (input.peek() == '&')
-                    return r + input.digest();
-                else
-                    return r;
+                return r;
             }
 
             if (type == Token.Type.Identifier)
@@ -155,6 +151,9 @@ namespace Qrakhen.Sqr.Core
 
         public T get<T>()
         {
+            if (!(value is T))
+                return default(T);
+
             return (T)value;
         }
 
@@ -170,12 +169,12 @@ namespace Qrakhen.Sqr.Core
             throw new SqrError("no known native type applied to token " + this, this);
         }
 
-        public Variable makeVariable(bool isReference = false, bool isStrictType = false, bool isReadonly = false)
+        public Variable makeVariable(bool isReference = false, Core.Type strictType = null, bool isReadonly = false)
         {
             if (!isType(Type.Identifier))
                 throw new SqrError("can not make variable out of token: not an identifier token" + this, this);
 
-            return new Variable(null, isReference, isStrictType, isReadonly);
+            return new Variable(null, isReference, strictType, isReadonly);
         }
 
         public NativeType asNativeType(Type type)
@@ -218,6 +217,10 @@ namespace Qrakhen.Sqr.Core
                 if (type == Type.Structure) {
                     parsedType = Type.Structure;
                     return Structure.get(raw); 
+                }
+                if (raw.StartsWith("@")) {
+                    parsedType = Type.Type;
+                    return Core.Type.get(raw.Substring(1));
                 }
                 if (type == Type.Keyword || type == Type.Type || type == Type.Identifier) {
                     var v = Keyword.get(raw);

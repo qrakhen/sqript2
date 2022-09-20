@@ -42,26 +42,26 @@ namespace Qrakhen.Sqr.Core
         [Flags]
         public enum Type
         {
-            CALC_ADD = 1,
-            CALC_SUB = 2,
-            CALC_MULT = 4,
-            CALC_DIV = 8,
+            CALC_ADD,
+            CALC_SUB,
+            CALC_MULT,
+            CALC_DIV,
             CALC = CALC_ADD | CALC_SUB | CALC_MULT | CALC_DIV,
-            COND_AND = 16,
-            COND_OR = 32,
-            COMP_EQUAL = 64,
-            COMP_NOTEQUAL = 128,
-            COMP_GT = 246,
-            COMP_GTEQUAL = 512,
-            COMP_LT = 1024,
-            COMP_LTEQUAL = 2048,
-            LOGIC_NOT = 4096,
-            LOGIC_OR = 8192,
-            LOGIC_AND = 16384,
-            LOGIC_XOR = 32768,
-            QOLLECTION_ADD = 65536,
-            ASSIGN = 131072,
-            ASSIGN_REF = 262144
+            COND_AND,
+            COND_OR,
+            COMP_EQUAL,
+            COMP_NOTEQUAL,
+            COMP_GT,
+            COMP_GTEQUAL,
+            COMP_LT,
+            COMP_LTEQUAL,
+            LOGIC_NOT,
+            LOGIC_OR,
+            LOGIC_AND,
+            LOGIC_XOR,
+            QOLLECTION_ADD,
+            ASSIGN,
+            ASSIGN_REF
         }
 
         public static void register(Type type, string symbol, int weight, Func<Value, Value, Value> resolve)
@@ -144,6 +144,24 @@ namespace Qrakhen.Sqr.Core
 
             register(Type.LOGIC_NOT, "!", 0, (left, right) => {
                 return new Boolean(!(right as Boolean));
+            });
+
+            register(Type.LOGIC_AND, "&", 0, (left, right) => {
+                if (left is Number && right is Number)
+                    return new Number((left as Number).asInteger() & (right as Number).asInteger());
+                return new Number(0);
+            });
+
+            register(Type.LOGIC_OR, "|", 0, (left, right) => {
+                if (left is Number && right is Number)
+                    return new Number((left as Number).asInteger() | (right as Number).asInteger());
+                return new Number(0);
+            });
+
+            register(Type.LOGIC_XOR, "^", 0, (left, right) => {
+                if (left is Number && right is Number)
+                    return new Number((left as Number).asInteger() ^ (right as Number).asInteger());
+                return new Number(0);
             });
         }
     }

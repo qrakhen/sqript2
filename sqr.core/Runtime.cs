@@ -33,8 +33,6 @@ namespace Qrakhen.Sqr.Core
                 "log",
                 new Qallable(new InternalFunqtion((p, s) => { log.setLoggingLevel((Logger.Level)int.Parse(p[0].raw.ToString())); return null; })));
 
-            var t = File.ReadAllText("tests.sqr");
-            execute(t);
             do {
                 try {
                     Console.Write("    <: ");
@@ -161,6 +159,9 @@ namespace Qrakhen.Sqr.Core
                     log.setLoggingLevel((Logger.Level)int.Parse(args[1]));
                     log.cmd("set logging level to " + log.loggingLevel);
                 }
+            } else if (input ==  "t") {
+                var t = File.ReadAllText("tests.sqr");
+                execute(t);
             }
         }
 

@@ -11,12 +11,12 @@ namespace Qrakhen.Sqr.Core
         private static readonly OperationResolver operationResolver = Dependor.Dependor.get<OperationResolver>();
 
         public readonly DeclaredParam[] parameters = new DeclaredParam[0];
-        public readonly NativeType returnType;
+        public readonly Type returnType;
         public readonly Body body;
 
         protected Funqtion() { }
 
-        public Funqtion(Body body, DeclaredParam[] parameters, NativeType returnType = NativeType.None)
+        public Funqtion(Body body, DeclaredParam[] parameters, Type returnType = null)
         {
             this.body = body;
             this.parameters = parameters;

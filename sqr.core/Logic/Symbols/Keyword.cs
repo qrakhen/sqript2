@@ -32,6 +32,7 @@ namespace Qrakhen.Sqr.Core
 
         public static Keyword get(string symbol)
         {
+            if (symbol.StartsWith("@")) return keywords[Type.DECLARE_TYPED];
             return keywords.findOne(_ => _.aliases.Contains(symbol));
         }
 
@@ -68,7 +69,7 @@ namespace Qrakhen.Sqr.Core
         static Keyword()
         {
             register(Type.DECLARE_DYN, "var"); 
-            register(Type.DECLARE_REF, "ref");
+            register(Type.DECLARE_REF, "ref DISCONTINUED, use var& name instead");
             register(Type.DECLARE_TYPED, "@");
             register(Type.DECLARE_FUNQTION, "funqtion")
                 .alias("funq")

@@ -18,18 +18,19 @@ namespace Qrakhen.Sqr.Core
         /// <param name="input"></param>
         /// <param name="qontext"></param>
         /// <returns></returns>
-        public Funqtion resolve(Stack<Token> input, Qontext qontext)
+        public Funqtion resolve(Stack<Token> input, Qontext qontext, DeclarationResolver.IDeclareInfo info = new DeclarationResolver.IDeclareInfo())
         {
             log.spam("in " + GetType().Name);
             var bodyStructure = Structure.get(Structure.Type.BODY);
             var header = resolveHeader(structureResolver.resolveUntil(input, qontext, bodyStructure.open));
             input.move(-1); // not nice. gotta find a way to make this consistent and tidy. (geht um (a b c { }) das { wird mitgegessen bei readStructure
             var body = new Body(structureResolver.resolve(input, qontext).items);
-            return new Funqtion(body, header.ToArray(), NativeType.None);
+            return new Funqtion(body, header.ToArray(), info.type);
         }
 
         private List<Funqtion.DeclaredParam> resolveHeader(Stack<Token> stack)
         {
+            //@todo hier auch IDeclareinfo verwenden ffs
             var headerStructure = Structure.get(Structure.Type.GROUP);
             var parameters = new List<Funqtion.DeclaredParam>();
 

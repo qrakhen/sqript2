@@ -11,19 +11,19 @@ namespace Qrakhen.Sqr.Core
         private static readonly Storage<string, Type> definitions = new Storage<string, Type>();
         public static List<string> typeList => definitions.Keys.ToList();
 
-        public static Type Value => definitions["Value"];
-        public static Type Boolean => definitions["Boolean"];
-        public static Type Float => definitions["Float"];
-        public static Type Integer => definitions["Integer"];
-        public static Type Number => definitions["Number"];
-        public static Type String => definitions["String"];
-        public static Type Array => definitions["Array"];
-        public static Type List => definitions["List"];
-        public static Type Qollection => definitions["Qollection"];
-        public static Type Qallable => definitions["Qallable"];
-        public static Type Objeqt => definitions["Objeqt"];
-        public static Type Variable => definitions["Variable"];
-        public static Type Qlass => definitions["Qlass"];
+        public static Type Value        => get("Value");
+        public static Type Boolean      => get("Boolean");
+        public static Type Float        => get("Float");
+        public static Type Integer      => get("Integer");
+        public static Type Number       => get("Number");
+        public static Type String       => get("String");
+        public static Type Array        => get("Array");
+        public static Type List         => get("List");
+        public static Type Qollection   => get("Qollection");
+        public static Type Qallable     => get("Qallable");
+        public static Type Objeqt       => get("Objeqt");
+        public static Type Variable     => get("Variable");
+        public static Type Qlass        => get("Qlass");
 
         private static readonly Module coreModule = new Module("Core", new Module("Sqript", null));
 

@@ -19,6 +19,7 @@ namespace Qrakhen.Sqr.Core
         private readonly FunqtionResolver funqtionResolver;
         private readonly ObjeqtResolver objeqtResolver;
         private readonly QonditionResolver qonditionResolver;
+        private readonly DeclarationResolver declarationResolver;
 
         public Operation resolveOne(Stack<Token> input, Qontext qontext)
         {
@@ -62,7 +63,7 @@ namespace Qrakhen.Sqr.Core
                 else if (input.peek().isType(Token.Type.End)) {
                     if (level == 0) input.digest();
                     break;
-                }
+                } else throw new SqrError("unknown or entirely unexpected token " + t, t);
             } while (!input.done);
 
             if (level == 0) {
@@ -92,26 +93,17 @@ namespace Qrakhen.Sqr.Core
             if (!node.empty || level > 0) {
                 throw new SqrError("unexpected keyword " + t, t);
             } else {
-                var k = input.digest().get<Keyword>();
+                var k = input.peek().get<Keyword>();
                 if (k.isType(Keyword.Type.DECLARE)) {
-                    t = input.digest();
-                    if (!t.isType(Token.Type.Identifier)) {
-                        throw new SqrError("identifier expected after keyword " + k.symbol + ", got " + t + "instead", t);
+                    var info = declarationResolver.resolve(input, qontext);
+                    if (info.isFunqtion) {
+                        var funqtion = funqtionResolver.resolve(
+                            structureResolver.resolve(input, qontext), qontext, info);
+                        node.left = qontext.register(info.name, new Qallable(funqtion));
                     } else {
-                        if (k.isType(Keyword.Type.DECLARE_DYN)) {
-                            node.left = qontext.register(t.raw);
-                        } else if (k.isType(Keyword.Type.DECLARE_REF)) {
-                            node.left = qontext.register(t.raw, null, true);
-                        } else if (k.isType(Keyword.Type.DECLARE_FUNQTION)) {
-                            var funqtion = funqtionResolver.resolve(
-                                structureResolver.resolve(input, qontext), qontext);
-                            node.left = qontext.register(t.raw, new Qallable(funqtion));
-                        } else {
-                            throw new SqrError("not yet implemented: " + k.symbol);
-                        }
-
-                        log.spam("registered name " + t + " in qontext");
-                    }
+                        node.left = qontext.register(info.name, null, info.isReference, info.type, info.isReadonly);
+                    }                     
+                    log.spam("registered name " + t + " in qontext");                    
                 } else if (k.isType(Keyword.Type.QONDITION_IF)) {
                     input.move(-1); // it hurts so bad
                     var qondition = qonditionResolver.resolveIfElse(input, qontext);

@@ -11,17 +11,19 @@ namespace Qrakhen.Sqr.Core
         [JsonIgnore] public override Value obj { get => get(); }
 
         public bool isReference { get; private set; }
-        public readonly bool isStrictType;
+        public readonly Type strictType;
         public readonly bool isReadonly;
+
+        public bool isStrictTyped => strictType != null;
 
         public Variable(
                 Value value = null, 
                 bool isReference = false, 
-                bool isStrictType = false, 
+                Type strictType = null, 
                 bool isReadonly = false) : base(value, Type.Variable)
         {
             this.isReference = isReference;
-            this.isStrictType = isStrictType;
+            this.strictType = strictType;
             this.isReadonly = isReadonly;
             if (value != null)
                 set(value);
@@ -35,13 +37,13 @@ namespace Qrakhen.Sqr.Core
             if (!asReference && value.GetType() == typeof(Variable))
                 value = (value as Variable).__value;
 
-            if (isStrictType && base.type?.name != value.type?.name)
+            if (isStrictTyped && strictType?.name != value.type?.name)
                 throw new SqrError("can not assign type of " + value.type + " to type of " + base.type, this);
 
             // reference logic
             if (asReference) {
                 if (!isReference) {
-                    if (isStrictType)
+                    if (isStrictTyped)
                         throw new SqrError("can not make value into reference due to it being strictly typed", this);
                     else
                         isReference = true;
