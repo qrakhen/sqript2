@@ -94,8 +94,8 @@ namespace Qrakhen.Sqr.Core
                 throw new SqrError("unexpected keyword " + t, t);
             } else {
                 var k = input.peek().get<Keyword>();
-                if (k != null && k.isType(Keyword.Type.QONDITION_IF)) {
-                    var qondition = qonditionResolver.resolveIfElse(input, qontext);
+                if (k != null && k.isType(Keyword.Type.QONDITION)) {
+                    var qondition = qonditionResolver.resolve(input, qontext);
                     qondition.execute();
                 } else {
                     var info = declarationResolver.resolve(input, qontext);
