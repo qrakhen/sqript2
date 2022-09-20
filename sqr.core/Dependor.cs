@@ -3,8 +3,11 @@ using System;
 using System.Linq;
 using System.Reflection;
 
-namespace Qrakhen.Dependor
-{  
+namespace Qrakhen.SqrDI
+{
+    /// <summary>
+    /// Extend from here to have automatic injection of all injectable fields.
+    /// </summary>
     public abstract class Injector
     {
         protected Injector()

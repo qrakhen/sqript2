@@ -1,10 +1,10 @@
-﻿using Qrakhen.Dependor;
+﻿using Qrakhen.SqrDI;
 using System.Linq;
 
 namespace Qrakhen.Sqr.Core
 {
     [Injectable]
-    public class ObjeqtResolver : Resolver<Stack<Token>, Objeqt>
+    internal class ObjeqtResolver : Resolver<Stack<Token>, Objeqt>
     {
         private readonly ValueResolver valueResolver;
         private readonly StructureResolver structureResolver;
@@ -27,7 +27,7 @@ namespace Qrakhen.Sqr.Core
                 if (!op.isType(Operator.Type.ASSIGN | Operator.Type.ASSIGN_REF))
                     throw new SqrError("assign operator expected " + op, op);
 
-                var value = operationResolver.resolve(sub, qontext).execute();
+                var value = operationResolver.resolveOne(sub, qontext).execute();
                 var property = new Variable(value);
                 property.set(value, op.isType(Operator.Type.ASSIGN_REF));
                 objeqt.properties[name.raw] = property;

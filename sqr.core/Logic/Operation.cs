@@ -1,31 +1,34 @@
-﻿using Qrakhen.Dependor;
+﻿using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Operation : Injector
+    internal class Operation : Injector
     {
         protected readonly Logger log;
 
         public Node head { get; protected set; }
-        public bool isReturning => head?.isReturning ?? false;
+        public bool isReturning { get; protected set; }
 
-        public Operation(Node head = null)
+        public Operation(Node head = null, bool isReturning = false)
         {
+            log.spam(head.render());
             this.head = head;
+            this.isReturning = isReturning;
         }
 
         public Value execute()
         {
             log.spam("executing operation");
+            if (head == null)
+                return null;
             return head.execute();
         }
 
         public class Node
         {
-            public bool isReturning;
             public object left;
             public object right;
             public Operator op;
@@ -66,7 +69,7 @@ namespace Qrakhen.Sqr.Core
 
                         return op.resolve(_left, _right);
                     } else {
-                        return (Value)left;
+                        return (left is Node ? (left as Node).execute() : (Value)left);
                     }
                 } else {
                     return null;
@@ -93,6 +96,45 @@ namespace Qrakhen.Sqr.Core
             {
                 if (empty) return "{ empty }";
                 return "{ " + (left ?? "null") + " " + (op == null ? "noop" : op.symbol) + " " + (right ?? "null") + " }";
+            }
+
+            public string render()
+            {
+                var drawer = new StringDrawer(Console.WindowWidth - 32, Console.WindowHeight / 4);
+                var x = drawer.length / 2;
+                var y = drawer.height - 2;
+                __render(x, y, drawer);
+                return drawer.render();
+            }
+
+            private void __render(int x = 0, int y = 0, StringDrawer drawer = null)
+            {
+                var e = "";
+                //drawer.draw(x, y, op?.symbol ?? " ");
+                if (left is Node) {
+                    (left as Node).__render(x - 7, y - 1, drawer);
+                } else {
+                    var s = left?.ToString();
+                    if (s != null) {
+                        e += "(" + s + " ";
+                        //drawer.draw(x - s.Length - 2, y, s ?? " ");
+                        //drawer.draw(x - s.Length - 3, y, "("); 
+                    }
+                }
+
+                e += op?.symbol;
+
+                if (right is Node) {
+                    (right as Node).__render(x + 7, y - 1, drawer);
+                } else {
+                    var s = right?.ToString();
+                    if (s != null) {
+                        e += " " + s + ")";
+                        //drawer.draw(x + 3, y, s ?? " ");
+                        //drawer.draw(x + 4 + s.Length, y, ")");
+                    }
+                }
+                drawer.draw(x - e.Length / 2, y, e);
             }
         }
     }

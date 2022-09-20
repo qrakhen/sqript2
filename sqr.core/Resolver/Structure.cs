@@ -1,4 +1,4 @@
-﻿using Qrakhen.Dependor;
+﻿using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 namespace Qrakhen.Sqr.Core
 {
     [Injectable]
-    public class StructureResolver : Resolver<Stack<Token>, Stack<Token>>
+    internal class StructureResolver : Resolver<Stack<Token>, Stack<Token>>
     {
         public Stack<Token> resolve(Stack<Token> input, Qontext qontext)
         {
@@ -57,7 +57,7 @@ namespace Qrakhen.Sqr.Core
             do {
                 t = input.digest();
                 log.spam(t);
-                if (t.raw == until)
+                if (t.raw == until && level == 0)
                     break;
 
                 if (Structure.openers.Contains(t.raw)) {

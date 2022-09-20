@@ -1,16 +1,16 @@
 ﻿using Newtonsoft.Json;
-using Qrakhen.Dependor;
+using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
-{  
+{
     public class Qontext
     {
         [JsonProperty]
-        protected Storage<string, Variable> names = new Storage<string, Variable>();
+        public Storage<string, Variable> names { get; protected set; } = new Storage<string, Variable>();
 
         public static readonly Qontext globalContext = new Qontext();
 
@@ -30,13 +30,13 @@ namespace Qrakhen.Sqr.Core
                 string name, 
                 Value value = null, 
                 bool isReference = false, 
-                bool isStrictType = false, 
+                Type strictType = null, 
                 bool isReadonly = false)
         {
             if (names[name] != null) {
                 throw new SqrError("name " + name + " already declared in qontext");
             }
-            return names[name] = new Variable(value, isReference, isStrictType, isReadonly);
+            return names[name] = new Variable(value, isReference, strictType, isReadonly);
         }
 
         public Value resolveName(string name) => resolveName(new string[] { name });
@@ -57,7 +57,7 @@ namespace Qrakhen.Sqr.Core
             else if (parent != null)
                 return parent.lookUp(name);
             else
-                throw new SqrError("could not find the name " + name[0] + " within the current qontext (recursive lookup)");
+                throw new SqrError("could not find the name " + name + " within the current qontext (recursive lookup)");
         }
     }
 }

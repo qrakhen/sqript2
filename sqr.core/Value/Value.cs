@@ -1,7 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Qrakhen.Sqr.Core
 {
@@ -9,8 +6,8 @@ namespace Qrakhen.Sqr.Core
     {
         public static Value Null => null;
 
-        public virtual object raw => null;
-        public virtual Value obj { get => this; }
+        public virtual object raw => this;
+        public virtual Value obj => this;
 
         public readonly Storage<string, Variable> fields;
         [JsonIgnore] public readonly Type type;
@@ -26,7 +23,7 @@ namespace Qrakhen.Sqr.Core
         public virtual Value accessMember(string name)
         {
             if (type.methods.contains(name))
-                return type.methods[name].makeValue();
+                return type.methods[name].makeQallable();
             else if (fields != null && fields.contains(name))
                 return fields[name];
             else
@@ -54,19 +51,21 @@ namespace Qrakhen.Sqr.Core
             return false;
         }
 
-        public virtual object getValue()
-        {
-            return this;
-        }
-
         public override string ToString()
         {
             return type.name;
         }
 
+        [NativeMethod]
         public virtual String toString()
         {
             return new String(ToString());
+        }
+
+        [NativeMethod]
+        public virtual String getType()
+        {            
+            return new String(obj == null ? type.render() : obj.type.render()); // ?? i dont even know
         }
     }
 

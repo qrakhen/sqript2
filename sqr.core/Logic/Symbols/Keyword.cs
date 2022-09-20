@@ -4,17 +4,24 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    public class Keyword : ITyped<Keyword.Type>
+    internal class Keyword : ITyped<Keyword.Type>
     {
         private static readonly Storage<Type, Keyword> keywords = new Storage<Type, Keyword>();
 
         public string symbol;
-        public Func<object, Stack<Token>> resolve;
+        public List<string> aliases = new List<string>();
 
         public Keyword(Type type, string symbol)
         {
             this.type = type;
             this.symbol = symbol;
+            alias(symbol);
+        }
+
+        public Keyword alias(string alias)
+        {
+            aliases.Add(alias);
+            return this;
         }
 
         public override string ToString()
@@ -24,36 +31,48 @@ namespace Qrakhen.Sqr.Core
 
         public static Keyword get(string symbol)
         {
-            return keywords.findOne(_ => _.symbol == symbol);
+            if (symbol.StartsWith("@")) return keywords[Type.DECLARE_TYPED];
+            return keywords.findOne(_ => _.aliases.Contains(symbol));
+        }
+
+        public static Keyword get(Type type)
+        {
+            return keywords[type];
         }
 
         [Flags]
         public enum Type
         {
-            DECLARE_DYN,
-            DECLARE_REF,
-            DECLARE_FUNQTION,
-            DECLARE_QLASS,
+            DECLARE_DYN = BitFlag._1,
+            DECLARE_REF = BitFlag._2,
+            DECLARE_TYPED = BitFlag._3,
+            DECLARE_FUNQTION = BitFlag._4,
+            DECLARE_QLASS = BitFlag._5,
             DECLARE = DECLARE_DYN | DECLARE_REF | DECLARE_FUNQTION | DECLARE_QLASS,
-            IMPORT,
-            QONDITION_IF,
-            QONDITION_ELSE,
-            LOOP_FOR,
-            LOOP_WHILE,
-            LOOP_DO,
-            FUNQTION_RETURN,
+            IMPORT = BitFlag._6,
+            QONDITION_IF = BitFlag._7,
+            QONDITION_ELSE = BitFlag._8,
+            LOOP_FOR = BitFlag._9,
+            LOOP_WHILE = BitFlag._10,
+            LOOP_DO = BitFlag._11,
+            FUNQTION_RETURN = BitFlag._12
         }
 
-        public static void register(Type type, string symbol)
+        public static Keyword register(Type type, string symbol)
         {
-            keywords.Add(type, new Keyword(type, symbol));
+            var word = new Keyword(type, symbol);
+            keywords.Add(type, word);
+            return word;
         }
 
         static Keyword()
         {
             register(Type.DECLARE_DYN, "var"); 
-            register(Type.DECLARE_REF, "ref");
-            register(Type.DECLARE_FUNQTION, "funqtion");
+            register(Type.DECLARE_REF, "ref DISCONTINUED, use var& name instead");
+            register(Type.DECLARE_TYPED, "@");
+            register(Type.DECLARE_FUNQTION, "funqtion")
+                .alias("funq")
+                .alias("fn");
             register(Type.DECLARE_QLASS, "qlass");
             register(Type.IMPORT, "import");
             register(Type.QONDITION_IF, "if");

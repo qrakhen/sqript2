@@ -1,79 +1,79 @@
 ﻿using Newtonsoft.Json;
-using Qrakhen.Dependor;
+using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
     public class Funqtion
     {
-        private readonly OperationResolver operationResolver;
+        private static readonly OperationResolver operationResolver = SqrDI.Dependor.get<OperationResolver>();
 
-        public DeclaredParam[] declaredParameters = new DeclaredParam[0];
-        public Type returnType;
-        public Body body;
+        public readonly IDeclareInfo[] parameters = new IDeclareInfo[0];
+        public readonly Type returnType;
+        public readonly Body body;
+
+        protected Funqtion() { }
+
+        public Funqtion(Body body, IDeclareInfo[] parameters, Type returnType = null)
+        {
+            this.body = body;
+            this.parameters = parameters;
+            this.returnType = returnType;
+        }
         
-        public virtual Value execute(ProvidedParam[] parameters, Qontext qontext, Value self = null)
+        public virtual Value execute(Value[] parameters, Qontext qontext, Value self = null)
         {
             var eq = createExecutionQontext(parameters, qontext);
             if (self != null)
                 eq.register("this", self);
 
-            var stack = new Stack<Token>(body.content);
-            while (!stack.done)
-            {
-                var op = operationResolver.resolve(stack, eq);
-                var r = op.execute();
-                if (op.isReturning)
-                    return r;
-            }
-            return null;
+            return body.execute(eq);
         }
 
-        protected Qontext createExecutionQontext(ProvidedParam[] parameters, Qontext qontext)
+        protected Qontext createExecutionQontext(Value[] parameters, Qontext qontext)
         {
             var tempQontext = new Qontext(qontext);
 
-            for (int i = 0; i < declaredParameters.Length; i++) {
-                var p = declaredParameters[i];
+            for (int i = 0; i < this.parameters.Length; i++) {
+                var p = this.parameters[i];
                 if (parameters.Length <= i) {
-                    if (p.optional) break;
+                    if (p.isOptional) break;
                     else throw new SqrError("parameter " + p.name + " missing");
                 } 
-                tempQontext.register(parameters[i].name, new Variable(parameters[i].value));
+                tempQontext.register(this.parameters[i].name, new Variable(parameters[i]));
             }
 
             return tempQontext;
         }
 
-        public struct ProvidedParam
+        public override string ToString()
         {
-            public string name;
-            public Value value;
-        }
-
-        public struct DeclaredParam
-        {
-            public string name;
-            public NativeType type;
-            public Value defaultValue;
-            public bool optional;
+            return "(" + string.Join(", ", parameters.ToList().Select(_ =>
+                (_.type != null ? "@" + _.type.name + " " : "") +
+                _.name)) + ")";
         }
     }
 
     public class InternalFunqtion : Funqtion
     {
-        protected Func<ProvidedParam[], Value, Value> callback;
+        protected Func<Value[], Qontext, Value, Value> callback;
 
-        public InternalFunqtion(Func<ProvidedParam[], Value, Value> callback)
+        public InternalFunqtion(Func<Value[], Qontext, Value, Value> callback)
         {
             this.callback = callback;
         }
 
-        public Value execute(ProvidedParam[] parameters, Value self = null)
+        public override Value execute(Value[] parameters, Qontext qontext, Value self = null)
         {
-            return callback(parameters, self);
+            return callback(parameters, qontext, self);
+        }
+
+        public Value execute(Value[] parameters, Value self = null)
+        {
+            return execute(parameters, null, self);
         }
     }
 }

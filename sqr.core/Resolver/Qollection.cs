@@ -1,4 +1,4 @@
-﻿using Qrakhen.Dependor;
+﻿using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 namespace Qrakhen.Sqr.Core
 {
     [Injectable]
-    public class QollectionResolver : Resolver<Stack<Token>, Qollection>
+    internal class QollectionResolver : Resolver<Stack<Token>, Qollection>
     {
         private readonly ValueResolver valueResolver;
         private readonly StructureResolver structureResolver;
@@ -28,10 +28,10 @@ namespace Qrakhen.Sqr.Core
                 // outsourcing the entire level/structure logic, should do that more often
                 var sub = structureResolver.resolveUntil(input, qontext, separator);
                 log.spam("digested sub (until " + separator + "): " + string.Join(' ', sub.items.Select(_ => _.ToString())));
-                var op = operationResolver.resolve(sub, qontext);
+                var op = operationResolver.resolveOne(sub, qontext);
                 var r = op.execute();
                 log.spam("adding result: " + r);
-                qollection.add(r.getValue() as Value);
+                qollection.add(r.obj);
             });
             return qollection;
         }

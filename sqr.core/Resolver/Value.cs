@@ -1,4 +1,4 @@
-﻿using Qrakhen.Dependor;
+﻿using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -7,7 +7,7 @@ using System.Linq;
 namespace Qrakhen.Sqr.Core
 {  
     [Injectable]
-    public class ValueResolver : Resolver<Stack<Token>, Value>
+    internal class ValueResolver : Resolver<Stack<Token>, Value>
     {
         private readonly Logger log;
         private readonly StructureResolver structureResolver;
@@ -60,7 +60,8 @@ namespace Qrakhen.Sqr.Core
                             qontext),
                         qontext);
                     log.spam("parameters: " + parameters);
-                    value = ((value.obj as Value<Funqtion>).raw as InternalFunqtion).execute(new Funqtion.ProvidedParam[0], (parent == null ? value : parent).obj); //@TODO make this less awful
+                    value = (value.obj as Qallable).execute(parameters.items.ToArray(), qontext, parent);
+                    //value = ((value.obj as Value<Funqtion>).raw as InternalFunqtion).execute(new Funqtion.ProvidedParam[0], (parent == null ? value : parent).obj); //@TODO make this less awful
                 }
 
                 if (input.done)
@@ -74,9 +75,7 @@ namespace Qrakhen.Sqr.Core
                 } else {
                     end();
                 }
-            });
-
-            log.spam(full + " is a " + value.type.name + " with the value " + value);            
+            });          
 
             return value;
         }
