@@ -14,7 +14,7 @@ namespace Qrakhen.Sqr.Core
 
         public Operation(Node head = null, bool isReturning = false)
         {
-            Console.Write(head.render());
+            log.spam(head.render());
             this.head = head;
             this.isReturning = isReturning;
         }
