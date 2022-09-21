@@ -69,6 +69,11 @@ namespace Qrakhen.Sqr.Core
             var type = input.digest().get<Keyword>();
             log.spam("resolving " + type.symbol + " condition");
 
+            string name = null;
+            if (Validator.Token.isType(input.peek(), Token.Type.Identifier)) {
+                name = input.digest().raw;
+            }
+
             var condition = operationResolver.resolveOne(
                 structureResolver.resolve(input, qontext), qontext);            
 
@@ -76,7 +81,7 @@ namespace Qrakhen.Sqr.Core
                 throw new SqrError("expected { after if, got " + input.peek() + " instead", input.peek());
 
             var body = new Body(structureResolver.resolve(input, qontext).items);
-            return new WhileQondition(condition, body, qontext);
+            return new WhileQondition(condition, body, qontext, name);
         }
 
         public Qondition resolveFor(Stack<Token> input, Qontext qontext)

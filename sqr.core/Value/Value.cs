@@ -4,7 +4,8 @@ namespace Qrakhen.Sqr.Core
 {
     public class Value
     {
-        public static Value Null => null;
+        public static readonly Value Null = new Null();
+        public static readonly Value Void = new Void();
 
         public virtual object raw => this;
         public virtual Value obj => this;
@@ -23,7 +24,7 @@ namespace Qrakhen.Sqr.Core
         public virtual Value accessMember(string name)
         {
             if (type.methods.contains(name))
-                return type.methods[name].makeQallable();
+                return type.methods[name].makeQallable(this);
             else if (fields != null && fields.contains(name))
                 return fields[name];
             else
@@ -56,6 +57,11 @@ namespace Qrakhen.Sqr.Core
             return type.name;
         }
 
+        public virtual string toDebugString()
+        {
+            return ToString();
+        }
+
         [NativeMethod]
         public virtual String toString()
         {
@@ -67,6 +73,18 @@ namespace Qrakhen.Sqr.Core
         {            
             return new String(obj == null ? type.render() : obj.type.render()); // ?? i dont even know
         }
+    }
+
+    public class Void : Value
+    {
+        public Void() : base(null) { }
+        public override string ToString() => "Void";
+    }
+
+    public class Null : Value
+    {
+        public Null() : base(null) { }
+        public override string ToString() => "Null";
     }
 
     public class Value<T> : Value
@@ -92,6 +110,11 @@ namespace Qrakhen.Sqr.Core
         public override string ToString()
         {
             return __value?.ToString();
+        }
+
+        public override string toDebugString()
+        {
+            return type.name + "(" + ToString() + ")";
         }
     }
 }

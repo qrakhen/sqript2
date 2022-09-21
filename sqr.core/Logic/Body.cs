@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
+
+using static Qrakhen.Sqr.Core.Operation;
+
 namespace Qrakhen.Sqr.Core
 {
-    public class Body
+    internal class Body
     {
         private static readonly OperationResolver operationResolver = 
             SqrDI.Dependor.get<OperationResolver>(); // use static fields for these kinds of injectors
@@ -21,28 +24,26 @@ namespace Qrakhen.Sqr.Core
             return new Stack<Token>(content);
         }
 
-        public OperationResult execute(Qontext qontext)
+        public void execute(Qontext qontext, JumpCallback callback)
         {
-            var result = new OperationResult();
             var stack = getStack();
+            var statement = Statement.None;
+            var result = Value.Void;
+            string jumpTarget = null;
+            JumpCallback localCallback = (v, s, t) => { 
+                result = v; 
+                statement = s;
+                jumpTarget = t;
+            };
             while (!stack.done) {
                 var op = operationResolver.resolveOne(stack, qontext);
-                var r = op.execute();
-                if (op.isReturning) {
-                    result.value = r;
-                    result.action = OperationResultAction.Return;
-                    return result;
-                }
-                if (op.didContinue) {
-                    result.action = OperationResultAction.Continue;
-                    return result;
-                }
-                if (op.didBreak) {
-                    result.action = OperationResultAction.Break;
-                    return result;
+                op.execute(localCallback);
+                if (statement != Statement.None) {
+                    callback?.Invoke(result, statement, jumpTarget);
+                    return;
                 }
             }
-            return result;
+            callback?.Invoke(Value.Void, Statement.None);
         }
     }
 }

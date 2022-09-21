@@ -13,6 +13,11 @@ namespace Qrakhen.Sqr.Core
 
         }
 
+        public override string toDebugString()
+        {
+            return type.name + "(" + ToString() + ")";
+        }
+
         public static implicit operator bool(Boolean b) => b.__value;
         public static implicit operator Boolean(bool b) => new Boolean(b);
     }
