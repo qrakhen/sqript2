@@ -14,7 +14,6 @@ namespace Qrakhen.Sqr.Core
 
         public Operation(Node head = null, Statement statement = Statement.None)
         {
-            log.spam(head.render());
             this.head = head;
             this.statement = statement;
         }

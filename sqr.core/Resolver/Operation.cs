@@ -21,6 +21,15 @@ namespace Qrakhen.Sqr.Core
         private readonly QonditionResolver qonditionResolver;
         private readonly DeclarationResolver declarationResolver;
                
+        public Operation[] resolveAll(Stack<Token> input, Qontext qontext)
+        {
+            var operations = new List<Operation>();
+            while (!input.done) {
+                operations.Add(resolveOne(input, qontext));
+            }
+            return operations.ToArray();
+        }
+
         public Operation resolveOne(Stack<Token> input, Qontext qontext)
         {
             Statement statement = Statement.None;

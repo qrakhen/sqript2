@@ -114,7 +114,12 @@ namespace Qrakhen.Sqr.Core
             while (!tokenStack.done) {
                 var operation = operationResolver.resolveOne(tokenStack, Qontext.globalContext);
                 var result = operation.execute();
-                if (result != null) log.success(result.toDebugString());
+                if (result != null) {
+                    if (log.loggingLevel > Logger.Level.INFO)
+                        log.success(result.toDebugString());
+                    else
+                        log.success(result.ToString());
+                }
                 log.verbose("operation time " + (t.ElapsedMilliseconds - _ms) + "ms, " + (t.ElapsedTicks - _t) + " ticks");
                 _ms = t.ElapsedMilliseconds;
                 _t = t.ElapsedTicks;
