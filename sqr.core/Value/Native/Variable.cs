@@ -78,7 +78,7 @@ namespace Qrakhen.Sqr.Core
         public Value get()
         {
             if (isReference)
-                return (__value as Variable).get();
+                return (__value as Variable)?.get();
             else
                 return __value;
         }
@@ -94,6 +94,11 @@ namespace Qrakhen.Sqr.Core
         public override string ToString()
         {
             return __value?.ToString();
+        }
+
+        public override string toDebugString()
+        {
+            return (isReference ? "Reference" : "Variable") + "(" + obj?.toDebugString() + ")";
         }
     }
 }

@@ -57,6 +57,11 @@ namespace Qrakhen.Sqr.Core
             return type.name;
         }
 
+        public virtual string toDebugString()
+        {
+            return ToString();
+        }
+
         [NativeMethod]
         public virtual String toString()
         {
@@ -105,6 +110,11 @@ namespace Qrakhen.Sqr.Core
         public override string ToString()
         {
             return __value?.ToString();
+        }
+
+        public override string toDebugString()
+        {
+            return type.name + "(" + ToString() + ")";
         }
     }
 }

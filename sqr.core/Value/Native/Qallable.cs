@@ -23,7 +23,7 @@ namespace Qrakhen.Sqr.Core
 
         public override string ToString()
         {
-            if (__value == null)
+            if (__value == null || __value.parameters == null)
                 return "Qallable (null)";
 
             return "(" + string.Join(", ", __value.parameters.ToList().Select(_ => _.name).ToArray()) + " {\n" + "    return @any;\n})";
