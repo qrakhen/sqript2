@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    internal class Qondition : Injector
+    internal abstract class Qondition : Injector
     {
         protected readonly Logger log;
 
@@ -20,7 +20,7 @@ namespace Qrakhen.Sqr.Core
             this.qontext = new Qontext(qontext);
         }
 
-        public virtual void execute() { }
+        public abstract void execute();
     }
 
     internal class IfQondition : Qondition

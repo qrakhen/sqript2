@@ -21,7 +21,7 @@ namespace Qrakhen.Sqr.Core
             return new Stack<Token>(content);
         }
 
-        public Value execute(Qontext qontext, bool looped = false)
+        public Value execute(Qontext qontext, Operation.ResultCallback callback = null, bool looped = false)
         {
             var stack = getStack();
             while (!stack.done) {
@@ -31,14 +31,14 @@ namespace Qrakhen.Sqr.Core
                     return r;
                 }
                 if (looped) {
-                    if (op.didContinue) {
+                    if (stack.done || op.didContinue) {
                         qontext.names.clear();
                         stack.reset();
                         continue;
                     }
                     if (op.didBreak) {
                         break;
-                    }
+                    }                    
                 }
             }
             return Value.Void;

@@ -31,6 +31,16 @@ namespace Qrakhen.Sqr.Core
             return head.execute();
         }
 
+        public delegate void ResultCallback(Value value, Statement action = Statement.None);
+
+        public enum Statement
+        {
+            None,
+            Return,
+            Continue,
+            Break
+        }
+
         public class Node
         {
             public object left;

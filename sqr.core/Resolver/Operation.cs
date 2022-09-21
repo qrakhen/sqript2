@@ -21,7 +21,7 @@ namespace Qrakhen.Sqr.Core
         private readonly QonditionResolver qonditionResolver;
         private readonly DeclarationResolver declarationResolver;
                
-        public Operation resolveOne(Stack<Token> input, Qontext qontext)
+        public Operation resolveOne(Stack<Token> input, Qontext qontext, ResultCallback callback = null)
         {
             bool
                 isReturning = false,
@@ -53,7 +53,7 @@ namespace Qrakhen.Sqr.Core
             return new Operation(build(input, qontext), isReturning, didContinue, didBreak);
         }
 
-        protected Node build(Stack<Token> input, Qontext qontext, Node node = null, int level = 0)
+        protected Node build(Stack<Token> input, Qontext qontext, Node node = null, int level = 0, ResultCallback callback = null)
         {
             log.spam("in " + GetType().Name);
             if (input.done)
@@ -104,7 +104,7 @@ namespace Qrakhen.Sqr.Core
             }
         }
 
-        private void handleKeyword(Stack<Token> input, ref Node node, Qontext qontext, int level = 0)
+        private void handleKeyword(Stack<Token> input, ref Node node, Qontext qontext, int level = 0, ResultCallback callback = null)
         {
             var t = input.peek();
 
@@ -113,7 +113,7 @@ namespace Qrakhen.Sqr.Core
             } else {
                 var k = input.peek().get<Keyword>();
                 if (k != null && k.isType(Keyword.Type.QONDITION)) {
-                    var qondition = qonditionResolver.resolve(input, qontext);
+                    var qondition = qonditionResolver.resolve(input, qontext, callback);
                     qondition.execute();
                 } else {
                     var info = declarationResolver.resolve(input, qontext);
