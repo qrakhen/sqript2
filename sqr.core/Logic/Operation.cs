@@ -142,18 +142,4 @@ namespace Qrakhen.Sqr.Core
             }
         }        
     }
-
-    public struct OperationResult
-    {
-        public Value value;
-        public OperationResultAction action;
-    }
-
-    public enum OperationResultAction
-    {
-        None = default,
-        Return,
-        Break,
-        Continue
-    }
 }

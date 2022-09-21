@@ -4,7 +4,8 @@ namespace Qrakhen.Sqr.Core
 {
     public class Value
     {
-        public static Value Null => null;
+        public static readonly Value Null = new Null();
+        public static readonly Value Void = new Void();
 
         public virtual object raw => this;
         public virtual Value obj => this;
@@ -67,6 +68,16 @@ namespace Qrakhen.Sqr.Core
         {            
             return new String(obj == null ? type.render() : obj.type.render()); // ?? i dont even know
         }
+    }
+
+    public class Void : Value
+    {
+        public Void() : base(null) { }
+    }
+
+    public class Null : Value
+    {
+        public Null() : base(null) { }
     }
 
     public class Value<T> : Value

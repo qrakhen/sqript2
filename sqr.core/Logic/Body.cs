@@ -21,28 +21,27 @@ namespace Qrakhen.Sqr.Core
             return new Stack<Token>(content);
         }
 
-        public OperationResult execute(Qontext qontext)
+        public Value execute(Qontext qontext, bool looped = false)
         {
-            var result = new OperationResult();
             var stack = getStack();
             while (!stack.done) {
                 var op = operationResolver.resolveOne(stack, qontext);
                 var r = op.execute();
                 if (op.isReturning) {
-                    result.value = r;
-                    result.action = OperationResultAction.Return;
-                    return result;
+                    return r;
                 }
-                if (op.didContinue) {
-                    result.action = OperationResultAction.Continue;
-                    return result;
-                }
-                if (op.didBreak) {
-                    result.action = OperationResultAction.Break;
-                    return result;
+                if (looped) {
+                    if (op.didContinue) {
+                        qontext.names.clear();
+                        stack.reset();
+                        continue;
+                    }
+                    if (op.didBreak) {
+                        break;
+                    }
                 }
             }
-            return result;
+            return Value.Void;
         }
     }
 }

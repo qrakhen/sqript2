@@ -30,7 +30,7 @@ namespace Qrakhen.Sqr.Core
             if (self != null)
                 eq.register("this", self);
 
-            return body.execute(eq).value;
+            return body.execute(eq);
         }
 
         protected Qontext createExecutionQontext(Value[] parameters, Qontext qontext)
