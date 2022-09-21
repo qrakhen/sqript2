@@ -20,7 +20,7 @@ namespace Qrakhen.Sqr.Core
             this.jumpTarget = jumpTarget;
         }
 
-        public void execute(JumpCallback callback)
+        public void execute(JumpCallback callback) 
         {
             log.spam("executing operation");
             if (head == null) {
