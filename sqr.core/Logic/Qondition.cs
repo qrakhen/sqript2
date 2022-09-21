@@ -61,13 +61,7 @@ namespace Qrakhen.Sqr.Core
 
         public override void execute()
         {
-            while (condition?.execute() as Boolean) {
-                var result = body.execute(qontext);
-                if (result.action == OperationResultAction.Break) {
-                    log.spam("break from while");
-                    break;
-                }
-            }
+            var result = body.execute(qontext, true);
         }
     }
 }
