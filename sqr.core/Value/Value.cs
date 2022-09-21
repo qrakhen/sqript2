@@ -73,11 +73,13 @@ namespace Qrakhen.Sqr.Core
     public class Void : Value
     {
         public Void() : base(null) { }
+        public override string ToString() => "Void";
     }
 
     public class Null : Value
     {
         public Null() : base(null) { }
+        public override string ToString() => "Null";
     }
 
     public class Value<T> : Value

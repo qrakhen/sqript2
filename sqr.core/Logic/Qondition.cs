@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using static Qrakhen.Sqr.Core.Operation;
 
 namespace Qrakhen.Sqr.Core
 {
@@ -20,7 +21,7 @@ namespace Qrakhen.Sqr.Core
             this.qontext = new Qontext(qontext);
         }
 
-        public abstract void execute();
+        public abstract void execute(JumpCallback callback);
     }
 
     internal class IfQondition : Qondition
@@ -39,15 +40,13 @@ namespace Qrakhen.Sqr.Core
             return this;
         }
 
-        public override void execute() 
+        public override void execute(JumpCallback callback)
         {
-            var r = condition?.execute();
-
-            if (r == null || (r as Boolean)) {
-                body.execute(qontext);
+            if (condition == null || condition.execute() as Boolean) {
+                body.execute(qontext, callback);
             } else if (elseIf != null) {
-                elseIf.execute();
-            }
+                elseIf.execute(callback);
+            }         
         }
     }
 
@@ -59,9 +58,29 @@ namespace Qrakhen.Sqr.Core
         public WhileQondition(Operation condition, Body body, Qontext qontext)
             : base(condition, body, qontext) { }
 
-        public override void execute()
+        public override void execute(JumpCallback callback)
         {
-            var result = body.execute(qontext, true);
+            var statement = Statement.None;
+            var result = Value.Void;
+            JumpCallback localCallback = (v, s) => { result = v; statement = s; };
+            while (condition?.execute() as Boolean) {
+                body.execute(qontext, localCallback);
+                if (statement == Statement.Return) {
+                    log.spam("return jump statement called. value: " + result);
+                    callback(result, statement);
+                    return;
+                }
+                if (statement == Statement.Continue) {
+                    log.spam("continue jump statement called. value: " + result);
+                    qontext.names.clear();
+                    continue;
+                }
+                if (statement == Statement.Break) {
+                    log.spam("break jump statement called. value: " + result);
+                    break;
+                }
+            }            
+            callback(Value.Void, Statement.None);
         }
     }
 }

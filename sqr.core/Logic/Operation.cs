@@ -10,28 +10,46 @@ namespace Qrakhen.Sqr.Core
         protected readonly Logger log;
 
         public Node head { get; protected set; }
-        public bool isReturning { get; protected set; }
-        public bool didContinue { get; protected set; }
-        public bool didBreak { get; protected set; }
+        public Statement statement { get; protected set; }
 
-        public Operation(Node head = null, bool isReturning = false, bool didContinue = false, bool didBreak = false)
+        public Operation(Node head = null, Statement statement = Statement.None)
         {
             log.spam(head.render());
             this.head = head;
-            this.isReturning = isReturning;
-            this.didContinue = didContinue;
-            this.didBreak = didBreak;
+            this.statement = statement;
         }
 
-        public Value execute()
+        public void execute(JumpCallback callback)
         {
             log.spam("executing operation");
-            if (head == null)
-                return null;
-            return head.execute();
+            if (head == null) {
+                callback?.Invoke(Value.Void, Statement.None);
+                return;
+            }
+
+            if (statement == Statement.Continue || statement == Statement.Break) {
+                callback?.Invoke(Value.Void, statement);
+            } else {
+                if (head.left is Qondition) {
+                    (head.left as Qondition).execute(callback);
+                    return;
+                } else {
+                    var value = head.execute();
+                    callback?.Invoke(value, statement);
+                    return;
+                }
+            }
         }
 
-        public delegate void ResultCallback(Value value, Statement action = Statement.None);
+        // not all callers use callback, so we have both return type here as a QoL
+        public Value execute()
+        {
+            Value value = Value.Void;
+            execute((v, s) => { value = v; });
+            return value;            
+        }
+
+        public delegate void JumpCallback(Value value, Statement statement = Statement.None);
 
         public enum Statement
         {

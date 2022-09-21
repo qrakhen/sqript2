@@ -13,11 +13,11 @@ namespace Qrakhen.Sqr.Core
 
         public readonly IDeclareInfo[] parameters = new IDeclareInfo[0];
         public readonly Type returnType;
-        public readonly Body body;
+        internal readonly Body body;
 
         protected Funqtion() { }
 
-        public Funqtion(Body body, IDeclareInfo[] parameters, Type returnType = null)
+        internal Funqtion(Body body, IDeclareInfo[] parameters, Type returnType = null)
         {
             this.body = body;
             this.parameters = parameters;
@@ -30,7 +30,9 @@ namespace Qrakhen.Sqr.Core
             if (self != null)
                 eq.register("this", self);
 
-            return body.execute(eq);
+            Value value = Value.Void;
+            body.execute(eq, (v, s) => { value = v; });
+            return value;
         }
 
         protected Qontext createExecutionQontext(Value[] parameters, Qontext qontext)
