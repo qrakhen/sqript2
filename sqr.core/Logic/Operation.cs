@@ -15,7 +15,6 @@ namespace Qrakhen.Sqr.Core
 
         public Operation(Node head = null, Statement statement = Statement.None, string jumpTarget = null)
         {
-            log.spam(head.render());
             this.head = head;
             this.statement = statement;
             this.jumpTarget = jumpTarget;
