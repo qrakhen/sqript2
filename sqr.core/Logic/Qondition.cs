@@ -1,11 +1,14 @@
-﻿using System;
+﻿using Qrakhen.SqrDI;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
 {
-    internal class Qondition
+    internal class Qondition : Injector
     {
+        protected readonly Logger log;
+
         public readonly Operation condition;
         public readonly Body body;
         public readonly Qontext qontext;
@@ -44,6 +47,26 @@ namespace Qrakhen.Sqr.Core
                 body.execute(qontext);
             } else if (elseIf != null) {
                 elseIf.execute();
+            }
+        }
+    }
+
+    internal class WhileQondition : Qondition
+    {
+        public WhileQondition(Qondition qondition)
+            : base(qondition.condition, qondition.body, qondition.qontext) { }
+
+        public WhileQondition(Operation condition, Body body, Qontext qontext)
+            : base(condition, body, qontext) { }
+
+        public override void execute()
+        {
+            while (condition?.execute() as Boolean) {
+                var result = body.execute(qontext);
+                if (result.action == OperationResultAction.Break) {
+                    log.spam("break from while");
+                    break;
+                }
             }
         }
     }

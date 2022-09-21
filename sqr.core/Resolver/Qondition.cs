@@ -66,7 +66,17 @@ namespace Qrakhen.Sqr.Core
 
         public Qondition resolveWhile(Stack<Token> input, Qontext qontext)
         {
-            return null;
+            var type = input.digest().get<Keyword>();
+            log.spam("resolving " + type.symbol + " condition");
+
+            var condition = operationResolver.resolveOne(
+                structureResolver.resolve(input, qontext), qontext);            
+
+            if (input.peek().raw != Structure.get(Structure.Type.BODY).open)
+                throw new SqrError("expected { after if, got " + input.peek() + " instead", input.peek());
+
+            var body = new Body(structureResolver.resolve(input, qontext).items);
+            return new WhileQondition(condition, body, qontext);
         }
 
         public Qondition resolveFor(Stack<Token> input, Qontext qontext)

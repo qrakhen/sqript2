@@ -20,7 +20,7 @@ namespace Qrakhen.Sqr.Core
         private readonly ObjeqtResolver objeqtResolver;
         private readonly QonditionResolver qonditionResolver;
 
-        public IDeclareInfo resolve(Stack<Token> input, Qontext qontext)
+        public IDeclareInfo resolve(Stack<Token> input, Qontext qontext, bool isFunqtionHeader = false)
         {
             log.spam("in " + GetType().Name);
 
@@ -41,14 +41,16 @@ namespace Qrakhen.Sqr.Core
                         throw new SqrError("unkown type: " + input.peek().raw);
                     }
                 } else {
-                    var k = input.digest().get<Keyword>();
-                    if (k != null && k.isType(Keyword.Type.DECLARE_FUNQTION))
-                        info.isFunqtion = true;
-                    else if (k != null && !k.isType(Keyword.Type.DECLARE_DYN))
-                        throw new SqrError("typed or dynamic declaration expected, got " + k.symbol);
-                    else if (k == null)
-                        throw new SqrError("typed or dynamic declaration expected, got " + k.symbol);
-                    log.spam("dynamic declaration: " + k.symbol);
+                    if (!isFunqtionHeader) {
+                        var k = input.digest().get<Keyword>();
+                        if (k != null && k.isType(Keyword.Type.DECLARE_FUNQTION))
+                            info.isFunqtion = true;
+                        else if (k != null && !k.isType(Keyword.Type.DECLARE_DYN))
+                            throw new SqrError("typed or dynamic declaration expected, got " + k.symbol);
+                        else if (k == null)
+                            throw new SqrError("typed or dynamic declaration expected");
+                        log.spam("dynamic declaration: " + k.symbol);
+                    }
                 }
 
                 // reference switch &
@@ -61,11 +63,11 @@ namespace Qrakhen.Sqr.Core
                 }
 
                 // when typed, expect : after @type[&], nah fuck that @todo
-                if (false && info.type != null) {
+                /*if (info.type != null) {
                     var a = input.digest();
                     if (!a.isType(Token.Type.Accessor))
                         throw new SqrError("expected accessor : after typed declaration: " + a, a);
-                }
+                }*/
 
                 // see if it's a funqtion
                 var f = input.peek();

@@ -11,12 +11,16 @@ namespace Qrakhen.Sqr.Core
 
         public Node head { get; protected set; }
         public bool isReturning { get; protected set; }
+        public bool didContinue { get; protected set; }
+        public bool didBreak { get; protected set; }
 
-        public Operation(Node head = null, bool isReturning = false)
+        public Operation(Node head = null, bool isReturning = false, bool didContinue = false, bool didBreak = false)
         {
             log.spam(head.render());
             this.head = head;
             this.isReturning = isReturning;
+            this.didContinue = didContinue;
+            this.didBreak = didBreak;
         }
 
         public Value execute()
@@ -136,6 +140,20 @@ namespace Qrakhen.Sqr.Core
                 }
                 drawer.draw(x - e.Length / 2, y, e);
             }
-        }
+        }        
+    }
+
+    public struct OperationResult
+    {
+        public Value value;
+        public OperationResultAction action;
+    }
+
+    public enum OperationResultAction
+    {
+        None = default,
+        Return,
+        Break,
+        Continue
     }
 }

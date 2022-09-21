@@ -37,7 +37,7 @@ namespace Qrakhen.Sqr.Core
 
             stack.process((current, take, index, abort) => {
                 var sub = structureResolver.resolveUntil(stack, qontext, headerStructure.separator);
-                var info = declarationResolver.resolve(sub, qontext);
+                var info = declarationResolver.resolve(sub, qontext, true);
                 parameters.Add(info);               
             });
 

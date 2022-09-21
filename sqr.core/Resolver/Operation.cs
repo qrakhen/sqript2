@@ -20,10 +20,15 @@ namespace Qrakhen.Sqr.Core
         private readonly ObjeqtResolver objeqtResolver;
         private readonly QonditionResolver qonditionResolver;
         private readonly DeclarationResolver declarationResolver;
-
+               
         public Operation resolveOne(Stack<Token> input, Qontext qontext)
         {
-            bool isReturning = false;
+            bool
+                isReturning = false,
+                didContinue = false,
+                didBreak = false;
+
+            // @todo: rework this
             if ((    
                     input.peek().type == Token.Type.Keyword && 
                     input.peek().get<Keyword>().type == Keyword.Type.FUNQTION_RETURN) || ((
@@ -32,7 +37,20 @@ namespace Qrakhen.Sqr.Core
                 input.digest();
                 isReturning = true;
             }
-            return new Operation(build(input, qontext), isReturning);
+            if (
+                    input.peek().type == Token.Type.Keyword &&
+                    input.peek().get<Keyword>().type == Keyword.Type.LOOP_CONTINUE) {
+                input.digest();
+                return new Operation(new Node(), false, true, false);
+            }
+            if (
+                    input.peek().type == Token.Type.Keyword &&
+                    input.peek().get<Keyword>().type == Keyword.Type.LOOP_BREAK) {
+                input.digest();
+                return new Operation(new Node(), false, false, true);
+            }
+            
+            return new Operation(build(input, qontext), isReturning, didContinue, didBreak);
         }
 
         protected Node build(Stack<Token> input, Qontext qontext, Node node = null, int level = 0)
@@ -94,8 +112,8 @@ namespace Qrakhen.Sqr.Core
                 throw new SqrError("unexpected keyword " + t, t);
             } else {
                 var k = input.peek().get<Keyword>();
-                if (k != null && k.isType(Keyword.Type.QONDITION_IF)) {
-                    var qondition = qonditionResolver.resolveIfElse(input, qontext);
+                if (k != null && k.isType(Keyword.Type.QONDITION)) {
+                    var qondition = qonditionResolver.resolve(input, qontext);
                     qondition.execute();
                 } else {
                     var info = declarationResolver.resolve(input, qontext);
