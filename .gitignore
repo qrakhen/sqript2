@@ -7,3 +7,5 @@ Assets/previews/*
 bin/
 Debug/
 .vs/
+
+*/launchSettings.json
