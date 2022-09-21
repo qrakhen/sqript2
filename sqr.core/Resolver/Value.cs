@@ -61,7 +61,7 @@ namespace Qrakhen.Sqr.Core
                             qontext),
                         qontext);
                     log.spam("parameters: " + parameters);
-                    value = (value.obj as Qallable).execute(parameters.items.ToArray(), qontext, parent);
+                    value = (value.obj as Qallable).execute(parameters.items.ToArray(), qontext);
                     //value = ((value.obj as Value<Funqtion>).raw as InternalFunqtion).execute(new Funqtion.ProvidedParam[0], (parent == null ? value : parent).obj); //@TODO make this less awful
                 }
 
