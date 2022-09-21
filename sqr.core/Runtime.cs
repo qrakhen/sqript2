@@ -40,6 +40,7 @@ namespace Qrakhen.Sqr.Core
 
                 } catch (SqrError e) {
                     log.error(log.loggingLevel > Logger.Level.INFO ? e : (object)e.Message);
+                    log.warn("Sqr stacktrace:\n" + string.Join("\n", SqrError.stackTrace.ToArray()));
                     if (e.data != null && log.loggingLevel >= Logger.Level.DEBUG) 
                         log.warn(json(e.data));
                 } /* catch (Exception e) {
@@ -113,7 +114,12 @@ namespace Qrakhen.Sqr.Core
             while (!tokenStack.done) {
                 var operation = operationResolver.resolveOne(tokenStack, Qontext.globalContext);
                 var result = operation.execute();
-                if (result != null) log.success(result);
+                if (result != null) {
+                    if (log.loggingLevel > Logger.Level.INFO)
+                        log.success(result.toDebugString());
+                    else
+                        log.success(result.ToString());
+                }
                 log.verbose("operation time " + (t.ElapsedMilliseconds - _ms) + "ms, " + (t.ElapsedTicks - _t) + " ticks");
                 _ms = t.ElapsedMilliseconds;
                 _t = t.ElapsedTicks;

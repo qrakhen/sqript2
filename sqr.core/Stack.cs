@@ -45,6 +45,11 @@ namespace Qrakhen.Sqr.Core
             index += delta;
         }
 
+        public void reset()
+        {
+            index = 0;
+        }
+
         public T[] digestUntil(T value)
         {
             List<T> buffer = new List<T>();

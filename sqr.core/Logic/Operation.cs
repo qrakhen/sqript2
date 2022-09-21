@@ -10,25 +10,54 @@ namespace Qrakhen.Sqr.Core
         protected readonly Logger log;
 
         public Node head { get; protected set; }
-        public bool isReturning { get; protected set; }
-        public bool didContinue { get; protected set; }
-        public bool didBreak { get; protected set; }
+        public Statement statement { get; protected set; }
+        public string jumpTarget { get; protected set; }
 
-        public Operation(Node head = null, bool isReturning = false, bool didContinue = false, bool didBreak = false)
+        public Operation(Node head = null, Statement statement = Statement.None, string jumpTarget = null)
         {
-            log.spam(head.render());
             this.head = head;
-            this.isReturning = isReturning;
-            this.didContinue = didContinue;
-            this.didBreak = didBreak;
+            this.statement = statement;
+            this.jumpTarget = jumpTarget;
         }
 
-        public Value execute()
+        public void execute(JumpCallback callback)
         {
             log.spam("executing operation");
-            if (head == null)
-                return null;
-            return head.execute();
+            if (head == null) {
+                callback?.Invoke(Value.Void, Statement.None);
+                return;
+            }
+
+            if (statement == Statement.Continue || statement == Statement.Break) {
+                callback?.Invoke(Value.Void, statement, jumpTarget);
+            } else {
+                if (head.left is Qondition) {
+                    (head.left as Qondition).execute(callback);
+                    return;
+                } else {
+                    var value = head.execute();
+                    callback?.Invoke(value, statement, jumpTarget);
+                    return;
+                }
+            }
+        }
+
+        // not all callers use callback, so we have both return type here as a QoL
+        public Value execute()
+        {
+            Value value = Value.Void;
+            execute((v, s, t) => { value = v; });
+            return value;            
+        }
+
+        public delegate void JumpCallback(Value value, Statement statement = Statement.None, string jumpTarget = null);
+
+        public enum Statement
+        {
+            None,
+            Return,
+            Continue,
+            Break
         }
 
         public class Node
@@ -141,19 +170,5 @@ namespace Qrakhen.Sqr.Core
                 drawer.draw(x - e.Length / 2, y, e);
             }
         }        
-    }
-
-    public struct OperationResult
-    {
-        public Value value;
-        public OperationResultAction action;
-    }
-
-    public enum OperationResultAction
-    {
-        None = default,
-        Return,
-        Break,
-        Continue
     }
 }

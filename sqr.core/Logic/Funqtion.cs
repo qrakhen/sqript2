@@ -11,26 +11,40 @@ namespace Qrakhen.Sqr.Core
     {
         private static readonly OperationResolver operationResolver = SqrDI.Dependor.get<OperationResolver>();
 
-        public readonly IDeclareInfo[] parameters = new IDeclareInfo[0];
+        public readonly string name;
+        public readonly Type declaringType;
         public readonly Type returnType;
-        public readonly Body body;
+        internal readonly Body body;
+        public readonly IDeclareInfo[] parameters = new IDeclareInfo[0];
 
         protected Funqtion() { }
 
-        public Funqtion(Body body, IDeclareInfo[] parameters, Type returnType = null)
+        internal Funqtion(Body body, IDeclareInfo[] parameters, Type returnType = null, Type declaringType = null, string name = null)
         {
+            this.name = name;
+            this.declaringType = declaringType;
             this.body = body;
             this.parameters = parameters;
             this.returnType = returnType;
         }
-        
-        public virtual Value execute(Value[] parameters, Qontext qontext, Value self = null)
+
+        public Value execute(Value[] parameters, Qontext qontext, Value self = null)
+        {            
+            SqrError.stackTrace.Add("<Funq> " + (declaringType != null ? declaringType.name + ":" : "") + (name ?? "[anonymous]") + "(" + string.Join<Value>(", ", parameters) + ")");
+            var result = __execute(parameters, qontext, self);
+            SqrError.stackTrace.RemoveAt(SqrError.stackTrace.Count - 1);
+            return result;
+        }
+
+        protected virtual Value __execute(Value[] parameters, Qontext qontext, Value self = null)
         {
             var eq = createExecutionQontext(parameters, qontext);
             if (self != null)
                 eq.register("this", self);
 
-            return body.execute(eq).value;
+            Value value = Value.Void;
+            body.execute(eq, (v, s, t) => { value = v; });
+            return value;
         }
 
         protected Qontext createExecutionQontext(Value[] parameters, Qontext qontext)
@@ -61,12 +75,13 @@ namespace Qrakhen.Sqr.Core
     {
         protected Func<Value[], Qontext, Value, Value> callback;
 
-        public InternalFunqtion(Func<Value[], Qontext, Value, Value> callback)
+        public InternalFunqtion(Func<Value[], Qontext, Value, Value> callback, Type returnType = null, Type declaringType = null, string name = null)
+            : base(null, null, returnType, declaringType, name)
         {
             this.callback = callback;
         }
 
-        public override Value execute(Value[] parameters, Qontext qontext, Value self = null)
+        protected override Value __execute(Value[] parameters, Qontext qontext, Value self = null)
         {
             return callback(parameters, qontext, self);
         }

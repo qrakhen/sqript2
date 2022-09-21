@@ -208,8 +208,8 @@ namespace Qrakhen.Sqr.Core
             public Value execute(Value[] parameters, Qontext qontext, Value self = null)
                 => funqtion.execute(parameters, qontext, self);
 
-            public Qallable makeQallable()
-                => new Qallable(funqtion);
+            public Qallable makeQallable(Value target)
+                => new Qallable(funqtion, target);
         }
 
         public enum Access

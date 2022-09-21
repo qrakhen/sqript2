@@ -6,6 +6,8 @@ namespace Qrakhen.Sqr.Core
 {
     public class SqrError : Exception
     {
+        public static List<string> stackTrace = new List<string>();
+
         public object data;
 
         public SqrError(string message, object data = null) : base(message)
@@ -44,11 +46,8 @@ namespace Qrakhen.Sqr.Core
 
     public class SqrTypeError : SqrError
     {
-        public Qontext qontext;
-
-        public SqrQontextError(string message, Qontext qontext = null, object data = null) : base(message, data)
+        public SqrTypeError(string message, object data = null) : base(message, data)
         {
-            this.qontext = qontext;
         }
     }
 }

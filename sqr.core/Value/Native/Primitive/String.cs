@@ -27,6 +27,11 @@ namespace Qrakhen.Sqr.Core
                 (int)(to as Number)));
         }
 
+        public override string ToString()
+        {
+            return "'" + __value?.ToString() + "'";
+        }
+
         public static implicit operator string(String s) => s.__value;
         public static implicit operator String(string s) => new String(s);
     }

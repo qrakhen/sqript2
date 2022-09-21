@@ -21,36 +21,48 @@ namespace Qrakhen.Sqr.Core
         private readonly QonditionResolver qonditionResolver;
         private readonly DeclarationResolver declarationResolver;
                
+        public Operation[] resolveAll(Stack<Token> input, Qontext qontext)
+        {
+            var operations = new List<Operation>();
+            while (!input.done) {
+                operations.Add(resolveOne(input, qontext));
+            }
+            return operations.ToArray();
+        }
+
         public Operation resolveOne(Stack<Token> input, Qontext qontext)
         {
-            bool
-                isReturning = false,
-                didContinue = false,
-                didBreak = false;
+            Statement statement = Statement.None;
+            string jumpTarget = null;
 
-            // @todo: rework this
             if ((    
                     input.peek().type == Token.Type.Keyword && 
                     input.peek().get<Keyword>().type == Keyword.Type.FUNQTION_RETURN) || ((
                     input.peek().type == Token.Type.Operator &&
                     input.peek().get<Operator>().type == Operator.Type.ASSIGN))) {
                 input.digest();
-                isReturning = true;
+                statement = Statement.Return;
             }
             if (
                     input.peek().type == Token.Type.Keyword &&
                     input.peek().get<Keyword>().type == Keyword.Type.LOOP_CONTINUE) {
                 input.digest();
-                return new Operation(new Node(), false, true, false);
+                if (Validator.Token.isType(input.peek(), Token.Type.Identifier)) {
+                    jumpTarget = input.digest().raw;
+                }
+                return new Operation(new Node(), Statement.Continue, jumpTarget);
             }
             if (
                     input.peek().type == Token.Type.Keyword &&
                     input.peek().get<Keyword>().type == Keyword.Type.LOOP_BREAK) {
                 input.digest();
-                return new Operation(new Node(), false, false, true);
+                if (Validator.Token.isType(input.peek(), Token.Type.Identifier)) {
+                    jumpTarget = input.digest().raw;
+                }
+                return new Operation(new Node(), Statement.Break, jumpTarget);
             }
             
-            return new Operation(build(input, qontext), isReturning, didContinue, didBreak);
+            return new Operation(build(input, qontext), statement);
         }
 
         protected Node build(Stack<Token> input, Qontext qontext, Node node = null, int level = 0)
@@ -82,6 +94,10 @@ namespace Qrakhen.Sqr.Core
                     if (level == 0) input.digest();
                     break;
                 } else throw new SqrError("unknown or entirely unexpected token " + t, t);
+
+                if (node.left is Qondition) // conditions are single-value nodes
+                    break;
+
             } while (!input.done);
 
             if (level == 0) {
@@ -113,8 +129,7 @@ namespace Qrakhen.Sqr.Core
             } else {
                 var k = input.peek().get<Keyword>();
                 if (k != null && k.isType(Keyword.Type.QONDITION)) {
-                    var qondition = qonditionResolver.resolve(input, qontext);
-                    qondition.execute();
+                    node.left = qonditionResolver.resolve(input, qontext);
                 } else {
                     var info = declarationResolver.resolve(input, qontext);
                     if (info.isFunqtion) {
@@ -167,7 +182,8 @@ namespace Qrakhen.Sqr.Core
                 var qollection = qollectionResolver.resolve(innerStack, qontext);
                 node.put(qollection);
             } else if (Structure.get(t.raw).type == Structure.Type.GROUP) {
-                var result = resolveOne(innerStack, qontext);//.execute(); // we dont have to execute right away. why would we do that even.
+                //@todo: callback könnte hier zu bugs führen. brauchen wir returns in () klammern?
+                var result = resolveOne(innerStack, qontext); //, callback);//.execute(); // we dont have to execute right away. why would we do that even.
                 node.put(result.head);
             } else if (Structure.get(t.raw).type == Structure.Type.BODY) {
                 var objeqt = objeqtResolver.resolve(innerStack, qontext);
