@@ -34,7 +34,7 @@ namespace Qrakhen.Sqr.Core
                 bool isReadonly = false)
         {
             if (names[name] != null) {
-                Logger.TEMP_STATIC_DEBUG.warn("warning: overwriting existing name " + name + + " in qontext (make this configurable)");
+                Logger.TEMP_STATIC_DEBUG.warn("warning: overwriting existing name " + name + " in qontext (make this configurable)");
                 //throw new SqrError("name " + name + " already declared in qontext");
             }
             return names[name] = new Variable(value, isReference, strictType, isReadonly);

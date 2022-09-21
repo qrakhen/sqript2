@@ -30,7 +30,7 @@ namespace Qrakhen.Sqr.Core
 
         public Value execute(Value[] parameters, Qontext qontext, Value self = null)
         {            
-            SqrError.stackTrace.Add("<Funq> " + (name ?? "[anonymous]") + "(" + string.Join<Value>(", ", parameters) + ")");
+            SqrError.stackTrace.Add("<Funq> " + (declaringType != null ? declaringType.name + ":" : "") + (name ?? "[anonymous]") + "(" + string.Join<Value>(", ", parameters) + ")");
             var result = __execute(parameters, qontext, self);
             SqrError.stackTrace.RemoveAt(SqrError.stackTrace.Count - 1);
             return result;
