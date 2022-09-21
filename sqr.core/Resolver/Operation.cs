@@ -41,14 +41,15 @@ namespace Qrakhen.Sqr.Core
                     input.peek().type == Token.Type.Keyword &&
                     input.peek().get<Keyword>().type == Keyword.Type.LOOP_CONTINUE) {
                 input.digest();
-                didContinue = true;
+                return new Operation(new Node(), false, true, false);
             }
             if (
                     input.peek().type == Token.Type.Keyword &&
                     input.peek().get<Keyword>().type == Keyword.Type.LOOP_BREAK) {
                 input.digest();
-                didBreak = true;
+                return new Operation(new Node(), false, false, true);
             }
+            
             return new Operation(build(input, qontext), isReturning, didContinue, didBreak);
         }
 
