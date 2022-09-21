@@ -24,7 +24,7 @@ namespace Qrakhen.Sqr.Core
         public virtual Value accessMember(string name)
         {
             if (type.methods.contains(name))
-                return type.methods[name].makeQallable();
+                return type.methods[name].makeQallable(this);
             else if (fields != null && fields.contains(name))
                 return fields[name];
             else
