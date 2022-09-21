@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "sqr.shell": {
+      "commandName": "Project",
+      "commandLineArgs": "E:\\Coding\\Projekte\\Sqript\\sqripts\\Testing.sq"
+    }
+  }
+}

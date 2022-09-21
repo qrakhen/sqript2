@@ -46,7 +46,7 @@ namespace Qrakhen.Sqr.Core
     {
         public Qontext qontext;
 
-        public SqrQontextError(string message, Qontext qontext = null, object data = null) : base(message, data)
+        public SqrTypeError(string message, Qontext qontext = null, object data = null) : base(message, data)
         {
             this.qontext = qontext;
         }
