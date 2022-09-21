@@ -29,7 +29,7 @@ namespace Qrakhen.Sqr.Core
             }
             return member;
         }
-
+        
         [NativeMethod]
         public void add(Value value)
         {

@@ -20,10 +20,15 @@ namespace Qrakhen.Sqr.Core
         private readonly ObjeqtResolver objeqtResolver;
         private readonly QonditionResolver qonditionResolver;
         private readonly DeclarationResolver declarationResolver;
-
+               
         public Operation resolveOne(Stack<Token> input, Qontext qontext)
         {
-            bool isReturning = false;
+            bool
+                isReturning = false,
+                didContinue = false,
+                didBreak = false;
+
+            // @todo: rework this
             if ((    
                     input.peek().type == Token.Type.Keyword && 
                     input.peek().get<Keyword>().type == Keyword.Type.FUNQTION_RETURN) || ((
@@ -32,7 +37,19 @@ namespace Qrakhen.Sqr.Core
                 input.digest();
                 isReturning = true;
             }
-            return new Operation(build(input, qontext), isReturning);
+            if (
+                    input.peek().type == Token.Type.Keyword &&
+                    input.peek().get<Keyword>().type == Keyword.Type.LOOP_CONTINUE) {
+                input.digest();
+                didContinue = true;
+            }
+            if (
+                    input.peek().type == Token.Type.Keyword &&
+                    input.peek().get<Keyword>().type == Keyword.Type.LOOP_BREAK) {
+                input.digest();
+                didBreak = true;
+            }
+            return new Operation(build(input, qontext), isReturning, didContinue, didBreak);
         }
 
         protected Node build(Stack<Token> input, Qontext qontext, Node node = null, int level = 0)
