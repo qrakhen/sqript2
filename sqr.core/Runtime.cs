@@ -9,10 +9,10 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Qrakhen.Sqr.Core
+namespace Qrakhen.Sqr.Core 
 {
     [Injectable]
-    public class Runtime
+    public class Runtime 
     {
         private readonly Logger log;
         private readonly TokenResolver tokenResolver;
@@ -21,39 +21,57 @@ namespace Qrakhen.Sqr.Core
 
         public bool alive { get; private set; } = true;
 
-        public void run()
+        public void run(string content = null, bool __DEV_DEBUG = false) 
         {
-            log.setLoggingLevel(Logger.Level.SPAM);
-            log.success("welcome to Sqript2.0, or simply sqr. Enjoy thyself.");
+            registerDefaultQontexts();
 
+            log.write(Properties.strings.ASCII_Logo, ConsoleColor.DarkGreen, prefix: "    ");
+            log.success(Properties.strings.Message_Welcome);
+
+            if (content != null) {
+                log.setLoggingLevel(Logger.Level.CRITICAL);
+                if (content.StartsWith("!!")) {
+                    content = content[2..];
+                    __DEV_DEBUG = true;
+                } else if (content.EndsWith("!!")) {
+                    content = content[0..^2];
+                    __DEV_DEBUG = true;
+                }
+                if (__DEV_DEBUG)
+                    log.setLoggingLevel(Logger.Level.SPAM);
+                execute(content);
+            } else {
+                do {
+                    try {
+                        Console.Write("    <: ");
+                        execute(Console.ReadLine()); // doTheConsoleThing()); <- dont, broken atm
+
+                    } catch (SqrError e) {
+                        log.error(log.loggingLevel > Logger.Level.INFO ? e : (object) e.Message);
+                        if (e.data != null && log.loggingLevel >= Logger.Level.DEBUG)
+                            log.warn(json(e.data));
+                    } /* catch (Exception e) {
+                        log.error("### system exceptions need to be completely eradicated ###");
+                        log.error(e);
+                        log.error("### system exceptions need to be completely eradicated ###");
+                        throw e;
+                    }*/
+                } while (alive);
+            }
+        }
+
+        internal void registerDefaultQontexts() 
+        {
             Qontext.globalContext.register(
                 "cout",
                 new Qallable(new InternalFunqtion((p, q, s) => { log.success(p[0].raw); return null; })));
             Qontext.globalContext.register(
                 "log",
-                new Qallable(new InternalFunqtion((p, q, s) => { log.setLoggingLevel((Logger.Level)int.Parse(p[0].raw.ToString())); return null; })));
-
-            do {
-                try {
-                    Console.Write("    <: ");
-                    execute(Console.ReadLine()); // doTheConsoleThing()); <- dont, broken atm
-
-                } catch (SqrError e) {
-                    log.error(log.loggingLevel > Logger.Level.INFO ? e : (object)e.Message);
-                    log.warn("Sqr stacktrace:\n" + string.Join("\n", SqrError.stackTrace.ToArray()));
-                    if (e.data != null && log.loggingLevel >= Logger.Level.DEBUG) 
-                        log.warn(json(e.data));
-                } /* catch (Exception e) {
-                    log.error("### system exceptions need to be completely eradicated ###");
-                    log.error(e);
-                    log.error("### system exceptions need to be completely eradicated ###");
-                    throw e;
-                }*/
-            } while (alive);
+                new Qallable(new InternalFunqtion((p, q, s) => { log.setLoggingLevel((Logger.Level) int.Parse(p[0].raw.ToString())); return null; })));
         }
 
         // das alles in eine console klasse
-        private void clearLine()
+        private void clearLine() 
         {
             var c = Console.CursorTop;
             Console.SetCursorPosition(0, Console.CursorTop);
@@ -61,7 +79,7 @@ namespace Qrakhen.Sqr.Core
             Console.SetCursorPosition(0, c);
         }
 
-        private string doTheConsoleThing()
+        private string doTheConsoleThing() 
         {
             var builder = new StringBuilder();
             var input = Console.ReadKey(true);
@@ -93,11 +111,11 @@ namespace Qrakhen.Sqr.Core
                     }
                 }
             }
-           
+
             return builder.ToString();
         }
 
-        private void execute(string input)
+        private void execute(string input) 
         {
             if (input.StartsWith("/")) {
                 commands(input.Substring(1));
@@ -127,7 +145,7 @@ namespace Qrakhen.Sqr.Core
             log.info("execution time " + (t.ElapsedMilliseconds) + "ms, " + (t.ElapsedTicks) + " ticks");
         }
 
-        private void commands(string input)
+        private void commands(string input) 
         {
             var args = input.Split(" ");
             if (input == "q") {
@@ -137,8 +155,8 @@ namespace Qrakhen.Sqr.Core
                 log.cmd(json(
                     valueResolver.resolve(
                         new Stack<Token>(
-                            new Token[] { 
-                                Token.create(args[1], Token.Type.Identifier) 
+                            new Token[] {
+                                Token.create(args[1], Token.Type.Identifier)
                             }), Qontext.globalContext)));
                 return;
             } else if (input.StartsWith("alias")) {
@@ -157,15 +175,15 @@ namespace Qrakhen.Sqr.Core
                 log.warn("the help DLC is available on steam for $39.95");
             } else if (input.StartsWith("log")) {
                 if (args.Length == 1) {
-                    log.cmd("current level: " + (int)log.loggingLevel);
+                    log.cmd("current level: " + (int) log.loggingLevel);
                     foreach (var i in Enum.GetValues(typeof(Logger.Level))) {
-                        log.cmd((int)i + ": " + (Logger.Level)i);
+                        log.cmd((int) i + ": " + (Logger.Level) i);
                     }
                 } else if (args.Length == 2) {
-                    log.setLoggingLevel((Logger.Level)int.Parse(args[1]));
+                    log.setLoggingLevel((Logger.Level) int.Parse(args[1]));
                     log.cmd("set logging level to " + log.loggingLevel);
                 }
-            } else if (input ==  "t") {
+            } else if (input == "t") {
                 var t = File.ReadAllText("tests.sqr");
                 execute(t);
             } else if (input == "c") {
@@ -174,7 +192,7 @@ namespace Qrakhen.Sqr.Core
             }
         }
 
-        private string applyAliases(string value)
+        private string applyAliases(string value) 
         {
             log.verbose("applying aliases:");
             foreach (var alias in aliases) {
@@ -188,12 +206,12 @@ namespace Qrakhen.Sqr.Core
                 } else {
                     log.verbose("  + " + alias.Key + " > " + alias.Value);
                     value = value.Replace(alias.Key, " " + alias.Value + " ");
-                }                
+                }
             }
             return value;
         }
 
-        private string json(object any)
+        private string json(object any) 
         {
             return JsonConvert.SerializeObject(
                 any,
@@ -205,7 +223,8 @@ namespace Qrakhen.Sqr.Core
             );
         }
 
-        static readonly private Dictionary<string, string> aliases = new Dictionary<string, string>() {
+        static readonly private Dictionary<string, string> aliases = new Dictionary<string, string>() 
+        {
             { "*~", "var" },
             { "*&", "ref" },
             { "*$~", "@$" },
