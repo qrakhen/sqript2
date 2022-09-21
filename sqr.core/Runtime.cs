@@ -40,6 +40,7 @@ namespace Qrakhen.Sqr.Core
 
                 } catch (SqrError e) {
                     log.error(log.loggingLevel > Logger.Level.INFO ? e : (object)e.Message);
+                    log.warn("Sqr stacktrace:\n" + string.Join("\n", SqrError.stackTrace.ToArray()));
                     if (e.data != null && log.loggingLevel >= Logger.Level.DEBUG) 
                         log.warn(json(e.data));
                 } /* catch (Exception e) {

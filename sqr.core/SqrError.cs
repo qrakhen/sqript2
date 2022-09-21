@@ -6,6 +6,8 @@ namespace Qrakhen.Sqr.Core
 {
     public class SqrError : Exception
     {
+        public static List<string> stackTrace = new List<string>();
+
         public object data;
 
         public SqrError(string message, object data = null) : base(message)
