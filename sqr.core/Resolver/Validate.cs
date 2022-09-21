@@ -9,7 +9,22 @@ namespace Qrakhen.Sqr.Core
     {
         public class Token
         {
-            public bool isType<T>(Core.Token token, T type, bool throwError = false) where T : Enum
+            public static bool isType(Core.Token token, Core.Token.Type type, bool throwError = false)
+            {
+                if (token == null) {
+                    if (throwError)
+                        throw new SqrParseError("expected a token, got nothing instead.");
+                    return false;
+                }
+                if (!token.isType(type)) {
+                    if (throwError)
+                        throw new SqrParseError("expected token of type " + type + ", got " + token.type + " instead.", token);
+                    return false;
+                }
+                return true;
+            }
+
+            public static bool isType<T>(Core.Token token, T type, bool throwError = false) where T : Enum
             {
                 if (token == null) {
                     if (throwError)

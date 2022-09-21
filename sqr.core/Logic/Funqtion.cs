@@ -43,7 +43,7 @@ namespace Qrakhen.Sqr.Core
                 eq.register("this", self);
 
             Value value = Value.Void;
-            body.execute(eq, (v, s) => { value = v; });
+            body.execute(eq, (v, s, t) => { value = v; });
             return value;
         }
 

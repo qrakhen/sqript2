@@ -52,17 +52,24 @@ namespace Qrakhen.Sqr.Core
 
     internal class WhileQondition : Qondition
     {
-        public WhileQondition(Qondition qondition)
-            : base(qondition.condition, qondition.body, qondition.qontext) { }
+        public readonly string name;
 
-        public WhileQondition(Operation condition, Body body, Qontext qontext)
-            : base(condition, body, qontext) { }
+        public WhileQondition(Operation condition, Body body, Qontext qontext, string name = null)
+                : base(condition, body, qontext) 
+        {
+            this.name = name;
+        }
 
         public override void execute(JumpCallback callback)
         {
             var statement = Statement.None;
             var result = Value.Void;
-            JumpCallback localCallback = (v, s) => { result = v; statement = s; };
+            string jumpTarget = null;
+            JumpCallback localCallback = (v, s, t ) => { 
+                result = v; 
+                statement = s; 
+                jumpTarget = t; 
+            };
             while (condition?.execute() as Boolean) {
                 body.execute(qontext, localCallback);
                 if (statement == Statement.Return) {
@@ -71,11 +78,19 @@ namespace Qrakhen.Sqr.Core
                     return;
                 }
                 if (statement == Statement.Continue) {
+                    if (jumpTarget != null && jumpTarget != name) {
+                        callback(result, statement, jumpTarget);
+                        return;
+                    }
                     log.spam("continue jump statement called. value: " + result);
                     qontext.names.clear();
                     continue;
                 }
                 if (statement == Statement.Break) {
+                    if (jumpTarget != null && jumpTarget != name) {
+                        callback(result, statement, jumpTarget);
+                        return;
+                    }
                     log.spam("break jump statement called. value: " + result);
                     break;
                 }

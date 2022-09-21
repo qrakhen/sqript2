@@ -29,12 +29,17 @@ namespace Qrakhen.Sqr.Core
             var stack = getStack();
             var statement = Statement.None;
             var result = Value.Void;
-            JumpCallback localCallback = (v, s) => { result = v; statement = s; };
+            string jumpTarget = null;
+            JumpCallback localCallback = (v, s, t) => { 
+                result = v; 
+                statement = s;
+                jumpTarget = t;
+            };
             while (!stack.done) {
                 var op = operationResolver.resolveOne(stack, qontext);
                 op.execute(localCallback);
                 if (statement != Statement.None) {
-                    callback?.Invoke(result, statement);
+                    callback?.Invoke(result, statement, jumpTarget);
                     return;
                 }
             }

@@ -24,6 +24,7 @@ namespace Qrakhen.Sqr.Core
         public Operation resolveOne(Stack<Token> input, Qontext qontext)
         {
             Statement statement = Statement.None;
+            string jumpTarget = null;
 
             if ((    
                     input.peek().type == Token.Type.Keyword && 
@@ -37,13 +38,19 @@ namespace Qrakhen.Sqr.Core
                     input.peek().type == Token.Type.Keyword &&
                     input.peek().get<Keyword>().type == Keyword.Type.LOOP_CONTINUE) {
                 input.digest();
-                return new Operation(new Node(), Statement.Continue);
+                if (Validator.Token.isType(input.peek(), Token.Type.Identifier)) {
+                    jumpTarget = input.digest().raw;
+                }
+                return new Operation(new Node(), Statement.Continue, jumpTarget);
             }
             if (
                     input.peek().type == Token.Type.Keyword &&
                     input.peek().get<Keyword>().type == Keyword.Type.LOOP_BREAK) {
                 input.digest();
-                return new Operation(new Node(), Statement.Break);
+                if (Validator.Token.isType(input.peek(), Token.Type.Identifier)) {
+                    jumpTarget = input.digest().raw;
+                }
+                return new Operation(new Node(), Statement.Break, jumpTarget);
             }
             
             return new Operation(build(input, qontext), statement);

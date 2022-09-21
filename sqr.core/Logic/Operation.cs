@@ -11,12 +11,14 @@ namespace Qrakhen.Sqr.Core
 
         public Node head { get; protected set; }
         public Statement statement { get; protected set; }
+        public string jumpTarget { get; protected set; }
 
-        public Operation(Node head = null, Statement statement = Statement.None)
+        public Operation(Node head = null, Statement statement = Statement.None, string jumpTarget = null)
         {
             log.spam(head.render());
             this.head = head;
             this.statement = statement;
+            this.jumpTarget = jumpTarget;
         }
 
         public void execute(JumpCallback callback)
@@ -28,14 +30,14 @@ namespace Qrakhen.Sqr.Core
             }
 
             if (statement == Statement.Continue || statement == Statement.Break) {
-                callback?.Invoke(Value.Void, statement);
+                callback?.Invoke(Value.Void, statement, jumpTarget);
             } else {
                 if (head.left is Qondition) {
                     (head.left as Qondition).execute(callback);
                     return;
                 } else {
                     var value = head.execute();
-                    callback?.Invoke(value, statement);
+                    callback?.Invoke(value, statement, jumpTarget);
                     return;
                 }
             }
@@ -45,11 +47,11 @@ namespace Qrakhen.Sqr.Core
         public Value execute()
         {
             Value value = Value.Void;
-            execute((v, s) => { value = v; });
+            execute((v, s, t) => { value = v; });
             return value;            
         }
 
-        public delegate void JumpCallback(Value value, Statement statement = Statement.None);
+        public delegate void JumpCallback(Value value, Statement statement = Statement.None, string jumpTarget = null);
 
         public enum Statement
         {
