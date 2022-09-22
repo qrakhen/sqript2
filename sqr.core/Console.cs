@@ -45,6 +45,8 @@ namespace Qrakhen.Sqr.Core
             { Token.Type.End, ConsoleColor.DarkGray }
         };
 
+        private const string HISTORY_FILE = "sqr.history";
+
         private readonly Logger log;
         private readonly Runtime runtime;
         private readonly TokenResolver tokenResolver;
@@ -67,6 +69,12 @@ namespace Qrakhen.Sqr.Core
 
         public void run()
         {
+            if (!File.Exists(HISTORY_FILE)) {
+                File.Create(HISTORY_FILE);
+            } else {
+                history = File.ReadAllText(HISTORY_FILE).Split("\n").ToList();
+            }
+            historyIndex = history.Count;
             clock = new Stopwatch();
             //thread = new Thread(__run);
             clock.Start();
@@ -102,13 +110,15 @@ namespace Qrakhen.Sqr.Core
                             if (--historyIndex < 0) {
                                 historyIndex = -1;
                             } else {
-                                line = history[historyIndex].ToCharArray().ToList();
+                                buffer = history[historyIndex].ToCharArray().ToList();
+                                line.Clear();
                             }
                         } else if (keyInfo.Key == ConsoleKey.DownArrow) {
                             if (++historyIndex >= history.Count) {
                                 historyIndex = history.Count;
                             } else {
-                                line = history[historyIndex].ToCharArray().ToList();
+                                buffer = history[historyIndex].ToCharArray().ToList();
+                                line.Clear();
                             }
                         } else if (keyInfo.Key == ConsoleKey.LeftArrow) {
                             setCursor(Math.Max(0, cx - 1));
@@ -123,6 +133,7 @@ namespace Qrakhen.Sqr.Core
                     if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != ConsoleModifiers.Shift) {
                         history.Add(input);
                         historyIndex = history.Count;
+                        File.WriteAllText(HISTORY_FILE, string.Join<string>('\n', history.Select(_ => _.Replace("\n", " ")).ToArray<string>()));
                         write("\n");
                         //new Thread(() => runtime.execute(input)).Start();
                         runtime.execute(strip(input));
