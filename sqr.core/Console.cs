@@ -88,72 +88,68 @@ namespace Qrakhen.Sqr.Core
             draw();
             setCursor(0);
             do {
-                //try {
-                    while ((keyInfo = Console.ReadKey(true)).Key != ConsoleKey.Enter) {
-                        if (keyInfo.Key == ConsoleKey.Backspace) {
-                            if (input.Length > 0 && cx > 0) {
-                                line.RemoveAt(cx - 1);
-                                setCursor(cx - 1);
-                            }
-                        } else if (keyInfo.Key == ConsoleKey.Delete) {
-                            if (input.Length > 0 && cx < line.Count) {
-                                line.RemoveAt(cx);
-                            }
-                        } else if (keyInfo.Key == ConsoleKey.Tab) {
-                            var match = Qontext.globalContext.names.Keys
-                                .FirstOrDefault(item => item != input && item.StartsWith(input, true, CultureInfo.InvariantCulture));
-                            if (string.IsNullOrEmpty(match))
-                                continue;
-
-                            write(match);
-                        } else if (keyInfo.Key == ConsoleKey.UpArrow) {
-                            if (--historyIndex < 0) {
-                                historyIndex = -1;
-                                line.Clear();
-                                buffer.Clear();
-                        } else {
-                                buffer = history[historyIndex].ToCharArray().ToList();
-                                line.Clear();
-                            }
-                        } else if (keyInfo.Key == ConsoleKey.DownArrow) {
-                            if (++historyIndex >= history.Count) {
-                                historyIndex = history.Count;
-                                line.Clear(); 
-                                buffer.Clear();
-                            } else {
-                                buffer = history[historyIndex].ToCharArray().ToList();
-                                line.Clear();
-                            }
-                        } else if (keyInfo.Key == ConsoleKey.LeftArrow) {
-                            setCursor(Math.Max(0, cx - 1));
-                        } else if (keyInfo.Key == ConsoleKey.RightArrow) {
-                            setCursor(Math.Min(input.Length, cx + 1));
-                        } else {
-                            line.Insert(Math.Min(cx, line.Count), keyInfo.KeyChar);
-                            setCursor(cx + 1);
+                while ((keyInfo = Console.ReadKey(true)).Key != ConsoleKey.Enter) {
+                    if (keyInfo.Key == ConsoleKey.Backspace) {
+                        if (input.Length > 0 && cx > 0) {
+                            line.RemoveAt(cx - 1);
+                            setCursor(cx - 1);
                         }
-                        draw();
-                    }
-                    if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != ConsoleModifiers.Shift) {
-                        history.Add(input);
-                        historyIndex = history.Count;
-                        File.WriteAllText(HISTORY_FILE, string.Join<string>('\n', history.Select(_ => _.Replace("\n", " ")).ToArray<string>()));
-                        write("\n");
-                        //new Thread(() => runtime.execute(input)).Start();
-                        runtime.execute(strip(input));
+                    } else if (keyInfo.Key == ConsoleKey.Delete) {
+                        if (input.Length > 0 && cx < line.Count) {
+                            line.RemoveAt(cx);
+                        }
+                    } else if (keyInfo.Key == ConsoleKey.Tab) {
+                        var match = Qontext.globalContext.names.Keys
+                            .FirstOrDefault(item => item != input && item.StartsWith(input, true, CultureInfo.InvariantCulture));
+                        if (string.IsNullOrEmpty(match))
+                            continue;
+
+                        write(match);
+                    } else if (keyInfo.Key == ConsoleKey.UpArrow) {
                         buffer.Clear();
-                        line.Clear();
+                        if (--historyIndex < 0) {
+                            historyIndex = -1;
+                            line.Clear();
                     } else {
-                        buffer = buffer.Concat(line).ToList();
-                        buffer.Add('\n');                        
-                        line.Clear();
-                        setCursor(0, 1);
+                            line = history[historyIndex].ToCharArray().ToList();
+                        }
+                        setCursor(line.Count, 0);
+                    } else if (keyInfo.Key == ConsoleKey.DownArrow) {
+                        buffer.Clear();
+                        if (++historyIndex >= history.Count) {
+                            historyIndex = history.Count;
+                            line.Clear(); 
+                        } else {
+                            line = history[historyIndex].ToCharArray().ToList();
+                        }
+                        setCursor(line.Count, 0);
+                    } else if (keyInfo.Key == ConsoleKey.LeftArrow) {
+                        setCursor(Math.Max(0, cx - 1));
+                    } else if (keyInfo.Key == ConsoleKey.RightArrow) {
+                        setCursor(Math.Min(input.Length, cx + 1));
+                    } else {
+                        line.Insert(Math.Min(cx, line.Count), keyInfo.KeyChar);
+                        setCursor(cx + 1);
                     }
                     draw();
-                    setCursor(0);
-                //} catch (Exception e) {
-                //    throw e;
-                //}
+                }
+                if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != ConsoleModifiers.Shift) {
+                    history.Add(input);
+                    historyIndex = history.Count;
+                    File.WriteAllText(HISTORY_FILE, string.Join<string>('\n', history.Select(_ => _.Replace("\n", " ")).ToArray<string>()));
+                    write("\n");
+                    //new Thread(() => runtime.execute(input)).Start();
+                    runtime.execute(strip(input));
+                    buffer.Clear();
+                    line.Clear();
+                } else {
+                    buffer = buffer.Concat(line).ToList();
+                    buffer.Add('\n');                        
+                    line.Clear();
+                    setCursor(0, 1);
+                }
+                draw();
+                setCursor(0);
             } while (exitCode == 0);
         }
 
