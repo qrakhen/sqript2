@@ -58,7 +58,8 @@ namespace Qrakhen.Sqr.Core
             LOOP_BREAK = BitFlag._12,
             LOOP_CONTINUE = BitFlag._13,
             QONDITION = QONDITION_IF | QONDITION_ELSE | LOOP_DO | LOOP_FOR | LOOP_WHILE,
-            FUNQTION_RETURN = BitFlag._14
+            FUNQTION_RETURN = BitFlag._14,
+            INSTANCE_CREATE = BitFlag._15
         }
 
         public static Keyword register(Type type, string symbol)
@@ -86,6 +87,7 @@ namespace Qrakhen.Sqr.Core
             register(Type.LOOP_BREAK, "break");
             register(Type.LOOP_CONTINUE, "continue");
             register(Type.FUNQTION_RETURN, "return");
+            register(Type.INSTANCE_CREATE, "new");
         }
     }
 }

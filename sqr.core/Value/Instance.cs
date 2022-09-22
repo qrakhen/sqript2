@@ -8,9 +8,11 @@ namespace Qrakhen.Sqr.Core
 {
     public class Instance : Value
     {
-        public Instance(Type definition) : base(definition)
+        public readonly Qontext qontext;
+         
+        public Instance(Qontext qontext, Type definition) : base(definition)
         {
-
+            this.qontext = new Qontext(qontext);
         }
     }
 }

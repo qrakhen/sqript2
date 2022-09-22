@@ -76,9 +76,9 @@ namespace Qrakhen.Sqr.Core
         }
 
         // native types are instantiated by just using new() since theyre hard coded
-        public Instance spawn(Value[] parameters)
+        public Instance spawn(Qontext qontext, Value[] parameters)
         {
-            return new Instance(this);
+            return new Instance(qontext, this);
         }
 
         public Value invoke(Method method, Value invoker, Value[] parameters, Qontext qontext)

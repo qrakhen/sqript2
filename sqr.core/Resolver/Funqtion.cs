@@ -21,10 +21,10 @@ namespace Qrakhen.Sqr.Core
         /// <returns></returns>
         public Funqtion resolve(Stack<Token> input, Qontext qontext, IDeclareInfo info = new IDeclareInfo())
         {
-            log.spam("in " + GetType().Name);
+            log.debug("in " + GetType().Name);
             var bodyStructure = Structure.get(Structure.Type.BODY);
             var header = resolveHeader(structureResolver.resolveUntil(input, qontext, bodyStructure.open), qontext);
-            input.move(-1); // not nice. gotta find a way to make this consistent and tidy. (geht um (a b c { }) das { wird mitgegessen bei readStructure
+            input.move(-1);
             var body = new Body(structureResolver.resolve(input, qontext).items);
             return new Funqtion(body, header.ToArray(), info.type);
         }
@@ -33,10 +33,11 @@ namespace Qrakhen.Sqr.Core
         {
             //@todo hier auch IDeclareinfo verwenden ffs
             var headerStructure = Structure.get(Structure.Type.GROUP);
+            var bodyStructure = Structure.get(Structure.Type.BODY);
             var parameters = new List<IDeclareInfo>();
 
             stack.process((current, take, index, abort) => {
-                var sub = structureResolver.resolveUntil(stack, qontext, headerStructure.separator);
+                var sub = structureResolver.resolveUntil(stack, qontext, new string[] { headerStructure.separator, bodyStructure.open });
                 var info = declarationResolver.resolve(sub, qontext, true);
                 parameters.Add(info);               
             });

@@ -13,7 +13,7 @@ namespace Qrakhen.Sqr.Core
 
         public Stack<Token> resolve(Stack<char> input)
         {
-            log.spam("in " + GetType().Name);
+            log.debug("in " + GetType().Name);
             var result = new List<Token>();
             long row = 0, count = 0, __prev = 0;
             while (!input.done) {
@@ -136,6 +136,8 @@ namespace Qrakhen.Sqr.Core
 
     public class Token : ITyped<Token.Type>
     {
+        public const string end = ";";
+
         public long __row, __col, __pos = -1;
 
         public readonly string raw;
@@ -231,7 +233,7 @@ namespace Qrakhen.Sqr.Core
                     var t = Core.Type.get(raw);
                     if (t != null) { 
                         parsedType = Type.Type;
-                        return v;
+                        return t;
                     }
                 }
                 return raw;

@@ -16,7 +16,7 @@ namespace Qrakhen.Sqr.Core
 
         public Value resolve(Stack<Token> input, Qontext qontext)
         {
-            log.spam("in " + GetType().Name);
+            log.debug("in " + GetType().Name);
             Token t = input.peek();
 
             if (!t.isType(Token.Type.Value))

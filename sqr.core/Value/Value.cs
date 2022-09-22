@@ -73,6 +73,8 @@ namespace Qrakhen.Sqr.Core
         {            
             return new String(obj == null ? type.render() : obj.type.render()); // ?? i dont even know
         }
+
+        public static implicit operator bool(Value v) { return (v == null); }
     }
 
     public class Void : Value

@@ -23,7 +23,7 @@ namespace Qrakhen.Sqr.Core
 
         public void run()
         {
-            log.setLoggingLevel(Logger.Level.SPAM);
+            log.setLoggingLevel(Logger.Level.VERBOSE);
             log.success("welcome to Sqript2.0, or simply sqr. Enjoy thyself.");
 
             Qontext.globalContext.register(

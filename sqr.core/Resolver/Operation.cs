@@ -20,7 +20,8 @@ namespace Qrakhen.Sqr.Core
         private readonly ObjeqtResolver objeqtResolver;
         private readonly QonditionResolver qonditionResolver;
         private readonly DeclarationResolver declarationResolver;
-               
+        private readonly QlassResolver qlassResolver;
+
         public Operation[] resolveAll(Stack<Token> input, Qontext qontext)
         {
             var operations = new List<Operation>();
@@ -67,7 +68,7 @@ namespace Qrakhen.Sqr.Core
 
         protected Node build(Stack<Token> input, Qontext qontext, Node node = null, int level = 0)
         {
-            log.spam("in " + GetType().Name);
+            log.debug("in " + GetType().Name);
             if (input.done)
                 return null;
 
@@ -124,12 +125,27 @@ namespace Qrakhen.Sqr.Core
         {
             var t = input.peek();
 
+            if (Validator.Token.tryGetSubType(t, Keyword.Type.INSTANCE_CREATE, out Keyword keyword)) {
+                input.digest();
+                Validator.Token.tryGetType(input.digest(), Token.Type.Type, out Type type, true);
+                var parameters = qollectionResolver.resolve(
+                    structureResolver.resolve(
+                        input,
+                        qontext),
+                    qontext);
+                if (!node.put(type.spawn(qontext,parameters.items.ToArray())))
+                    throw new SqrError("weird spot to instantiate something.", t);
+                return;
+            }
+                
             if (!node.empty || level > 0) {
                 throw new SqrError("unexpected keyword " + t, t);
             } else {
                 var k = input.peek().get<Keyword>();
                 if (k != null && k.isType(Keyword.Type.QONDITION)) {
                     node.left = qonditionResolver.resolve(input, qontext);
+                } else if (k != null && k.isType(Keyword.Type.DECLARE_QLASS)) {
+                    node.left = qlassResolver.resolve(input, qontext);
                 } else {
                     var info = declarationResolver.resolve(input, qontext);
                     if (info.isFunqtion) {
