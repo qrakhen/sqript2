@@ -42,14 +42,15 @@ namespace Qrakhen.Sqr.Core
                     args.methods[info.name] = new Type.Method(funqtion, info);
                     log.spam("registering method '" + info.name + "' to qlass '" + name + "'");
                 } else {
-                    args.fields[info.name] = new Type.Field(info);
-                    if (Validator.Token.tryGetSubType(current(), Operator.Type.ASSIGN, out Operator value)) {
-                        next();
+                    if (Validator.Token.tryGetSubType(sub.peek(), Operator.Type.ASSIGN, out Operator value)) {
+                        sub.digest();
                         var defaultValue = valueResolver.resolve(sub, qontext);
                         if (!defaultValue.type.isPrimitive) {
                             // throw error fragezeichen?
                         }
+                        info.defaultValue = defaultValue;
                     }
+                    args.fields[info.name] = new Type.Field(info);
                     log.spam("registering field '" + info.name + "' to qlass '" + name + "'");
                 }         
             });
