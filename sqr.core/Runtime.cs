@@ -80,7 +80,7 @@ namespace Qrakhen.Sqr.Core
             qontext.register(
                "export",
                new Qallable(new InternalFunqtion((p, q, s) => {
-                   qontext.export(p[0] as String, p[1]);
+                   qontext.export(p[0].raw as string, p[0]);
                    return Value.Void;
                })));
         }        

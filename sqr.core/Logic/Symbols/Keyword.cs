@@ -78,7 +78,7 @@ namespace Qrakhen.Sqr.Core
             register(Type.DECLARE_TYPED, "@");
             register(Type.DECLARE_FUNQTION, "funqtion")
                 .alias("funq")
-                .alias("fn");
+                .alias("fq");
             register(Type.DECLARE_QLASS, "qlass");
             register(Type.IMPORT, "import");
             register(Type.EXPORT, "export");
