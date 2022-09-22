@@ -37,23 +37,6 @@ namespace Qrakhen.Sqr.Core
             userControlInterface.run();
 
             return;
-            do {
-                try {
-                    Console.Write("    <: ");
-                    execute(Console.ReadLine()); // doTheConsoleThing()); <- dont, broken atm
-
-                } catch (SqrError e) {
-                    log.error(log.loggingLevel > Logger.Level.INFO ? e : (object)e.Message);
-                    log.warn("Sqr stacktrace:\n" + string.Join("\n", SqrError.stackTrace.ToArray()));
-                    if (e.data != null && log.loggingLevel >= Logger.Level.DEBUG) 
-                        log.warn(json(e.data));
-                } /* catch (Exception e) {
-                    log.error("### system exceptions need to be completely eradicated ###");
-                    log.error(e);
-                    log.error("### system exceptions need to be completely eradicated ###");
-                    throw e;
-                }*/
-            } while (alive);
         }
 
         // das alles in eine console klasse
@@ -63,72 +46,48 @@ namespace Qrakhen.Sqr.Core
             Console.SetCursorPosition(0, Console.CursorTop);
             Console.Write(new string(' ', Console.WindowWidth));
             Console.SetCursorPosition(0, c);
-        }
-
-        private string doTheConsoleThing()
-        {
-            var builder = new StringBuilder();
-            var input = Console.ReadKey(true);
-
-            while ((input = Console.ReadKey(true)).Key != ConsoleKey.Enter) {
-                var c = builder.ToString();
-                if (input.Key == ConsoleKey.Tab) {
-                    var match = Qontext.globalContext.names.Keys
-                        .FirstOrDefault(item => item != c && item.StartsWith(c, true, CultureInfo.InvariantCulture));
-                    if (string.IsNullOrEmpty(match)) {
-                        continue;
-                    }
-
-                    clearLine();
-                    builder.Clear();
-                    Console.Write("    <:" + match);
-                    builder.Append(match);
-                } else {
-                    if (input.Key == ConsoleKey.Backspace && c.Length > 0) {
-                        builder.Remove(builder.Length - 1, 1);
-                        clearLine();
-
-                        c = c.Remove(c.Length - 1);
-                        Console.Write("    <:" + c);
-                    } else {
-                        var key = input.KeyChar;
-                        builder.Append(key);
-                        Console.Write(key);
-                    }
-                }
-            }
-           
-            return builder.ToString();
-        }
+        }           
 
         public void execute(string input)
         {
-            if (input.StartsWith("/")) {
+            try {                
+                if (input.StartsWith("/")) {
                 commands(input.Substring(1));
                 return;
-            } else if (string.IsNullOrEmpty(input)) {
-                log.info("yes i too am kinda lazy today, it's fine.");
-                return;
-            }
-
-            var t = new Stopwatch();
-            t.Restart();
-            long _ms = 0, _t = 0;
-            var tokenStack = tokenResolver.resolve(new Core.Stack<char>(applyAliases(input).ToCharArray()));
-            while (!tokenStack.done) {
-                var operation = operationResolver.resolveOne(tokenStack, Qontext.globalContext);
-                var result = operation.execute(Qontext.globalContext);
-                if (result != null) {
-                    if (log.loggingLevel > Logger.Level.INFO)
-                        log.success(result.toDebugString());
-                    else
-                        log.success(result.ToString());
+                } else if (string.IsNullOrEmpty(input)) {
+                    log.info("yes i too am kinda lazy today, it's fine.");
+                    return;
                 }
-                log.verbose("operation time " + (t.ElapsedMilliseconds - _ms) + "ms, " + (t.ElapsedTicks - _t) + " ticks");
-                _ms = t.ElapsedMilliseconds;
-                _t = t.ElapsedTicks;
-            }
-            log.info("execution time " + (t.ElapsedMilliseconds) + "ms, " + (t.ElapsedTicks) + " ticks");
+
+                var t = new Stopwatch();
+                t.Restart();
+                long _ms = 0, _t = 0;
+                var tokenStack = tokenResolver.resolve(new Core.Stack<char>(applyAliases(input).ToCharArray()));
+                while (!tokenStack.done) {
+                    var operation = operationResolver.resolveOne(tokenStack, Qontext.globalContext);
+                    var result = operation.execute(Qontext.globalContext);
+                    if (result != null) {
+                        if (log.loggingLevel > Logger.Level.INFO)
+                            log.success(result.toDebugString());
+                        else
+                            log.success(result.ToString());
+                    }
+                    log.verbose("operation time " + (t.ElapsedMilliseconds - _ms) + "ms, " + (t.ElapsedTicks - _t) + " ticks");
+                    _ms = t.ElapsedMilliseconds;
+                    _t = t.ElapsedTicks;
+                }
+                log.info("execution time " + (t.ElapsedMilliseconds) + "ms, " + (t.ElapsedTicks) + " ticks");
+            } catch (SqrError e) {
+                log.error(log.loggingLevel > Logger.Level.INFO ? e : (object)e.Message);
+                log.warn("Sqr stacktrace:\n" + string.Join("\n", SqrError.stackTrace.ToArray()));
+                if (e.data != null && log.loggingLevel >= Logger.Level.DEBUG)
+                    log.warn(json(e.data));
+            } /* catch (Exception e) {
+                    log.error("### system exceptions need to be completely eradicated ###");
+                    log.error(e);
+                    log.error("### system exceptions need to be completely eradicated ###");
+                    throw e;
+                }*/
         }
 
         private void commands(string input)

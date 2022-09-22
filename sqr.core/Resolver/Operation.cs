@@ -114,19 +114,20 @@ namespace Qrakhen.Sqr.Core
         {
             Value value;
             if (node.op != null && node.op.type == Operator.Type.ACCESSOR) {
-                value = new String(input.digest().raw);
-                if (Validator.Token.tryGetSubType(input.peek(), Structure.Type.GROUP, out Structure s)) {
-                    if (s.open == input.peek().raw) {
-                        var parameters = qollectionResolver.resolve(
-                        structureResolver.resolve(
-                            input,
-                            qontext),
-                        qontext);
-                        node.data = parameters;
-                    }
-                }
+                value = new String(input.digest().raw);               
             } else {
                 value = valueResolver.resolve(input, qontext);
+            }
+
+            if (Validator.Token.tryGetSubType(input.peek(), Structure.Type.GROUP, out Structure s)) {
+                if (s.open == input.peek().raw) {
+                    var parameters = qollectionResolver.resolve(
+                    structureResolver.resolve(
+                        input,
+                        qontext),
+                    qontext);
+                    node.data = parameters;
+                }
             }
 
             if (!node.put(value)) { 
