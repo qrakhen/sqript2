@@ -84,6 +84,7 @@ namespace Qrakhen.Sqr.Core
 
         private void __run()
         {
+            Qontext qontext = new Qontext(Qontext.globalContext);
             ConsoleKeyInfo keyInfo;
             draw();
             setCursor(0);
@@ -139,7 +140,7 @@ namespace Qrakhen.Sqr.Core
                     File.WriteAllText(HISTORY_FILE, string.Join<string>('\n', history.Select(_ => _.Replace("\n", " ").Trim()).ToArray<string>()));
                     write("\n");
                     //new Thread(() => runtime.execute(input)).Start();
-                    runtime.execute(strip(input));
+                    runtime.execute(strip(input), qontext);
                     buffer.Clear();
                     line.Clear();
                 } else {

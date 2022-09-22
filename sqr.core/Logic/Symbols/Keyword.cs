@@ -49,7 +49,6 @@ namespace Qrakhen.Sqr.Core
             DECLARE_FUNQTION = BitFlag._4,
             DECLARE_QLASS = BitFlag._5,
             DECLARE = DECLARE_DYN | DECLARE_REF | DECLARE_FUNQTION | DECLARE_QLASS,
-            IMPORT = BitFlag._6,
             QONDITION_IF = BitFlag._7,
             QONDITION_ELSE = BitFlag._8,
             LOOP_FOR = BitFlag._9,
@@ -59,7 +58,10 @@ namespace Qrakhen.Sqr.Core
             LOOP_CONTINUE = BitFlag._13,
             QONDITION = QONDITION_IF | QONDITION_ELSE | LOOP_DO | LOOP_FOR | LOOP_WHILE,
             FUNQTION_RETURN = BitFlag._14,
-            INSTANCE_CREATE = BitFlag._15
+            INSTANCE_CREATE = BitFlag._15,
+            IMPORT = BitFlag._16,
+            EXPORT = BitFlag._17,
+            MODULE = BitFlag._18
         }
 
         public static Keyword register(Type type, string symbol)
@@ -79,6 +81,8 @@ namespace Qrakhen.Sqr.Core
                 .alias("fn");
             register(Type.DECLARE_QLASS, "qlass");
             register(Type.IMPORT, "import");
+            register(Type.EXPORT, "export");
+            register(Type.MODULE, "module");
             register(Type.QONDITION_IF, "if");
             register(Type.QONDITION_ELSE, "else");
             register(Type.LOOP_FOR, "for");
