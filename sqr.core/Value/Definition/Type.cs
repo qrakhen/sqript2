@@ -78,7 +78,11 @@ namespace Qrakhen.Sqr.Core
         // native types are instantiated by just using new() since theyre hard coded
         public Instance spawn(Qontext qontext, Value[] parameters)
         {
-            return new Instance(qontext, this);
+            var obj = new Instance(qontext, this);
+            foreach (var f in fields.Values) {
+                obj.fields[f.name] = obj.qontext.register(f.name, f.defaultValue, f.isReference, f.type, f.isReadonly);
+            }
+            return obj;
         }
 
         public Value invoke(Method method, Value invoker, Value[] parameters, Qontext qontext)
@@ -177,6 +181,7 @@ namespace Qrakhen.Sqr.Core
             public readonly Access access;
             public readonly bool isReference;
             public readonly bool isReadonly;
+            public readonly Value defaultValue = null;
 
             public Field(IDeclareInfo info = new IDeclareInfo())
             {
