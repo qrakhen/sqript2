@@ -24,14 +24,34 @@ namespace Qrakhen.Sqr.Core
                 return true;
             }
 
-            public static bool isType<T>(Core.Token token, T type, bool throwError = false) where T : Enum
+            public static bool tryGetType<T>(Core.Token token, Core.Token.Type type, out T value, bool throwError = false)
+            {
+                value = default(T);
+                if (isType(token, type, throwError)) {
+                    value = token.get<T>();
+                    return true;
+                } else
+                    return false;
+            }
+
+            public static bool raw(Core.Token token, Core.Token.Type type, out string value, bool throwError = false)
+            {
+                value = null;
+                if (isType(token, type, throwError)) {
+                    value = token.raw;
+                    return true;
+                } else
+                    return false;
+            }
+
+            public static bool isSubType<T, E>(Core.Token token, E type, bool throwError = false) where T : ITyped<E> where E : Enum
             {
                 if (token == null) {
                     if (throwError)
                         throw new SqrParseError("expected a token, got nothing instead.");
                     return false;
                 }
-                var t = token.get<ITyped<T>>();
+                var t = token.get<ITyped<E>>();
                 if (t == null) {
                     if (throwError)
                         throw new SqrParseError("expected token of type " + typeof(T).Name + ", got " + token + " instead.", token);
@@ -43,6 +63,16 @@ namespace Qrakhen.Sqr.Core
                     return false;
                 }
                 return true;
+            }
+
+            public static bool tryGetSubType<T, E>(Core.Token token, E type, out T value, bool throwError = false) where T : ITyped<E> where E : Enum
+            {
+                value = default(T);
+                if (isSubType<T, E>(token, type, throwError)) {
+                    value = token.get<T>();
+                    return true;
+                } else
+                    return false;
             }
         }
     }

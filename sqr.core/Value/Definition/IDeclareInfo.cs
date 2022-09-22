@@ -13,5 +13,6 @@ namespace Qrakhen.Sqr.Core
         public bool isReadonly;
         public bool isOptional;
         public string name;
+        public Value defaultValue;
     }
 }

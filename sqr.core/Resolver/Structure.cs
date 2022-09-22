@@ -1,6 +1,7 @@
 ﻿using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
@@ -10,7 +11,7 @@ namespace Qrakhen.Sqr.Core
     {
         public Stack<Token> resolve(Stack<Token> input, Qontext qontext)
         {
-            log.spam("in " + GetType().Name);
+            log.debug("in " + GetType().Name);
             int level = 0;
             List<Token> buffer = new List<Token>();
             var t = input.peek();
@@ -40,6 +41,10 @@ namespace Qrakhen.Sqr.Core
             return new Stack<Token>(buffer.ToArray());
         }
 
+        public Stack<Token> resolveUntil(Stack<Token> input, Qontext qontext, string until, bool includeLast = false)
+            => resolveUntil(input, qontext, new string[] { until }, includeLast);
+
+
         /// <summary>
         /// leveled digest until symbol, not including symbol
         /// </summary>
@@ -47,9 +52,9 @@ namespace Qrakhen.Sqr.Core
         /// <param name="qontext"></param>
         /// <param name="until"></param>
         /// <returns></returns>
-        public Stack<Token> resolveUntil(Stack<Token> input, Qontext qontext, string until)
+        public Stack<Token> resolveUntil(Stack<Token> input, Qontext qontext, string[] until, bool includeLast = false)
         {
-            log.spam("in " + GetType().Name);
+            log.debug("in " + GetType().Name);
             int level = 0;
             List<Token> buffer = new List<Token>();
             var t = input.peek();
@@ -57,8 +62,10 @@ namespace Qrakhen.Sqr.Core
             do {
                 t = input.digest();
                 log.spam(t);
-                if (t.raw == until && level == 0)
+                if (until.Contains(t.raw) && level == 0) {
+                    if (includeLast) buffer.Add(t);
                     break;
+                }
 
                 if (Structure.openers.Contains(t.raw)) {
                     level++;

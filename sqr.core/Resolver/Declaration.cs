@@ -22,7 +22,7 @@ namespace Qrakhen.Sqr.Core
 
         public IDeclareInfo resolve(Stack<Token> input, Qontext qontext, bool isFunqtionHeader = false)
         {
-            log.spam("in " + GetType().Name);
+            log.debug("in " + GetType().Name);
 
             // @type[&]:name
             var info = new IDeclareInfo { };
@@ -54,12 +54,10 @@ namespace Qrakhen.Sqr.Core
                 }
 
                 // reference switch &
-                var op = input.peek().get<Operator>();
-                if (op != null) {
+                if (Validator.Token.isSubType<Operator, Operator.Type>(input.peek(), Operator.Type.LOGIC_AND)) {
                     input.digest();
-                    if (op.type == Operator.Type.LOGIC_AND) info.isReference = true;
-                    else throw new SqrError("unexpected operator at name declaration: " + op.symbol);
-                    log.spam("declared name is a reference:" + op.symbol);
+                    info.isReference = true;
+                    log.spam("declared name is a reference");
                 }
 
                 // when typed, expect : after @type[&], nah fuck that @todo
@@ -70,8 +68,7 @@ namespace Qrakhen.Sqr.Core
                 }*/
 
                 // see if it's a funqtion
-                var f = input.peek();
-                if (f.isType(Token.Type.Keyword)) {
+                if (Validator.Token.isType(input.peek(), Token.Type.Keyword)) {
                     var k = input.digest().get<Keyword>();
                     if (k.type != Keyword.Type.DECLARE_FUNQTION)
                         throw new SqrError("unexpected keyword at name declaration: " + k, k);
@@ -88,7 +85,7 @@ namespace Qrakhen.Sqr.Core
                 if (input.done)
                     return info;
 
-                op = input.peek().get<Operator>();
+                var op = input.peek().get<Operator>();
                 if (op != null && op.isType(Operator.Type.NULLABLE)) {
                     input.digest();
                     info.isOptional = true;

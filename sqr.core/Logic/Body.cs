@@ -37,7 +37,7 @@ namespace Qrakhen.Sqr.Core
             };
             while (!stack.done) {
                 var op = operationResolver.resolveOne(stack, qontext);
-                op.execute(localCallback);
+                op.execute(localCallback, qontext);
                 if (statement != Statement.None) {
                     callback?.Invoke(result, statement, jumpTarget);
                     return;

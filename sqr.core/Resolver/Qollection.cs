@@ -21,7 +21,7 @@ namespace Qrakhen.Sqr.Core
         /// <returns></returns>
         public Qollection resolve(Stack<Token> input, Qontext qontext)
         {
-            log.spam("in " + GetType().Name);
+            log.debug("in " + GetType().Name);
             var qollection = new Qollection();
             var separator = Structure.get(Structure.Type.QOLLECTION).separator;
             input.process((current, take, index, abort) => {
@@ -29,7 +29,7 @@ namespace Qrakhen.Sqr.Core
                 var sub = structureResolver.resolveUntil(input, qontext, separator);
                 log.spam("digested sub (until " + separator + "): " + string.Join(' ', sub.items.Select(_ => _.ToString())));
                 var op = operationResolver.resolveOne(sub, qontext);
-                var r = op.execute();
+                var r = op.execute(qontext);
                 log.spam("adding result: " + r);
                 qollection.add(r.obj);
             });
