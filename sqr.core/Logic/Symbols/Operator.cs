@@ -36,7 +36,7 @@ namespace Qrakhen.Sqr.Core
 
         public static Operator get(string symbol)
         {
-            return operators.findOne(_ => _.aliases.Contains(symbol));
+            return operators.findOne(_ => _.aliases.Contains(symbol)).Value;
         }
 
         [Flags]
@@ -62,7 +62,8 @@ namespace Qrakhen.Sqr.Core
             QOLLECTION_ADD = BitFlag._17,
             ASSIGN = BitFlag._18,
             ASSIGN_REF = BitFlag._19,
-            NULLABLE = BitFlag._20
+            NULLABLE = BitFlag._20,
+            ACCESSOR = BitFlag._21
         }
 
         public static void register(Type type, string symbol, int weight, Func<Value, Value, Value> resolve)
@@ -145,6 +146,10 @@ namespace Qrakhen.Sqr.Core
 
             register(Type.NULLABLE, "?", 0, (left, right) => {
                 return null;
+            });
+
+            register(Type.ACCESSOR, ":", 8, (left, right) => {
+                return left.accessMember(right as String);
             });
 
             register(Type.LOGIC_NOT, "!", 0, (left, right) => {

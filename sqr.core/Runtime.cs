@@ -9,136 +9,138 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Qrakhen.Sqr.Core
+namespace Qrakhen.Sqr.Core 
 {
     [Injectable]
-    public class Runtime
+    public class Runtime 
     {
         private readonly Logger log;
+        private readonly UCI userControlInterface;
         private readonly TokenResolver tokenResolver;
         private readonly OperationResolver operationResolver;
         private readonly ValueResolver valueResolver;
 
         public bool alive { get; private set; } = true;
 
-        public void run()
+        public void init()
         {
             log.setLoggingLevel(Logger.Level.VERBOSE);
-            log.success("welcome to Sqript2.0, or simply sqr. Enjoy thyself.");
+        }
 
-            Qontext.globalContext.register(
+        public Qontext run(string content = null, bool __DEV_DEBUG = false) 
+        {           
+            if (content != null) {
+                log.setLoggingLevel(Logger.Level.CRITICAL);
+                if (content.StartsWith("!!")) {
+                    content = content[2..];
+                    __DEV_DEBUG = true;
+                } else if (content.EndsWith("!!")) {
+                    content = content[0..^2];
+                    __DEV_DEBUG = true;
+                }
+
+                Module module = null;
+                var moduleKeyword = Keyword.get(Keyword.Type.MODULE).symbol;
+                if (content.StartsWith(moduleKeyword)) {
+                    string name = content.Substring(moduleKeyword.Length, content.IndexOf(";")).Trim();
+                    module = new Module(name, null, Qontext.globalContext);
+                }
+                Qontext qontext = module == null ? Qontext.globalContext : module.qontext;
+
+                if (__DEV_DEBUG)
+                    log.setLoggingLevel(Logger.Level.SPAM);
+
+                execute(content, qontext);
+                return qontext;
+            } else {
+                log.write(Properties.strings.ASCII_Logo, ConsoleColor.DarkGray, prefix: "    ");
+                log.success(Properties.strings.Message_Welcome);
+                userControlInterface.run();
+                return null;
+            }
+        }
+
+        internal void registerGlobalFunqtions(Qontext qontext) 
+        {
+            if (qontext.names["cout"] != null)
+                return;
+
+            qontext.register(
                 "cout",
-                new Qallable(new InternalFunqtion((p, q, s) => { log.success(p[0].raw); return null; })));
-            Qontext.globalContext.register(
+                new Qallable(new InternalFunqtion((p, q, s) => { log.success(p[0].raw); return Value.Void; })));
+            qontext.register(
                 "log",
-                new Qallable(new InternalFunqtion((p, q, s) => { log.setLoggingLevel((Logger.Level)int.Parse(p[0].raw.ToString())); return null; })));
+                new Qallable(new InternalFunqtion((p, q, s) => { log.setLoggingLevel((Logger.Level)int.Parse(p[0].raw.ToString())); return Value.Void; })));
+            qontext.register(
+                "import",
+                new Qallable(new InternalFunqtion((p, q, s) => {
+                    qontext.import(run(File.ReadAllText(p[0] as String)));
+                    return Value.Void;
+                })));
+            qontext.register(
+               "export",
+               new Qallable(new InternalFunqtion((p, q, s) => {
+                   qontext.export(p[0].raw as string, p[0]);
+                   return Value.Void;
+               })));
+        }        
 
-            do {
-                try {
-                    Console.Write("    <: ");
-                    execute(Console.ReadLine()); // doTheConsoleThing()); <- dont, broken atm
+        public void execute(string input, Qontext qontext)
+        {
+            //qontext = qontext ?? Qontext.globalContext;
+            registerGlobalFunqtions(qontext);
+            try {                
+                if (input.StartsWith("/")) {
+                    commands(input.Substring(1), qontext);
+                    return;
+                } else if (string.IsNullOrEmpty(input)) {
+                    log.info("yes i too am kinda lazy today, it's fine.");
+                    return;
+                }
 
-                } catch (SqrError e) {
-                    log.error(log.loggingLevel > Logger.Level.INFO ? e : (object)e.Message);
-                    log.warn("Sqr stacktrace:\n" + string.Join("\n", SqrError.stackTrace.ToArray()));
-                    if (e.data != null && log.loggingLevel >= Logger.Level.DEBUG) 
-                        log.warn(json(e.data));
-                } /* catch (Exception e) {
+                var t = new Stopwatch();
+                t.Restart();
+                long _ms = 0, _t = 0;
+                var tokenStack = tokenResolver.resolve(new Core.Stack<char>(applyAliases(input).ToCharArray()));
+                while (!tokenStack.done) {
+                    var operation = operationResolver.resolveOne(tokenStack, qontext);
+                    var result = operation.execute(qontext);
+                    if (result != null) {
+                        if (log.loggingLevel > Logger.Level.INFO)
+                            log.success(result.toDebugString());
+                        else
+                            log.success(result.ToString());
+                    }
+                    log.verbose("operation time " + (t.ElapsedMilliseconds - _ms) + "ms, " + (t.ElapsedTicks - _t) + " ticks");
+                    _ms = t.ElapsedMilliseconds;
+                    _t = t.ElapsedTicks;
+                }
+                log.info("execution time " + (t.ElapsedMilliseconds) + "ms, " + (t.ElapsedTicks) + " ticks");
+            } catch (SqrError e) {
+                log.error(log.loggingLevel > Logger.Level.INFO ? e : (object)e.Message);
+                log.warn("Sqr stacktrace:\n" + string.Join("\n", SqrError.stackTrace.ToArray()));
+                if (e.data != null && log.loggingLevel >= Logger.Level.DEBUG)
+                    log.warn(json(e.data));
+            } /* catch (Exception e) {
                     log.error("### system exceptions need to be completely eradicated ###");
                     log.error(e);
                     log.error("### system exceptions need to be completely eradicated ###");
                     throw e;
                 }*/
-            } while (alive);
         }
 
-        // das alles in eine console klasse
-        private void clearLine()
-        {
-            var c = Console.CursorTop;
-            Console.SetCursorPosition(0, Console.CursorTop);
-            Console.Write(new string(' ', Console.WindowWidth));
-            Console.SetCursorPosition(0, c);
-        }
-
-        private string doTheConsoleThing()
-        {
-            var builder = new StringBuilder();
-            var input = Console.ReadKey(true);
-
-            while ((input = Console.ReadKey(true)).Key != ConsoleKey.Enter) {
-                var c = builder.ToString();
-                if (input.Key == ConsoleKey.Tab) {
-                    var match = Qontext.globalContext.names.Keys
-                        .FirstOrDefault(item => item != c && item.StartsWith(c, true, CultureInfo.InvariantCulture));
-                    if (string.IsNullOrEmpty(match)) {
-                        continue;
-                    }
-
-                    clearLine();
-                    builder.Clear();
-                    Console.Write("    <:" + match);
-                    builder.Append(match);
-                } else {
-                    if (input.Key == ConsoleKey.Backspace && c.Length > 0) {
-                        builder.Remove(builder.Length - 1, 1);
-                        clearLine();
-
-                        c = c.Remove(c.Length - 1);
-                        Console.Write("    <:" + c);
-                    } else {
-                        var key = input.KeyChar;
-                        builder.Append(key);
-                        Console.Write(key);
-                    }
-                }
-            }
-           
-            return builder.ToString();
-        }
-
-        private void execute(string input)
-        {
-            if (input.StartsWith("/")) {
-                commands(input.Substring(1));
-                return;
-            } else if (string.IsNullOrEmpty(input)) {
-                log.info("yes i too am kinda lazy today, it's fine.");
-                return;
-            }
-
-            var t = new Stopwatch();
-            t.Restart();
-            long _ms = 0, _t = 0;
-            var tokenStack = tokenResolver.resolve(new Core.Stack<char>(applyAliases(input).ToCharArray()));
-            while (!tokenStack.done) {
-                var operation = operationResolver.resolveOne(tokenStack, Qontext.globalContext);
-                var result = operation.execute();
-                if (result != null) {
-                    if (log.loggingLevel > Logger.Level.INFO)
-                        log.success(result.toDebugString());
-                    else
-                        log.success(result.ToString());
-                }
-                log.verbose("operation time " + (t.ElapsedMilliseconds - _ms) + "ms, " + (t.ElapsedTicks - _t) + " ticks");
-                _ms = t.ElapsedMilliseconds;
-                _t = t.ElapsedTicks;
-            }
-            log.info("execution time " + (t.ElapsedMilliseconds) + "ms, " + (t.ElapsedTicks) + " ticks");
-        }
-
-        private void commands(string input)
+        private void commands(string input, Qontext qontext) 
         {
             var args = input.Split(" ");
             if (input == "q") {
-                log.cmd(json(Qontext.globalContext));
+                log.cmd(json(qontext));
                 return;
             } else if (input.StartsWith("p")) {
                 log.cmd(json(
                     valueResolver.resolve(
                         new Stack<Token>(
-                            new Token[] { 
-                                Token.create(args[1], Token.Type.Identifier) 
+                            new Token[] {
+                                Token.create(args[1], Token.Type.Identifier)
                             }), Qontext.globalContext)));
                 return;
             } else if (input.StartsWith("alias")) {
@@ -157,24 +159,24 @@ namespace Qrakhen.Sqr.Core
                 log.warn("the help DLC is available on steam for $39.95");
             } else if (input.StartsWith("log")) {
                 if (args.Length == 1) {
-                    log.cmd("current level: " + (int)log.loggingLevel);
+                    log.cmd("current level: " + (int) log.loggingLevel);
                     foreach (var i in Enum.GetValues(typeof(Logger.Level))) {
-                        log.cmd((int)i + ": " + (Logger.Level)i);
+                        log.cmd((int) i + ": " + (Logger.Level) i);
                     }
                 } else if (args.Length == 2) {
-                    log.setLoggingLevel((Logger.Level)int.Parse(args[1]));
+                    log.setLoggingLevel((Logger.Level) int.Parse(args[1]));
                     log.cmd("set logging level to " + log.loggingLevel);
                 }
-            } else if (input ==  "t") {
+            } else if (input == "t") {
                 var t = File.ReadAllText("tests.sqr");
-                execute(t);
+                execute(t, qontext);
             } else if (input == "c") {
-                Qontext.globalContext.names.clear();
+                qontext.names.clear();
                 log.cmd("cleared global qontext");
             }
         }
 
-        private string applyAliases(string value)
+        private string applyAliases(string value) 
         {
             log.verbose("applying aliases:");
             foreach (var alias in aliases) {
@@ -188,24 +190,25 @@ namespace Qrakhen.Sqr.Core
                 } else {
                     log.verbose("  + " + alias.Key + " > " + alias.Value);
                     value = value.Replace(alias.Key, " " + alias.Value + " ");
-                }                
+                }
             }
             return value;
         }
 
-        private string json(object any)
+        private string json(object any) 
         {
             return JsonConvert.SerializeObject(
                 any,
                 Formatting.Indented,
                 new JsonSerializerSettings {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                    MaxDepth = 1
+                    MaxDepth = 3                  
                 }
             );
         }
 
-        static readonly private Dictionary<string, string> aliases = new Dictionary<string, string>() {
+        static readonly private Dictionary<string, string> aliases = new Dictionary<string, string>() 
+        {
             { "*~", "var" },
             { "*&", "ref" },
             { "*$~", "@$" },

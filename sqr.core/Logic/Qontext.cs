@@ -10,7 +10,9 @@ namespace Qrakhen.Sqr.Core
     public class Qontext
     {
         [JsonProperty]
-        public Storage<string, Variable> names { get; protected set; } = new Storage<string, Variable>();
+        public readonly Storage<string, Variable> names = new Storage<string, Variable>();
+        public readonly Storage<string, Value> exports = new Storage<string, Value>();
+        public readonly Storage<string, Value> imports = new Storage<string, Value>();
 
         public static readonly Qontext globalContext = new Qontext();
 
@@ -38,6 +40,30 @@ namespace Qrakhen.Sqr.Core
                 //throw new SqrError("name " + name + " already declared in qontext");
             }
             return names[name] = new Variable(value, isReference, strictType, isReadonly);
+        }
+
+        public void export(
+                string name,
+                Value value)
+        {
+            if (exports[name] != null) {
+                throw new SqrQontextError("name " + name + " already exported");
+            }
+            exports[name] = value;
+        }
+
+        public void import(
+                Qontext qontext)
+        {
+            foreach (var e in qontext.exports) {
+                if (imports[e.Key] != null) {
+                    throw new SqrQontextError("name " + e.Key + " already imported!");
+                }
+                if (names[e.Key] != null) {
+                    throw new SqrQontextError("name " + e.Key + " already defined in local qontext!");
+                }
+                imports[e.Key] = e.Value;
+            }
         }
 
         public Value resolveName(string name) => resolveName(new string[] { name });

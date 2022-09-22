@@ -100,11 +100,11 @@ namespace Qrakhen.Sqr.Core
             return count;
         }
 
-        public T findOne(Func<T, bool> callback)
+        public KeyValuePair<K, T> findOne(Func<T, bool> callback)
         {
-            foreach (var item in Values)
-                if (callback(item)) return item;
-            return default(T);
+            foreach (var item in this)
+                if (callback(item.Value)) return item;
+            return default(KeyValuePair<K, T>);
         }
 
         public T[] findAll(Func<T, bool> callback)

@@ -27,7 +27,7 @@ namespace Qrakhen.Sqr.Core
                 if (!op.isType(Operator.Type.ASSIGN | Operator.Type.ASSIGN_REF))
                     throw new SqrError("assign operator expected " + op, op);
 
-                var value = operationResolver.resolveOne(sub, qontext).execute();
+                var value = operationResolver.resolveOne(sub, qontext).execute(qontext);
                 var property = new Variable(value);
                 property.set(value, op.isType(Operator.Type.ASSIGN_REF));
                 objeqt.properties[name.raw] = property;
