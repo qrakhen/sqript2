@@ -9,10 +9,10 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Qrakhen.Sqr.Core
+namespace Qrakhen.Sqr.Core 
 {
     [Injectable]
-    public class Runtime
+    public class Runtime 
     {
         private readonly Logger log;
         private readonly UCI userControlInterface;
@@ -22,11 +22,33 @@ namespace Qrakhen.Sqr.Core
 
         public bool alive { get; private set; } = true;
 
-        public void run()
+        public void run(string content = null, bool __DEV_DEBUG = false) 
         {
             log.setLoggingLevel(Logger.Level.VERBOSE);
-            log.success("welcome to Sqript2.0, or simply sqr. Enjoy thyself.");
+            registerDefaultQontexts();
 
+            log.write(Properties.strings.ASCII_Logo, ConsoleColor.DarkGreen, prefix: "    ");
+            log.success(Properties.strings.Message_Welcome);
+
+            if (content != null) {
+                log.setLoggingLevel(Logger.Level.CRITICAL);
+                if (content.StartsWith("!!")) {
+                    content = content[2..];
+                    __DEV_DEBUG = true;
+                } else if (content.EndsWith("!!")) {
+                    content = content[0..^2];
+                    __DEV_DEBUG = true;
+                }
+                if (__DEV_DEBUG)
+                    log.setLoggingLevel(Logger.Level.SPAM);
+                execute(content);
+            } else {
+                userControlInterface.run();
+            }
+        }
+
+        internal void registerDefaultQontexts() 
+        {
             Qontext.globalContext.register(
                 "cout",
                 new Qallable(new InternalFunqtion((p, q, s) => { log.success(p[0].raw); return null; })));
@@ -34,26 +56,15 @@ namespace Qrakhen.Sqr.Core
                 "log",
                 new Qallable(new InternalFunqtion((p, q, s) => { log.setLoggingLevel((Logger.Level)int.Parse(p[0].raw.ToString())); return null; })));
 
-            userControlInterface.run();
-
             return;
-        }
-
-        // das alles in eine console klasse
-        private void clearLine()
-        {
-            var c = Console.CursorTop;
-            Console.SetCursorPosition(0, Console.CursorTop);
-            Console.Write(new string(' ', Console.WindowWidth));
-            Console.SetCursorPosition(0, c);
-        }           
+        }        
 
         public void execute(string input)
         {
             try {                
                 if (input.StartsWith("/")) {
-                commands(input.Substring(1));
-                return;
+                    commands(input.Substring(1));
+                    return;
                 } else if (string.IsNullOrEmpty(input)) {
                     log.info("yes i too am kinda lazy today, it's fine.");
                     return;
@@ -90,7 +101,7 @@ namespace Qrakhen.Sqr.Core
                 }*/
         }
 
-        private void commands(string input)
+        private void commands(string input) 
         {
             var args = input.Split(" ");
             if (input == "q") {
@@ -100,8 +111,8 @@ namespace Qrakhen.Sqr.Core
                 log.cmd(json(
                     valueResolver.resolve(
                         new Stack<Token>(
-                            new Token[] { 
-                                Token.create(args[1], Token.Type.Identifier) 
+                            new Token[] {
+                                Token.create(args[1], Token.Type.Identifier)
                             }), Qontext.globalContext)));
                 return;
             } else if (input.StartsWith("alias")) {
@@ -120,15 +131,15 @@ namespace Qrakhen.Sqr.Core
                 log.warn("the help DLC is available on steam for $39.95");
             } else if (input.StartsWith("log")) {
                 if (args.Length == 1) {
-                    log.cmd("current level: " + (int)log.loggingLevel);
+                    log.cmd("current level: " + (int) log.loggingLevel);
                     foreach (var i in Enum.GetValues(typeof(Logger.Level))) {
-                        log.cmd((int)i + ": " + (Logger.Level)i);
+                        log.cmd((int) i + ": " + (Logger.Level) i);
                     }
                 } else if (args.Length == 2) {
-                    log.setLoggingLevel((Logger.Level)int.Parse(args[1]));
+                    log.setLoggingLevel((Logger.Level) int.Parse(args[1]));
                     log.cmd("set logging level to " + log.loggingLevel);
                 }
-            } else if (input ==  "t") {
+            } else if (input == "t") {
                 var t = File.ReadAllText("tests.sqr");
                 execute(t);
             } else if (input == "c") {
@@ -137,7 +148,7 @@ namespace Qrakhen.Sqr.Core
             }
         }
 
-        private string applyAliases(string value)
+        private string applyAliases(string value) 
         {
             log.verbose("applying aliases:");
             foreach (var alias in aliases) {
@@ -151,12 +162,12 @@ namespace Qrakhen.Sqr.Core
                 } else {
                     log.verbose("  + " + alias.Key + " > " + alias.Value);
                     value = value.Replace(alias.Key, " " + alias.Value + " ");
-                }                
+                }
             }
             return value;
         }
 
-        private string json(object any)
+        private string json(object any) 
         {
             return JsonConvert.SerializeObject(
                 any,
@@ -168,7 +179,8 @@ namespace Qrakhen.Sqr.Core
             );
         }
 
-        static readonly private Dictionary<string, string> aliases = new Dictionary<string, string>() {
+        static readonly private Dictionary<string, string> aliases = new Dictionary<string, string>() 
+        {
             { "*~", "var" },
             { "*&", "ref" },
             { "*$~", "@$" },
