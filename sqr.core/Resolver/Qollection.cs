@@ -29,7 +29,7 @@ namespace Qrakhen.Sqr.Core
                 var sub = structureResolver.resolveUntil(input, qontext, separator);
                 log.spam("digested sub (until " + separator + "): " + string.Join(' ', sub.items.Select(_ => _.ToString())));
                 var op = operationResolver.resolveOne(sub, qontext);
-                var r = op.execute();
+                var r = op.execute(qontext);
                 log.spam("adding result: " + r);
                 qollection.add(r.obj);
             });

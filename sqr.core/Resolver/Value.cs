@@ -24,6 +24,19 @@ namespace Qrakhen.Sqr.Core
 
             string full = "", member = null;
             Value value = null, parent = null;
+
+            if (!t.isType(Token.Type.Identifier)) {
+                log.spam("got primitive " + t);
+                if (value == null)
+                    value = input.digest().makeValue();
+            } else {
+                log.spam("got identifier " + t.raw);
+                if (value == null) // root identifier of possible member chain
+                    value = qontext.resolveName(input.digest().raw);
+            }
+
+            return value;
+
             input.process((current, take, index, end) => {
 
                 // get name/literal

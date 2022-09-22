@@ -112,7 +112,22 @@ namespace Qrakhen.Sqr.Core
 
         private void handleValue(Stack<Token> input, ref Node node, Qontext qontext, int level = 0)
         {
-            Value value = valueResolver.resolve(input, qontext);
+            Value value;
+            if (node.op != null && node.op.type == Operator.Type.ACCESSOR) {
+                value = new String(input.digest().raw);
+                if (Validator.Token.tryGetSubType(input.peek(), Structure.Type.GROUP, out Structure s)) {
+                    if (s.open == input.peek().raw) {
+                        var parameters = qollectionResolver.resolve(
+                        structureResolver.resolve(
+                            input,
+                            qontext),
+                        qontext);
+                        node.data = parameters;
+                    }
+                }
+            } else {
+                value = valueResolver.resolve(input, qontext);
+            }
 
             if (!node.put(value)) { 
                 throw new SqrError("unexpected value after full operation node " + node, node);

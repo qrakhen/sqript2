@@ -125,12 +125,12 @@ namespace Qrakhen.Sqr.Core
         }
 
         static readonly private Dictionary<Token.Type, string> matches = new Dictionary<Token.Type, string>() {
-            { Token.Type.Operator, @"[\/\-\*+=&<>^?!~]" },
+            { Token.Type.Operator, @"[\/\-\*+=&<>^?!~:]" },
             { Token.Type.Number, @"[\d.]" },
             { Token.Type.String, "[\"']" },
             { Token.Type.Structure, @"[{}()[\],]" },
             { Token.Type.End, @";" },
-            { Token.Type.Accessor, @"[:]" },
+            //{ Token.Type.Accessor, @"[:]" },
             { Token.Type.Type, "@" },
             { Token.Type.Whitespace, @"\s" },
             { Token.Type.Comment, @"#" },

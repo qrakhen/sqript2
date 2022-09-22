@@ -117,7 +117,7 @@ namespace Qrakhen.Sqr.Core
             var tokenStack = tokenResolver.resolve(new Core.Stack<char>(applyAliases(input).ToCharArray()));
             while (!tokenStack.done) {
                 var operation = operationResolver.resolveOne(tokenStack, Qontext.globalContext);
-                var result = operation.execute();
+                var result = operation.execute(Qontext.globalContext);
                 if (result != null) {
                     if (log.loggingLevel > Logger.Level.INFO)
                         log.success(result.toDebugString());
