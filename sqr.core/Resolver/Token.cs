@@ -220,7 +220,11 @@ namespace Qrakhen.Sqr.Core
                 }
                 if (type == Type.Operator) {
                     parsedType = Type.Operator;
-                    return Operator.get(raw);
+                    var op = Operator.get(raw);
+                    if (op == null) {
+                        return Keyword.get(raw); // keyword aliases
+                    } else
+                        return op;
                 }
                 if (type == Type.Structure) {
                     parsedType = Type.Structure;
