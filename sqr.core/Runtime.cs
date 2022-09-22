@@ -15,6 +15,7 @@ namespace Qrakhen.Sqr.Core
     public class Runtime
     {
         private readonly Logger log;
+        private readonly UCI userControlInterface;
         private readonly TokenResolver tokenResolver;
         private readonly OperationResolver operationResolver;
         private readonly ValueResolver valueResolver;
@@ -33,6 +34,9 @@ namespace Qrakhen.Sqr.Core
                 "log",
                 new Qallable(new InternalFunqtion((p, q, s) => { log.setLoggingLevel((Logger.Level)int.Parse(p[0].raw.ToString())); return null; })));
 
+            userControlInterface.run();
+
+            return;
             do {
                 try {
                     Console.Write("    <: ");
@@ -97,7 +101,7 @@ namespace Qrakhen.Sqr.Core
             return builder.ToString();
         }
 
-        private void execute(string input)
+        public void execute(string input)
         {
             if (input.StartsWith("/")) {
                 commands(input.Substring(1));

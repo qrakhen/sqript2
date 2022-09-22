@@ -53,9 +53,9 @@ namespace Qrakhen.Sqr.Core
                 throw new SqrError("can not redeclare type " + name);
 
             if (definitions[args.name] == null) {
-                definitions[name.ToLower()] = this;
+                definitions[name] = this;
             } else {
-                definitions[id.ToLower()] = this;
+                definitions[id] = this;
             }
 
             if (extends != null)
@@ -97,7 +97,7 @@ namespace Qrakhen.Sqr.Core
 
         public static Type get(string name)
         {
-            return definitions[name.ToLower()];
+            return definitions[name];
         }
 
         public static Type register(System.Type systemType, Args args)
@@ -188,8 +188,6 @@ namespace Qrakhen.Sqr.Core
                 foreach (var f in GetType().GetFields()) {
                     f.SetValue(this, info.GetType().GetField(f.Name).GetValue(info));
                 }
-                if (type == null)
-                    type = Type.Value;
             }
         }
 

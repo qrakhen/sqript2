@@ -10,7 +10,7 @@ namespace Qrakhen.Sqr.Core
         public virtual object raw => this;
         public virtual Value obj => this;
 
-        public readonly Storage<string, Variable> fields;
+        public Storage<string, Variable> fields { get; protected set; }
         [JsonIgnore] public readonly Type type;
 
         public Value(Type type)
@@ -103,7 +103,7 @@ namespace Qrakhen.Sqr.Core
 
         public override bool Equals(object obj)
         {
-            if (obj is Value<T>)
+            if (obj is Value<T> && (obj as Value<T>).__value != null)
                 return (obj as Value<T>).__value.Equals(__value);
 
             return base.Equals(obj);

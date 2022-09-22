@@ -68,8 +68,7 @@ namespace Qrakhen.Sqr.Core
                 }*/
 
                 // see if it's a funqtion
-                var f = input.peek();
-                if (f.isType(Token.Type.Keyword)) {
+                if (Validator.Token.isType(input.peek(), Token.Type.Keyword)) {
                     var k = input.digest().get<Keyword>();
                     if (k.type != Keyword.Type.DECLARE_FUNQTION)
                         throw new SqrError("unexpected keyword at name declaration: " + k, k);
