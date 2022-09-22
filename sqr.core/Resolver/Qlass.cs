@@ -43,6 +43,13 @@ namespace Qrakhen.Sqr.Core
                     log.spam("registering method '" + info.name + "' to qlass '" + name + "'");
                 } else {
                     args.fields[info.name] = new Type.Field(info);
+                    if (Validator.Token.tryGetSubType(current(), Operator.Type.ASSIGN, out Operator value)) {
+                        next();
+                        var defaultValue = valueResolver.resolve(sub, qontext);
+                        if (!defaultValue.type.isPrimitive) {
+                            // throw error fragezeichen?
+                        }
+                    }
                     log.spam("registering field '" + info.name + "' to qlass '" + name + "'");
                 }         
             });
