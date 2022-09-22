@@ -15,19 +15,22 @@ namespace Qrakhen.Sqr.Core
         {
             log.debug("in " + GetType().Name);
             var result = new List<Token>();
-            long row = 0, count = 0, __prev = 0;
+            long row = 0, count = 0, __prev = 0, __end;
             while (!input.done) {
+                var pos = input.index;
                 if (input.peek() == '\n') {
                     row++;
-                    __prev = input.index;
+                    __prev = pos;
                 }
                 var type = matchType(input.peek());
                 var value = readValue(type, input);
+                __end = input.index;
                 if (value != null) {
                     var token = Token.create(value, type);
                     token.__row = row;
-                    token.__col = input.index - __prev;
-                    token.__pos = input.index;
+                    token.__col = pos - __prev;
+                    token.__pos = pos;
+                    token.__end = __end;
                     result.Add(token);
                 }
             }
@@ -138,7 +141,7 @@ namespace Qrakhen.Sqr.Core
     {
         public const string end = ";";
 
-        public long __row, __col, __pos = -1;
+        public long __row, __col, __pos = -1, __end = -1;
 
         public readonly string raw;
         public readonly object value;

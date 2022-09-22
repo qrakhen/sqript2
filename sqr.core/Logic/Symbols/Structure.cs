@@ -26,7 +26,7 @@ namespace Qrakhen.Sqr.Core
 
         public static Structure get(string symbol)
         {
-            return structures.findOne(_ => _.open == symbol || _.close == symbol || _.separator == symbol);
+            return structures.findOne(_ => _.open == symbol || _.close == symbol || _.separator == symbol).Value;
         }
 
         public static Structure get(Type type)

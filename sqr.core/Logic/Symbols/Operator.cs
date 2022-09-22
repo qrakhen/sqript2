@@ -36,7 +36,7 @@ namespace Qrakhen.Sqr.Core
 
         public static Operator get(string symbol)
         {
-            return operators.findOne(_ => _.aliases.Contains(symbol));
+            return operators.findOne(_ => _.aliases.Contains(symbol)).Value;
         }
 
         [Flags]

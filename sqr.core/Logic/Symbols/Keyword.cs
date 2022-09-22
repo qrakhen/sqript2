@@ -32,7 +32,7 @@ namespace Qrakhen.Sqr.Core
         public static Keyword get(string symbol)
         {
             if (symbol.StartsWith("@")) return keywords[Type.DECLARE_TYPED];
-            return keywords.findOne(_ => _.aliases.Contains(symbol));
+            return keywords.findOne(_ => _.aliases.Contains(symbol)).Value;
         }
 
         public static Keyword get(Type type)

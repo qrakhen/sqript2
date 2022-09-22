@@ -15,118 +15,190 @@ namespace Qrakhen.Sqr.Core
     [Injectable]
     public class UCI
     {
+        public static readonly Storage<ConsoleColor, char> colors = new Storage<ConsoleColor, char>() {
+            { ConsoleColor.White, '☺' }, // ☺
+            { ConsoleColor.Black, '☻' },
+            { ConsoleColor.Red, '♥' },
+            { ConsoleColor.Green, '♦' },
+            { ConsoleColor.Blue, '♣' },
+            { ConsoleColor.Cyan, '♠' },
+            { ConsoleColor.Yellow, '•' },
+            { ConsoleColor.Gray, '◘' },
+            { ConsoleColor.DarkRed, '○' },
+            { ConsoleColor.DarkGreen, '◙' },
+            { ConsoleColor.DarkBlue, '♀' },
+            { ConsoleColor.DarkCyan, '♪' },
+            { ConsoleColor.DarkYellow, '♫' },
+            { ConsoleColor.DarkGray, '☼' }
+        };
+
+        public static readonly Storage<Token.Type, ConsoleColor> mapping = new Storage<Token.Type, ConsoleColor>() {
+            { Token.Type.Identifier, ConsoleColor.White },
+            { Token.Type.Boolean, ConsoleColor.DarkYellow },
+            { Token.Type.Operator, ConsoleColor.DarkRed },
+            { Token.Type.Number, ConsoleColor.Yellow },
+            { Token.Type.Type, ConsoleColor.Blue },
+            { Token.Type.Keyword, ConsoleColor.DarkGreen },
+            { Token.Type.Accessor, ConsoleColor.DarkGray },
+            { Token.Type.String, ConsoleColor.Cyan },
+            { Token.Type.Structure, ConsoleColor.DarkGray },
+            { Token.Type.End, ConsoleColor.DarkGray }
+        };
+
         private readonly Logger log;
         private readonly Runtime runtime;
+        private readonly TokenResolver tokenResolver;
 
         public static string prefix = "    <: ";
 
         private Thread thread;
         private Stopwatch clock;
-        
+        private int historyIndex = 0;
+        private List<char> chars = new List<char>();
+        private string input => new string(chars.ToArray());
+
+        private int cx => Console.CursorLeft - prefix.Length;
+        private int cy => Console.CursorTop;
+
+        public List<string> history { get; private set; } = new List<string>();
         public int exitCode { get; private set; } = 0;
 
         public void run()
         {
             clock = new Stopwatch();
-            thread = new Thread(__run);
+            //thread = new Thread(__run);
             clock.Start();
-            thread.Start();
+            //thread.Start();
+            __run();
         }
 
         private void __run()
         {
             ConsoleKeyInfo keyInfo;
-            
+            draw();
+            setCursor(0);
             do {
-                string input = "", drawn = prefix;
-                while ((keyInfo = Console.ReadKey(true)).Key != ConsoleKey.Enter) {
-                    if (keyInfo.Key == ConsoleKey.Backspace && input.Length > 0) {
-                        input = input.Substring(0, input.Length - 1);
-                        clearLine();
-                        write(input);
-                    } else if (keyInfo.Key == ConsoleKey.Tab) {
-                        var match = Qontext.globalContext.names.Keys
-                            .FirstOrDefault(item => item != input && item.StartsWith(input, true, CultureInfo.InvariantCulture));
-                        if (string.IsNullOrEmpty(match))
-                            continue;
+                //try {
+                    while ((keyInfo = Console.ReadKey(true)).Key != ConsoleKey.Enter) {
+                        if (keyInfo.Key == ConsoleKey.Backspace) {
+                            if (input.Length > 0 && cx > 0) {
+                                chars.RemoveAt(cx - 1);
+                                setCursor(cx - 1);
+                            }
+                        } else if (keyInfo.Key == ConsoleKey.Delete) {
+                            if (input.Length > 0 && cx < chars.Count) {
+                                chars.RemoveAt(cx);
+                            }
+                        } else if (keyInfo.Key == ConsoleKey.Tab) {
+                            var match = Qontext.globalContext.names.Keys
+                                .FirstOrDefault(item => item != input && item.StartsWith(input, true, CultureInfo.InvariantCulture));
+                            if (string.IsNullOrEmpty(match))
+                                continue;
 
-                        clearLine();
-                        input = "";
-                        write(match);
-                    } else {
-                        input += keyInfo.KeyChar;
-                        write(keyInfo.KeyChar.ToString());
+                            write(match);
+                        } else if (keyInfo.Key == ConsoleKey.UpArrow) {
+                            if (--historyIndex < 0) {
+                                historyIndex = -1;
+                            } else {
+                                chars = history[historyIndex].ToCharArray().ToList();
+                            }
+                        } else if (keyInfo.Key == ConsoleKey.DownArrow) {
+                            if (++historyIndex >= history.Count) {
+                                historyIndex = history.Count;
+                            } else {
+                                chars = history[historyIndex].ToCharArray().ToList();
+                            }
+                        } else if (keyInfo.Key == ConsoleKey.LeftArrow) {
+                            setCursor(Math.Max(0, cx - 1));
+                        } else if (keyInfo.Key == ConsoleKey.RightArrow) {
+                            setCursor(Math.Min(input.Length, cx + 1));
+                        } else {
+                            chars.Insert(Math.Min(cx, chars.Count), keyInfo.KeyChar);
+                            setCursor(cx + 1);
+                        }
+                        draw();
                     }
-                }
-                if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != ConsoleModifiers.Shift) {
-                    runtime.execute(input);
-                } else {
-                    input += "\n";
-                    write(keyInfo.KeyChar.ToString());
-                }
+                    if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != ConsoleModifiers.Shift) {
+                        history.Add(input);
+                        historyIndex = history.Count;
+                        write("\n");
+                        //new Thread(() => runtime.execute(input)).Start();
+                        runtime.execute(strip(input));
+                        chars.Clear();
+                    } else {
+                        chars.Add('\n');
+                    }
+                    draw();
+                    setCursor(0);
+                //} catch (Exception e) {
+                //    throw e;
+                //}
             } while (exitCode == 0);
         }
 
-        private void clearLine()
+        private string strip(string input)
         {
-            var c = Console.CursorTop;
-            Console.SetCursorPosition(0, Console.CursorTop);
-            Console.Write(prefix + new string(' ', Console.WindowWidth - prefix.Length));
-            Console.SetCursorPosition(prefix.Length, c);
+            foreach (var c in colors.Values) {
+                input = input.Replace(c, '\0');
+            }
+            return input;
+        }
+
+        private string color()
+        {
+            var temp = ((char[])chars.ToArray().Clone()).ToList(); // perverted
+            var level = log.loggingLevel;
+            log.setLoggingLevel(Logger.Level.MUFFLE);
+            try {
+                int i = 0;
+                var tokens = tokenResolver.resolve(new Stack<char>(chars.ToArray()));
+                tokens.process((current, next, index, end) => {
+                    var t = next();
+                    if (mapping.contains(t.type)) {
+                        var c = mapping[t.type];
+                        temp.Insert((int)t.__pos + (i * 2), colors[c]);
+                        temp.Insert((int)t.__end + 1 + (i++ * 2), colors[ConsoleColor.White]);
+                    }
+                });
+            } catch (Exception e) {
+                temp.Insert(0, colors[ConsoleColor.Red]);
+                temp.Add(colors[ConsoleColor.White]);
+            }
+            log.setLoggingLevel(level);
+            return new string(temp.ToArray());
+        }
+
+        private void draw()
+        {
+            int y = 0;
+            int x = cx;            
+            var colored = color();
+            foreach (var line in colored.Split("\n")) {
+                setCursor(-prefix.Length, y);
+                write(prefix + new string(' ', Console.WindowWidth - prefix.Length));
+                setCursor(0, y);
+                write(line);
+                setCursor(x, y);
+                y--;
+            }
+        }
+
+        private void setCursor(int x = 0, int y = 0)
+        {
+           x = Math.Max(0, Math.Min(prefix.Length + x, Console.WindowWidth));
+           Console.SetCursorPosition(x, Console.CursorTop + y);
         }
 
         // das alles in eine console klasse
         private void write(string input)
         {
-            Console.Write(input);
-        }
-
-        private string doTheConsoleThing()
-        {
-            var builder = new StringBuilder();
-            var input = Console.ReadKey(true);
-
-            while ((input = Console.ReadKey(true)).Key != ConsoleKey.Enter) {
-                var c = builder.ToString();
-                if (input.Key == ConsoleKey.Tab) {
-                    var match = Qontext.globalContext.names.Keys
-                        .FirstOrDefault(item => item != c && item.StartsWith(c, true, CultureInfo.InvariantCulture));
-                    if (string.IsNullOrEmpty(match)) {
-                        continue;
-                    }
-
-                    clearLine();
-                    builder.Clear();
-                    Console.Write("    <:" + match);
-                    builder.Append(match);
+            foreach (var c in input.ToCharArray()) {
+                if (colors.Values.Contains(c)) {
+                    Console.ForegroundColor = colors.findOne(_ => _ == c).Key;
                 } else {
-                    if (input.Key == ConsoleKey.Backspace && c.Length > 0) {
-                        builder.Remove(builder.Length - 1, 1);
-                        clearLine();
-
-                        c = c.Remove(c.Length - 1);
-                        Console.Write("    <:" + c);
-                    } else {
-                        var key = input.KeyChar;
-                        builder.Append(key);
-                        Console.Write(key);
-                    }
+                    Console.Write(c);
                 }
             }
-           
-            return builder.ToString();
-        }       
-
-        private string json(object any)
-        {
-            return JsonConvert.SerializeObject(
-                any,
-                Formatting.Indented,
-                new JsonSerializerSettings {
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                    MaxDepth = 1
-                }
-            );
         }
     }
 }
