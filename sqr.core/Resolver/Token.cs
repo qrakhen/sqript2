@@ -22,6 +22,9 @@ namespace Qrakhen.Sqr.Core
                     row++;
                     __prev = pos;
                 }
+                if (input.peek() == '\0') {
+                    input.digest();
+                }
                 var type = matchType(input.peek());
                 var value = readValue(type, input);
                 __end = input.index;
@@ -125,12 +128,12 @@ namespace Qrakhen.Sqr.Core
         }
 
         static readonly private Dictionary<Token.Type, string> matches = new Dictionary<Token.Type, string>() {
-            { Token.Type.Operator, @"[\/\-\*+=&<>^?!~]" },
+            { Token.Type.Operator, @"[\/\-\*+=&<>^?!~:]" },
             { Token.Type.Number, @"[\d.]" },
             { Token.Type.String, "[\"']" },
             { Token.Type.Structure, @"[{}()[\],]" },
             { Token.Type.End, @";" },
-            { Token.Type.Accessor, @"[:]" },
+            //{ Token.Type.Accessor, @"[:]" },
             { Token.Type.Type, "@" },
             { Token.Type.Whitespace, @"\s" },
             { Token.Type.Comment, @"#" },
@@ -217,7 +220,11 @@ namespace Qrakhen.Sqr.Core
                 }
                 if (type == Type.Operator) {
                     parsedType = Type.Operator;
-                    return Operator.get(raw);
+                    var op = Operator.get(raw);
+                    if (op == null) {
+                        return Keyword.get(raw); // keyword aliases
+                    } else
+                        return op;
                 }
                 if (type == Type.Structure) {
                     parsedType = Type.Structure;

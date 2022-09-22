@@ -20,7 +20,7 @@ namespace Qrakhen.Sqr.Core
             this.jumpTarget = jumpTarget;
         }
 
-        public void execute(JumpCallback callback) 
+        public void execute(JumpCallback callback, Qontext qontext) 
         {
             log.spam("executing operation");
             if (head == null) {
@@ -35,7 +35,7 @@ namespace Qrakhen.Sqr.Core
                     (head.left as Qondition).execute(callback);
                     return;
                 } else {
-                    var value = head.execute();
+                    var value = head.execute(qontext);
                     callback?.Invoke(value, statement, jumpTarget);
                     return;
                 }
@@ -43,10 +43,10 @@ namespace Qrakhen.Sqr.Core
         }
 
         // not all callers use callback, so we have both return type here as a QoL
-        public Value execute()
+        public Value execute(Qontext qontext)
         {
             Value value = Value.Void;
-            execute((v, s, t) => { value = v; });
+            execute((v, s, t) => { value = v; }, qontext);
             return value;            
         }
 
@@ -64,6 +64,7 @@ namespace Qrakhen.Sqr.Core
         {
             public object left;
             public object right;
+            public object data;
             public Operator op;
 
             public Node(object left = null, object right = null, Operator op = null)
@@ -73,17 +74,17 @@ namespace Qrakhen.Sqr.Core
                 this.op = op;
             }
 
-            public Value execute()
+            public Value execute(Qontext qontext)
             {
                 if (left != null) {
                     if (op != null && right != null) 
                     {
                         Value _right;
-                        if (right is Node) _right = (right as Node).execute();
+                        if (right is Node) _right = (right as Node).execute(qontext);
                         else _right = (Value)right;
 
                         Value _left;
-                        if (left is Node) _left = (left as Node).execute();
+                        if (left is Node) _left = (left as Node).execute(qontext);
                         else _left = (Value)left;
 
                         if (op.isType(Operator.Type.ASSIGN_REF)) {
@@ -100,9 +101,13 @@ namespace Qrakhen.Sqr.Core
                         Logger.TEMP_STATIC_DEBUG.spam("resolving " + this);
                         Logger.TEMP_STATIC_DEBUG.spam("result " + op.resolve(_left, _right));
 
-                        return op.resolve(_left, _right);
+                        var result = op.resolve(_left, _right);
+                        if (result is Qallable && data != null) {
+                            result = (result as Qallable).execute((data as Qollection).items.ToArray(), qontext);
+                        }
+                        return result;
                     } else {
-                        return (left is Node ? (left as Node).execute() : (Value)left);
+                        return (left is Node ? (left as Node).execute(qontext) : (Value)left);
                     }
                 } else {
                     return null;

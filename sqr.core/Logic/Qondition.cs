@@ -42,7 +42,7 @@ namespace Qrakhen.Sqr.Core
 
         public override void execute(JumpCallback callback)
         {
-            if (condition == null || condition.execute() as Boolean) {
+            if (condition == null || condition.execute(qontext) as Boolean) {
                 body.execute(qontext, callback);
             } else if (elseIf != null) {
                 elseIf.execute(callback);
@@ -70,7 +70,7 @@ namespace Qrakhen.Sqr.Core
                 statement = s; 
                 jumpTarget = t; 
             };
-            while (condition?.execute() as Boolean) {
+            while (condition?.execute(qontext) as Boolean) {
                 body.execute(qontext, localCallback);
                 if (statement == Statement.Return) {
                     log.spam("return jump statement called. value: " + result);
