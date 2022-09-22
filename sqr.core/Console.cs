@@ -57,7 +57,7 @@ namespace Qrakhen.Sqr.Core
         private List<char> line = new List<char>();
         private List<char> buffer = new List<char>();
         private List<char> chars => buffer.Concat(line).ToList();
-        private string input => new string(line.ToArray());
+        private string input => new string(chars.ToArray());
 
         private int cx => Console.CursorLeft - prefix.Length;
         private int cy => Console.CursorTop;
