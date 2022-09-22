@@ -109,13 +109,17 @@ namespace Qrakhen.Sqr.Core
                         } else if (keyInfo.Key == ConsoleKey.UpArrow) {
                             if (--historyIndex < 0) {
                                 historyIndex = -1;
-                            } else {
+                                line.Clear();
+                                buffer.Clear();
+                        } else {
                                 buffer = history[historyIndex].ToCharArray().ToList();
                                 line.Clear();
                             }
                         } else if (keyInfo.Key == ConsoleKey.DownArrow) {
                             if (++historyIndex >= history.Count) {
                                 historyIndex = history.Count;
+                                line.Clear(); 
+                                buffer.Clear();
                             } else {
                                 buffer = history[historyIndex].ToCharArray().ToList();
                                 line.Clear();
