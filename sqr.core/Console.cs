@@ -54,8 +54,10 @@ namespace Qrakhen.Sqr.Core
         private Thread thread;
         private Stopwatch clock;
         private int historyIndex = 0;
-        private List<char> chars = new List<char>();
-        private string input => new string(chars.ToArray());
+        private List<char> line = new List<char>();
+        private List<char> buffer = new List<char>();
+        private List<char> chars => buffer.Concat(line).ToList();
+        private string input => new string(line.ToArray());
 
         private int cx => Console.CursorLeft - prefix.Length;
         private int cy => Console.CursorTop;
@@ -82,12 +84,12 @@ namespace Qrakhen.Sqr.Core
                     while ((keyInfo = Console.ReadKey(true)).Key != ConsoleKey.Enter) {
                         if (keyInfo.Key == ConsoleKey.Backspace) {
                             if (input.Length > 0 && cx > 0) {
-                                chars.RemoveAt(cx - 1);
+                                line.RemoveAt(cx - 1);
                                 setCursor(cx - 1);
                             }
                         } else if (keyInfo.Key == ConsoleKey.Delete) {
-                            if (input.Length > 0 && cx < chars.Count) {
-                                chars.RemoveAt(cx);
+                            if (input.Length > 0 && cx < line.Count) {
+                                line.RemoveAt(cx);
                             }
                         } else if (keyInfo.Key == ConsoleKey.Tab) {
                             var match = Qontext.globalContext.names.Keys
@@ -100,20 +102,20 @@ namespace Qrakhen.Sqr.Core
                             if (--historyIndex < 0) {
                                 historyIndex = -1;
                             } else {
-                                chars = history[historyIndex].ToCharArray().ToList();
+                                line = history[historyIndex].ToCharArray().ToList();
                             }
                         } else if (keyInfo.Key == ConsoleKey.DownArrow) {
                             if (++historyIndex >= history.Count) {
                                 historyIndex = history.Count;
                             } else {
-                                chars = history[historyIndex].ToCharArray().ToList();
+                                line = history[historyIndex].ToCharArray().ToList();
                             }
                         } else if (keyInfo.Key == ConsoleKey.LeftArrow) {
                             setCursor(Math.Max(0, cx - 1));
                         } else if (keyInfo.Key == ConsoleKey.RightArrow) {
                             setCursor(Math.Min(input.Length, cx + 1));
                         } else {
-                            chars.Insert(Math.Min(cx, chars.Count), keyInfo.KeyChar);
+                            line.Insert(Math.Min(cx, line.Count), keyInfo.KeyChar);
                             setCursor(cx + 1);
                         }
                         draw();
@@ -124,9 +126,13 @@ namespace Qrakhen.Sqr.Core
                         write("\n");
                         //new Thread(() => runtime.execute(input)).Start();
                         runtime.execute(strip(input));
-                        chars.Clear();
+                        buffer.Clear();
+                        line.Clear();
                     } else {
-                        chars.Add('\n');
+                        buffer = buffer.Concat(line).ToList();
+                        buffer.Add('\n');                        
+                        line.Clear();
+                        setCursor(0, 1);
                     }
                     draw();
                     setCursor(0);
@@ -170,17 +176,21 @@ namespace Qrakhen.Sqr.Core
 
         private void draw()
         {
-            int y = 0;
-            int x = cx;            
             var colored = color();
-            foreach (var line in colored.Split("\n")) {
-                setCursor(-prefix.Length, y);
+            var lines = colored.Split("\n");
+            int y = 0;
+            int x = cx;
+            int h = lines.Length - 1;
+            setCursor(-prefix.Length, -h);
+            foreach (var line in lines) {
+                setCursor(-prefix.Length, 0);
                 write(prefix + new string(' ', Console.WindowWidth - prefix.Length));
-                setCursor(0, y);
+                setCursor(0, 0);
                 write(line);
-                setCursor(x, y);
-                y--;
+                if (h > 0) setCursor(0, 1);
+                h--;
             }
+            setCursor(x, 0);
         }
 
         private void setCursor(int x = 0, int y = 0)
