@@ -22,6 +22,9 @@ namespace Qrakhen.Sqr.Core
                     row++;
                     __prev = pos;
                 }
+                if (input.peek() == '\0') {
+                    input.digest();
+                }
                 var type = matchType(input.peek());
                 var value = readValue(type, input);
                 __end = input.index;

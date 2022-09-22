@@ -136,7 +136,7 @@ namespace Qrakhen.Sqr.Core
                 if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != ConsoleModifiers.Shift) {
                     history.Add(input);
                     historyIndex = history.Count;
-                    File.WriteAllText(HISTORY_FILE, string.Join<string>('\n', history.Select(_ => _.Replace("\n", " ")).ToArray<string>()));
+                    File.WriteAllText(HISTORY_FILE, string.Join<string>('\n', history.Select(_ => _.Replace("\n", " ").Trim()).ToArray<string>()));
                     write("\n");
                     //new Thread(() => runtime.execute(input)).Start();
                     runtime.execute(strip(input));
@@ -156,7 +156,7 @@ namespace Qrakhen.Sqr.Core
         private string strip(string input)
         {
             foreach (var c in colors.Values) {
-                input = input.Replace(c, '\0');
+                input = input.Replace(c.ToString(), "");
             }
             return input;
         }
