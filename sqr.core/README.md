@@ -1,7 +1,21 @@
 ﻿# Sqript
 ## Better, faster, cooler
 
+![Sqript Command Line Interface](https://i.imgur.com/M36EDwW.png)
+
 ## Usage & Features
+
+### Summary
+ * Comes with a syntax-highlighting 'micro-IDE'
+ * Platform Independent
+ * Infinitely Expandable using the Library SDK
+ * Highly Customizable
+ * Custom Types & Classes
+ * Modules including import/export features
+ * Lightweight
+ * Directly integratable into any other program
+ * Special
+ * Fun
 
 ### Consider This
 #### Aliases
