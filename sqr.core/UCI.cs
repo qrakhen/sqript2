@@ -167,6 +167,11 @@ namespace Qrakhen.Sqr.Core
             } while (exitCode == 0);
         }
 
+        private void renderHistoryEntry(string v)
+        {
+
+        }
+
         private string strip(string input)
         {
             foreach (var c in colors.Values) {
@@ -205,6 +210,19 @@ namespace Qrakhen.Sqr.Core
         private void draw()
         {
             var colored = color();
+            var lines = colored.Split("\n");            
+            int x = cx;
+            var line = lines.Last();
+            setCursor(-prefix.Length, 0);
+            write(prefix + new string(' ', Console.WindowWidth - prefix.Length - 1));
+            setCursor(0, 0);
+            write(line);
+            setCursor(x, 0);
+        }
+
+        private void drawAll()
+        {
+            var colored = color();
             var lines = colored.Split("\n");
             int y = 0;
             int x = cx;
@@ -212,7 +230,7 @@ namespace Qrakhen.Sqr.Core
             setCursor(-prefix.Length, -h);
             foreach (var line in lines) {
                 setCursor(-prefix.Length, 0);
-                write(prefix + new string(' ', Console.WindowWidth - prefix.Length));
+                write(prefix + new string(' ', Console.WindowWidth - prefix.Length - 1));
                 setCursor(0, 0);
                 write(line);
                 if (h > 0) setCursor(0, 1);
@@ -223,7 +241,7 @@ namespace Qrakhen.Sqr.Core
 
         private void setCursor(int x = 0, int y = 0)
         {
-           x = Math.Max(0, Math.Min(prefix.Length + x, Console.WindowWidth));
+           x = Math.Max(0, Math.Min(prefix.Length + x, Console.WindowWidth - 1));
            Console.SetCursorPosition(x, Console.CursorTop + y);
         }
 

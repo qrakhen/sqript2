@@ -14,6 +14,8 @@ namespace Qrakhen.Sqr.Core
     [Injectable]
     public class Runtime 
     {
+        public static readonly Version version = new Version(0, 1, 0);
+
         public static readonly Qonfig qonfig = new Qonfig();
 
         private readonly Logger log;

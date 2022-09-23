@@ -83,7 +83,7 @@ namespace Qrakhen.Sqr.Core
             if (nativeType == NativeType.Static)
                 throw new SqrTypeError("can not instantiate a static qlass!");
             Value obj = null;
-            if (nativeClass != null) {
+            if (nativeClass != null && nativeClass != typeof(Instance)) {
                 obj = (Value)Activator.CreateInstance(nativeClass, parameters);
             } else {
                 obj = new Instance(qontext, this);
