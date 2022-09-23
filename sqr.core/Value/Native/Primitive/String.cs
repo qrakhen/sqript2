@@ -29,7 +29,7 @@ namespace Qrakhen.Sqr.Core
 
         public override string ToString()
         {
-            return "'" + __value?.ToString() + "'";
+            return __value?.ToString();
         }
 
         public static implicit operator string(String s) => s.__value;

@@ -79,7 +79,7 @@ namespace Qrakhen.Sqr.Core
                 Token t = input.peek();
                 log.spam("token peeked: " + t);
 
-                if (t.isType(Token.Type.Value))
+                if (t.isType(Token.Type.Value) || t.isType(Token.Type.TypeValue))
                     handleValue(input, ref node, qontext, level);
 
                 else if (t.isType(Token.Type.Keyword | Token.Type.Type))
@@ -114,8 +114,10 @@ namespace Qrakhen.Sqr.Core
         {
             Value value;
             if (node.op != null && node.op.type == Operator.Type.ACCESSOR) {
-                value = new String(input.digest().raw);               
-            } else {
+                value = new String(input.digest().raw);
+            } else if (input.peek().type == Token.Type.TypeValue) {
+                value = new Qlass(input.digest().get<Type>());
+            } else { 
                 value = valueResolver.resolve(input, qontext);
             }
 

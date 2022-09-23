@@ -25,7 +25,7 @@ namespace Qrakhen.Sqr.Core
         public static Type Variable     => get("Variable");
         public static Type Qlass        => get("Qlass");
 
-        private static readonly Module coreModule = new Module("Core", new Module("Sqript", null));
+        internal static readonly Module coreModule = new Module("Core", new Module("Sqript", null));
 
         [NativeField] public readonly string id;
         [NativeField] public readonly string name;
@@ -154,7 +154,7 @@ namespace Qrakhen.Sqr.Core
                 .Where(_ =>
                     Attribute.GetCustomAttribute(_, typeof(NativeMethodAttribute)) != null)) {
                     methods.Add(new Type.Method(
-                        new InternalFunqtion((v, q, s) => { return (Value)m.Invoke(s.obj, v); }),
+                        new InternalFunqtion((v, q, s) => { return (Value)m.Invoke(s?.obj, v); }),
                         new IDeclareInfo() {
                             name = m.Name,
                             type = get(m.ReturnType.Name),
@@ -238,6 +238,8 @@ namespace Qrakhen.Sqr.Core
 
         static Type()
         {
+            new Qonsole();
+
             var value = register(typeof(Value), new Args
             {
                 name = "Value",

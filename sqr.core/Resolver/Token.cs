@@ -240,7 +240,7 @@ namespace Qrakhen.Sqr.Core
                     return Structure.get(raw); 
                 }
                 if (raw.StartsWith("@")) {
-                    parsedType = Type.Type;
+                    parsedType = Type.TypeValue;
                     return Core.Type.get(raw.Substring(1));
                 }
                 if (type == Type.Keyword || type == Type.Type || type == Type.Identifier) {
@@ -250,8 +250,8 @@ namespace Qrakhen.Sqr.Core
                         return v;
                     }
                     var t = Core.Type.get(raw);
-                    if (t != null) { 
-                        parsedType = Type.Type;
+                    if (t != null) {
+                        parsedType = Type.Type;                        
                         return t;
                     }
                 }
@@ -285,7 +285,8 @@ namespace Qrakhen.Sqr.Core
             Null = Type * 2,
             Void = Null * 2,
 
-            Value = Boolean | Float | Number | String | Identifier | Null | Void
+            Value = Boolean | Float | Number | String | Identifier | Null | Void,
+            TypeValue = Value | Type
         }
     }
 }

@@ -28,7 +28,7 @@ namespace Qrakhen.Sqr.Core
             else if (fields != null && fields.contains(name))
                 return fields[name];
             else
-                return Null;
+                throw new SqrTypeError("unknown member " + name + " of type " + type?.name);
         }
 
         public Value lookAhead(string[] memberNames)
