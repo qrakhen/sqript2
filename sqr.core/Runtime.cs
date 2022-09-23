@@ -14,6 +14,8 @@ namespace Qrakhen.Sqr.Core
     [Injectable]
     public class Runtime 
     {
+        public static readonly Qonfig qonfig = new Qonfig();
+
         private readonly Logger log;
         private readonly UCI userControlInterface;
         private readonly TokenResolver tokenResolver;
@@ -55,7 +57,14 @@ namespace Qrakhen.Sqr.Core
             } else {
                 log.write(Properties.strings.ASCII_Logo, ConsoleColor.DarkGray, prefix: "    ");
                 log.success(Properties.strings.Message_Welcome);
-                userControlInterface.run();
+                if (qonfig.useExtendedConsole) {
+                    userControlInterface.run();
+                } else {
+                    Qontext consoleQontext = new Qontext();
+                    do {
+                        execute(Console.ReadLine(), consoleQontext);
+                    } while (true);
+                }
                 return null;
             }
         }
@@ -68,6 +77,9 @@ namespace Qrakhen.Sqr.Core
             qontext.register(
                 "cout",
                 new Qallable(new InternalFunqtion((p, q, s) => { log.success(p[0].raw); return Value.Void; })));
+            qontext.register(
+                "rand",
+                new Qallable(new InternalFunqtion((p, q, s) => { return new Number(new Random().NextDouble()); })));
             qontext.register(
                 "log",
                 new Qallable(new InternalFunqtion((p, q, s) => { log.setLoggingLevel((Logger.Level)int.Parse(p[0].raw.ToString())); return Value.Void; })));
@@ -164,15 +176,20 @@ namespace Qrakhen.Sqr.Core
                         log.cmd((int) i + ": " + (Logger.Level) i);
                     }
                 } else if (args.Length == 2) {
-                    log.setLoggingLevel((Logger.Level) int.Parse(args[1]));
+                    log.setLoggingLevel((Logger.Level)int.Parse(args[1]));
                     log.cmd("set logging level to " + log.loggingLevel);
                 }
             } else if (input == "t") {
                 var t = File.ReadAllText("tests.sqr");
                 execute(t, qontext);
+            } else if (input.StartsWith("run")) {
+                var t = File.ReadAllText(args[1]);
+                execute(t, qontext);
             } else if (input == "c") {
                 qontext.names.clear();
                 log.cmd("cleared global qontext");
+            } else {
+                log.error("unknown command " + input);
             }
         }
 

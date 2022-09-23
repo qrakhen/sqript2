@@ -128,7 +128,7 @@ namespace Qrakhen.Sqr.Core
         }
 
         static readonly private Dictionary<Token.Type, string> matches = new Dictionary<Token.Type, string>() {
-            { Token.Type.Operator, @"[\/\-\*+=&<>^?!~:]" },
+            { Token.Type.Operator, @"[\/\-\*+=&<>^?!~:.]" },
             { Token.Type.Number, @"[\d.]" },
             { Token.Type.String, "[\"']" },
             { Token.Type.Structure, @"[{}()[\],]" },
@@ -222,6 +222,7 @@ namespace Qrakhen.Sqr.Core
                     parsedType = Type.Operator;
                     var op = Operator.get(raw);
                     if (op == null) {
+                        parsedType = Type.Keyword;
                         return Keyword.get(raw); // keyword aliases
                     } else
                         return op;

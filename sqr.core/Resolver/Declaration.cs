@@ -41,6 +41,9 @@ namespace Qrakhen.Sqr.Core
                         throw new SqrError("unkown type: " + input.peek().raw);
                     }
                 } else {
+                    if (Runtime.qonfig.forceTypes)
+                        throw new SqrTypeError("enforce types is enabled in qonfig. dynamic variables forbidden.");
+
                     if (!isFunqtionHeader) {
                         var k = input.digest().get<Keyword>();
                         if (k != null && k.isType(Keyword.Type.DECLARE_FUNQTION))

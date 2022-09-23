@@ -102,11 +102,14 @@ namespace Qrakhen.Sqr.Core
                         Logger.TEMP_STATIC_DEBUG.spam("result " + op.resolve(_left, _right));
 
                         var result = op.resolve(_left, _right);
-                        if (result is Qallable && data != null) {
-                            result = (result as Qallable).execute((data as Qollection).items.ToArray(), qontext);
+                        if (result.obj is Qallable && data != null) {
+                            result = (result.obj as Qallable).execute((data as Qollection).items.ToArray(), qontext);
                         }
                         return result;
                     } else {
+                        if ((left is Value) && (left as Value).obj is Qallable && data != null) {
+                            return ((left as Value).obj as Qallable).execute((data as Qollection).items.ToArray(), qontext);
+                        }
                         return (left is Node ? (left as Node).execute(qontext) : (Value)left);
                     }
                 } else {
