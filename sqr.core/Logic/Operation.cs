@@ -77,15 +77,9 @@ namespace Qrakhen.Sqr.Core
             public Value execute(Qontext qontext)
             {
                 if (left != null) {
-                    if (op != null && right != null) 
-                    {
-                        Value _right;
-                        if (right is Node) _right = (right as Node).execute(qontext);
-                        else _right = (Value)right;
-
-                        Value _left;
-                        if (left is Node) _left = (left as Node).execute(qontext);
-                        else _left = (Value)left;
+                    Value _left = resolveValue(left, qontext);
+                    if (op != null && right != null) {
+                        Value _right = resolveValue(right, qontext);
 
                         if (op.isType(Operator.Type.ASSIGN_REF)) {
 
@@ -101,19 +95,29 @@ namespace Qrakhen.Sqr.Core
                         Logger.TEMP_STATIC_DEBUG.spam("resolving " + this);
                         Logger.TEMP_STATIC_DEBUG.spam("result " + op.resolve(_left, _right));
 
-                        var result = op.resolve(_left, _right);
-                        if (result.obj is Qallable && data != null) {
-                            result = (result.obj as Qallable).execute((data as Qollection).items.ToArray(), qontext);
-                        }
-                        return result;
+                        var result = op.resolve(_left, _right);                        
+                        return resolveValue(result, qontext);
                     } else {
-                        if ((left is Value) && (left as Value).obj is Qallable && data != null) {
-                            return ((left as Value).obj as Qallable).execute((data as Qollection).items.ToArray(), qontext);
-                        }
-                        return (left is Node ? (left as Node).execute(qontext) : (Value)left);
+                        return _left;
                     }
                 } else {
                     return null;
+                }
+            }
+
+            private Value resolveValue(object value, Qontext qontext)
+            {
+                Value _value;
+                if (value is Node) {
+                    _value = (value as Node).execute(qontext);
+                } else {
+                    _value = value as Value;
+                }
+                
+                if (_value.obj is Qallable && data != null) {
+                    return (_value.obj as Qallable).execute((data as Qollection).items.ToArray(), qontext);
+                } else {
+                    return _value;
                 }
             }
 

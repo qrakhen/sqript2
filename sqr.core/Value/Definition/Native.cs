@@ -1,24 +1,8 @@
-using Qrakhen.Sqr.Core;
 using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
 
 namespace Qrakhen.Sqr.Core 
 {
-    public class NativeAttribute : Attribute
-    {
-        public string name;
-        public Type type;
-    }
-
-    public class NativeMethodAttribute : NativeAttribute
-    {
-        public string[] parameters;
-    }
-
-    public class NativeFieldAttribute : NativeAttribute
-    {
-        
-    }
+    public class NativeAttribute : Attribute { }
+    public class NativeMethodAttribute : NativeAttribute { }
+    public class NativeFieldAttribute : NativeAttribute { }
 }
