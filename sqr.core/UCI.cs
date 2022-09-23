@@ -176,6 +176,9 @@ namespace Qrakhen.Sqr.Core
                     var t = next();
                     if (mapping.contains(t.type)) {
                         var c = mapping[t.type];
+                        if (index > 1 && tokens.peek(-2).raw == ":") {
+                            c = ConsoleColor.DarkCyan;
+                        }
                         temp.Insert((int)t.__pos + (i * 2), colors[c]);
                         temp.Insert((int)t.__end + 1 + (i++ * 2), colors[ConsoleColor.White]);
                     }

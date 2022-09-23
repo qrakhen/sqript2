@@ -79,7 +79,7 @@ namespace Qrakhen.Sqr.Core
                 Token t = input.peek();
                 log.spam("token peeked: " + t);
 
-                if (t.isType(Token.Type.Value) || t.isType(Token.Type.TypeValue))
+                if (t.isType(Token.Type.Value) || t.type == Token.Type.TypeValue)
                     handleValue(input, ref node, qontext, level);
 
                 else if (t.isType(Token.Type.Keyword | Token.Type.Type))

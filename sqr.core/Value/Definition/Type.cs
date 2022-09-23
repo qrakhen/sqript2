@@ -166,7 +166,7 @@ namespace Qrakhen.Sqr.Core
                 .Where(_ =>
                     Attribute.GetCustomAttribute(_, typeof(NativeMethodAttribute)) != null)) {
                     methods.Add(new Type.Method(
-                        new InternalFunqtion((v, q, s) => { return (Value)m.Invoke(s?.obj, v); }),
+                        new InternalFunqtion((v, q, s) => { return (Value)m.Invoke(m.IsStatic ? null : s?.obj, v); }),
                         new IDeclareInfo() {
                             name = m.Name,
                             type = get(m.ReturnType.Name),
@@ -254,6 +254,7 @@ namespace Qrakhen.Sqr.Core
             new Qonsole();
             new Time();
             new Random();
+            new Calc();
 
             var value = register(typeof(Value), new Args
             {

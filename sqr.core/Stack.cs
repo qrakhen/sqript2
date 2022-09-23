@@ -26,7 +26,7 @@ namespace Qrakhen.Sqr.Core
 
         public T peek(int delta = 0)
         {
-            if (index + delta >= length)
+            if (index + delta >= length || index + delta < 0)
                 return default(T);
 
             return __items[index + delta];
