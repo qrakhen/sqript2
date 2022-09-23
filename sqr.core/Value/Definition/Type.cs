@@ -82,6 +82,9 @@ namespace Qrakhen.Sqr.Core
             foreach (var f in fields.Values) {
                 obj.fields[f.name] = obj.qontext.register(f.name, f.defaultValue, f.isReference, f.type, f.isReadonly);
             }
+            if (methods.contains(name)) {
+                methods[name].makeQallable(obj).execute(parameters, qontext);
+            }
             return obj;
         }
 
