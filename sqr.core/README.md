@@ -3,16 +3,30 @@
 
 ## Usage & Features
 
-### Aliases
-First of all, it is important to note that aliases exist.
+### Consider This
+#### Aliases
+First of all, it is important to note that aliases exist as a fundamental part of Sqript.
 If you don't like the usage of a certain keyword or operator (i.e. `*~`),
 you can either add your own alias, or use the default text version.
 
 In all following examples, `*~` is used instead of the default `var`.
 
+More on aliases on the Extras Section of this readme.
+
+#### Dynamic vs. Static Types
+Sqript, by default, can work with both dynamic and static types at the same time.
+This behaviour can be configured to your needs, i.e. to enforce the usage of types,
+or to disable types entirely.
+
+## Demo
+```cpp
+module MyModule;
+
+import('sqript/core/http');
+```
+
 ### Basics
 #### Variables
-
 ##### Dynamic Declaration 
 ```cpp
 *~ x;
@@ -21,6 +35,12 @@ In all following examples, `*~` is used instead of the default `var`.
 ##### Typed Declaration 
 ```cpp
 Number x;
+```
+
+##### Reference Declaration
+```cpp
+*~ &r;
+Number &r;
 ```
 
 ##### Assign by Value
@@ -34,9 +54,6 @@ x <~ a;
 ```cpp
 *~ a <~ 10;
 *~ b <& a;
-
-// typed reference
-Number &c <& a; 
 ```
 
 #### Operators
@@ -92,5 +109,22 @@ f(5);
 ### Bubble Sort
 
 ### Vector Class
+
+## Libraries
+### Intro
+#### SDK
+#### Included
+
+## Aliases
+### Precompiled
+#### Simple
+#### Placeholder
+```cpp
+(str_$) -> ("$");
+```
+Would change all occurences of (str_*) to ("*")
+### Logical
+#### Simple
+#### Groups
 
 ## Qonfig
