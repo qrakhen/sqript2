@@ -10,6 +10,7 @@ namespace Qrakhen.Sqr.Core
     public class Qollection : ItemSet
     {
         [NativeField] public List<Variable> items = new List<Variable>();
+        [NativeField] public List<Value> values => items.Select(_ => _.obj).ToList();
         [NativeField] public override int length => items.Count;
 
         public Qollection() : base(Type.Qollection)

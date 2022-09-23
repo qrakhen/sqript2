@@ -98,7 +98,7 @@ namespace Qrakhen.Sqr.Core
                         Logger.TEMP_STATIC_DEBUG.spam("result " + op.resolve(_left, _right));
 
                         var result = op.resolve(_left, _right);                        
-                        return resolveValue(result, leftMod, qontext);
+                        return resolveValue(result, null, qontext);
                     } else {
                         return _left;
                     }
@@ -121,7 +121,7 @@ namespace Qrakhen.Sqr.Core
                 }
                 
                 if (_value.obj is Qallable && data != null) {
-                    return (_value.obj as Qallable).execute((data as Qollection).items.ToArray(), qontext);
+                    return (_value.obj as Qallable).execute((data as Qollection).values.ToArray(), qontext);
                 } else {
                     return _value;
                 }

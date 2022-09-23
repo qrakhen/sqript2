@@ -32,6 +32,7 @@ namespace Qrakhen.Sqr.Core
         [NativeField] public readonly NativeType nativeType;
         [NativeField] public readonly Module module;
         [NativeField] public readonly Type extends;
+        [NativeField] public readonly System.Type nativeClass;
         [NativeField] public readonly Storage<string, Field> fields;
         [NativeField] public readonly Storage<string, Method> methods;
 
@@ -46,6 +47,7 @@ namespace Qrakhen.Sqr.Core
             fields = args.fields ?? new Storage<string, Field>();
             methods = args.methods ?? new Storage<string, Method>();
             extends = args.extends;
+            nativeClass = args.nativeClass;
 
             id = buildTypeId(this);
 
@@ -76,14 +78,20 @@ namespace Qrakhen.Sqr.Core
         }
 
         // native types are instantiated by just using new() since theyre hard coded
-        public Instance spawn(Qontext qontext, Value[] parameters)
+        public Value spawn(Qontext qontext, Value[] parameters)
         {
-            var obj = new Instance(qontext, this);
-            foreach (var f in fields.Values) {
-                obj.fields[f.name] = obj.qontext.register(f.name, f.defaultValue, f.isReference, f.type, f.isReadonly);
+            Value obj = null;
+            if (nativeClass != null) {
+                obj = (Value)Activator.CreateInstance(nativeClass, parameters);
+            } else {
+                obj = new Instance(qontext, this);
+                foreach (var f in fields.Values) {
+                    obj.fields[f.name] = (obj as Instance).qontext.register(f.name, f.defaultValue, f.isReference, f.type, f.isReadonly);
+                }
             }
             if (methods.contains(name)) {
                 methods[name].makeQallable(obj).execute(parameters, qontext);
+                methods.remove(name);
             }
             return obj;
         }
@@ -105,6 +113,8 @@ namespace Qrakhen.Sqr.Core
 
         public static Type register(System.Type systemType, Args args)
         {
+            args.nativeClass = systemType;
+
             if (args.fields == null)
                 args.fields = new Storage<string, Field>();
             foreach (var f in buildNativeFields(systemType))
@@ -231,6 +241,7 @@ namespace Qrakhen.Sqr.Core
             public string name;
             public Module module;
             public Type extends;
+            public System.Type nativeClass;
             public NativeType nativeType;
             public Storage<string, Field> fields;
             public Storage<string, Method> methods;
@@ -239,6 +250,7 @@ namespace Qrakhen.Sqr.Core
         static Type()
         {
             new Qonsole();
+            new Time();
 
             var value = register(typeof(Value), new Args
             {
