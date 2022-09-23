@@ -22,7 +22,7 @@ namespace Qrakhen.Sqr.Core
 
         public IDeclareInfo resolve(Stack<Token> input, Qontext qontext, bool isFunqtionHeader = false)
         {
-            log.debug("in " + GetType().Name);
+            log.verbose("in " + GetType().Name);
 
             // @type[&]:name
             var info = new IDeclareInfo { };

@@ -100,7 +100,7 @@ namespace Qrakhen.Sqr.Core
                             line.RemoveAt(cx);
                         }
                     } else if (keyInfo.Key == ConsoleKey.Tab) {
-                        var match = Qontext.globalContext.names.Keys
+                        var match = qontext.names.Keys
                             .FirstOrDefault(item => item != input && item.StartsWith(input, true, CultureInfo.InvariantCulture));
                         if (string.IsNullOrEmpty(match))
                             continue;

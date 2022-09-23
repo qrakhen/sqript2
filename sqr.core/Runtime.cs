@@ -55,7 +55,7 @@ namespace Qrakhen.Sqr.Core
                 execute(content, qontext);
                 return qontext;
             } else {
-                log.write(Properties.strings.ASCII_Logo, ConsoleColor.DarkGray, prefix: "    ");
+                //log.write(Properties.strings.ASCII_Logo, ConsoleColor.DarkGray, prefix: "    ");
                 log.success(Properties.strings.Message_Welcome);
                 if (qonfig.useExtendedConsole) {
                     userControlInterface.run();
@@ -106,7 +106,6 @@ namespace Qrakhen.Sqr.Core
                     commands(input.Substring(1), qontext);
                     return;
                 } else if (string.IsNullOrEmpty(input)) {
-                    log.info("yes i too am kinda lazy today, it's fine.");
                     return;
                 }
 

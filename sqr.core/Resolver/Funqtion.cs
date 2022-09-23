@@ -21,7 +21,7 @@ namespace Qrakhen.Sqr.Core
         /// <returns></returns>
         public Funqtion resolve(Stack<Token> input, Qontext qontext, IDeclareInfo info = new IDeclareInfo())
         {
-            log.debug("in " + GetType().Name);
+            log.verbose("in " + GetType().Name);
             var bodyStructure = Structure.get(Structure.Type.BODY);
             var header = resolveHeader(structureResolver.resolveUntil(input, qontext, bodyStructure.open), qontext);
             input.move(-1);
