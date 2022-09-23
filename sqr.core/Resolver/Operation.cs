@@ -153,7 +153,16 @@ namespace Qrakhen.Sqr.Core
                     throw new SqrError("weird spot to instantiate something.", t);
                 return;
             }
-                
+
+            if (Validator.Token.tryGetSubType(t, Keyword.Type.FUNQTION_INLINE, out keyword)) {
+                input.digest();
+                var funqtion = funqtionResolver.resolve(
+                    structureResolver.resolve(input, qontext), qontext);
+                if (!node.put(new Qallable(funqtion)))
+                    throw new SqrError("weird spot to write an inline funqtion.", t);
+                return;
+            }
+
             if (!node.empty || level > 0) {
                 throw new SqrError("unexpected keyword " + t, t);
             } else {

@@ -62,7 +62,8 @@ namespace Qrakhen.Sqr.Core
             INSTANCE_THIS = BitFlag._16,
             IMPORT = BitFlag._17,
             EXPORT = BitFlag._18,
-            MODULE = BitFlag._19
+            MODULE = BitFlag._19,
+            FUNQTION_INLINE = BitFlag._20
         }
 
         public static Keyword register(Type type, string symbol)
@@ -81,6 +82,7 @@ namespace Qrakhen.Sqr.Core
             register(Type.DECLARE_TYPED, "@");
             register(Type.DECLARE_FUNQTION, "funqtion")
                 .alias("funq", "fq", "function");
+            register(Type.FUNQTION_INLINE, "~:");
             register(Type.DECLARE_QLASS, "qlass");
             register(Type.IMPORT, "import");
             register(Type.EXPORT, "export");
