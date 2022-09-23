@@ -107,6 +107,9 @@ namespace Qrakhen.Sqr.Core
                         }
                         return result;
                     } else {
+                        if ((left is Value) && (left as Value).obj is Qallable && data != null) {
+                            return ((left as Value).obj as Qallable).execute((data as Qollection).items.ToArray(), qontext);
+                        }
                         return (left is Node ? (left as Node).execute(qontext) : (Value)left);
                     }
                 } else {

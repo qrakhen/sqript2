@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
@@ -23,9 +24,9 @@ namespace Qrakhen.Sqr.Core
             alias(symbol);
         }
 
-        public Operator alias(string alias)
+        public Operator alias(params string[] alias)
         {
-            aliases.Add(alias);
+            aliases = aliases.Concat(alias).ToList();
             return this;
         }
 

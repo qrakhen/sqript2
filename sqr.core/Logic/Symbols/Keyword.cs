@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
@@ -18,9 +19,9 @@ namespace Qrakhen.Sqr.Core
             alias(symbol);
         }
 
-        public Keyword alias(string alias)
+        public Keyword alias(params string[] alias)
         {
-            aliases.Add(alias);
+            aliases = aliases.Concat(alias).ToList();
             return this;
         }
 
@@ -44,11 +45,10 @@ namespace Qrakhen.Sqr.Core
         public enum Type
         {
             DECLARE_DYN = BitFlag._1,
-            DECLARE_REF = BitFlag._2,
             DECLARE_TYPED = BitFlag._3,
             DECLARE_FUNQTION = BitFlag._4,
             DECLARE_QLASS = BitFlag._5,
-            DECLARE = DECLARE_DYN | DECLARE_REF | DECLARE_FUNQTION | DECLARE_QLASS,
+            DECLARE = DECLARE_DYN | DECLARE_FUNQTION | DECLARE_QLASS,
             QONDITION_IF = BitFlag._7,
             QONDITION_ELSE = BitFlag._8,
             LOOP_FOR = BitFlag._9,
@@ -59,9 +59,10 @@ namespace Qrakhen.Sqr.Core
             QONDITION = QONDITION_IF | QONDITION_ELSE | LOOP_DO | LOOP_FOR | LOOP_WHILE,
             FUNQTION_RETURN = BitFlag._14,
             INSTANCE_CREATE = BitFlag._15,
-            IMPORT = BitFlag._16,
-            EXPORT = BitFlag._17,
-            MODULE = BitFlag._18
+            INSTANCE_THIS = BitFlag._16,
+            IMPORT = BitFlag._17,
+            EXPORT = BitFlag._18,
+            MODULE = BitFlag._19
         }
 
         public static Keyword register(Type type, string symbol)
@@ -73,25 +74,31 @@ namespace Qrakhen.Sqr.Core
 
         static Keyword()
         {
-            register(Type.DECLARE_DYN, "var"); 
-            register(Type.DECLARE_REF, "ref DISCONTINUED, use var& name instead");
+            register(Type.DECLARE_DYN, "var");
+            /*register(Type.INSTANCE_THIS, "this")
+                .alias(".");*/
             register(Type.DECLARE_TYPED, "@");
             register(Type.DECLARE_FUNQTION, "funqtion")
-                .alias("funq")
-                .alias("fq");
+                .alias("funq", "fq", "function");
             register(Type.DECLARE_QLASS, "qlass");
             register(Type.IMPORT, "import");
             register(Type.EXPORT, "export");
             register(Type.MODULE, "module");
-            register(Type.QONDITION_IF, "if");
-            register(Type.QONDITION_ELSE, "else");
+            register(Type.QONDITION_IF, "if")
+                .alias("~?");
+            register(Type.QONDITION_ELSE, "else")
+                .alias("?~");
             register(Type.LOOP_FOR, "for");
-            register(Type.LOOP_WHILE, "while");
+            register(Type.LOOP_WHILE, "while")
+                .alias("as");
             register(Type.LOOP_DO, "do");
             register(Type.LOOP_BREAK, "break");
-            register(Type.LOOP_CONTINUE, "continue");
-            register(Type.FUNQTION_RETURN, "return");
-            register(Type.INSTANCE_CREATE, "new");
+            register(Type.LOOP_CONTINUE, "continue")
+                .alias("~^"); 
+            register(Type.FUNQTION_RETURN, "return")
+                .alias("<:");
+            register(Type.INSTANCE_CREATE, "new")
+                .alias("*:", "spawn");
         }
     }
 }
