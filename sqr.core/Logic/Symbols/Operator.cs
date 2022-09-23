@@ -77,6 +77,10 @@ namespace Qrakhen.Sqr.Core
             register(Type.CALC_ADD, "+", 2, (left, right) => {
                 if (left is Number && right is Number)
                     return new Number((left as Number) + (right as Number));
+                if (left is String)
+                    return new String((left.raw as String) + (right.raw));
+                if (right is String)
+                    return new String((left.raw) + (right.raw as String));
                 return new Number(0);
             });
 
