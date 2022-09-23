@@ -87,6 +87,8 @@ namespace Qrakhen.Sqr.Core
             register(Type.CALC_SUB, "-", 2, (left, right) => {
                 if (left is Number && right is Number)
                     return new Number((left as Number) - (right as Number));
+                if (left == null && right is Number)
+                    return new Number((right as Number) *- 1);
                 return new Number(0);
             });
 

@@ -113,6 +113,11 @@ namespace Qrakhen.Sqr.Core
         private void handleValue(Stack<Token> input, ref Node node, Qontext qontext, int level = 0)
         {
             Value value;
+            if (node.left == null && node.op != null) {
+                node.leftMod = node.op;
+                node.op = null;
+            }
+            
             if (node.op != null && node.op.type == Operator.Type.ACCESSOR) {
                 value = new String(input.digest().raw);
             } else if (input.peek().type == Token.Type.TypeValue) {
@@ -203,8 +208,10 @@ namespace Qrakhen.Sqr.Core
                         } else {
                             node = build(input, qontext, new Node(node, null, op), level + 1);
                         }
+                    } else if (node.left != null && node.right == null) {
+                        node.rightMod = op;
                     } else {
-                        throw new SqrError("2 operatorss? " + node, node);
+                        throw new SqrError("operators are weird" + node, node);
                     }
                 }
             }
