@@ -139,7 +139,8 @@ namespace Qrakhen.Sqr.Core
                     fields.Add(new Type.Field(new IDeclareInfo() {
                         name = f.Name,
                         type = get(f.FieldType.Name),
-                        access = Access.Public
+                        access = Access.Public,
+                        isReadonly = Attribute.GetCustomAttribute(f, typeof(NativeGetterAttribute)) != null
                     }));
             }
             return fields;
