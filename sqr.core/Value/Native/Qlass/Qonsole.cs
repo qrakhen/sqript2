@@ -44,7 +44,7 @@ namespace Qrakhen.Sqr.Core
                 name = "Qonsole",
                 module = Type.coreModule,
                 extends = Type.Value,
-                nativeType = NativeType.Instance
+                nativeType = NativeType.Static
             });
         }
     }

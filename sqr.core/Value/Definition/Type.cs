@@ -80,6 +80,8 @@ namespace Qrakhen.Sqr.Core
         // native types are instantiated by just using new() since theyre hard coded
         public Value spawn(Qontext qontext, Value[] parameters)
         {
+            if (nativeType == NativeType.Static)
+                throw new SqrTypeError("can not instantiate a static qlass!");
             Value obj = null;
             if (nativeClass != null) {
                 obj = (Value)Activator.CreateInstance(nativeClass, parameters);
@@ -251,6 +253,7 @@ namespace Qrakhen.Sqr.Core
         {
             new Qonsole();
             new Time();
+            new Random();
 
             var value = register(typeof(Value), new Args
             {
@@ -344,9 +347,10 @@ namespace Qrakhen.Sqr.Core
 
         Objeqt = BitFlag._8,
         Instance = BitFlag._9,
-        Variable = BitFlag._10,
-        Funqtion = BitFlag._11,
-        Null = BitFlag._12,
+        Static = BitFlag._10,
+        Variable = BitFlag._11,
+        Funqtion = BitFlag._12,
+        Null = BitFlag._13,
 
     }
 }

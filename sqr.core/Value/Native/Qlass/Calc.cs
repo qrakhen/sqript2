@@ -1,0 +1,39 @@
+﻿using Newtonsoft.Json;
+using Qrakhen.SqrDI;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+
+namespace Qrakhen.Sqr.Core
+{
+    public class Calc : Value
+    {
+        public Calc() : base(Type.get("Calc"))
+        {
+
+        }
+
+        [NativeMethod]
+        public static Number round(Number value)
+        {
+            return new Number(Math.Round(value));
+        }
+
+        [NativeMethod]
+        public static Number sqrt(Number value)
+        {
+            return new Number(Math.Sqrt(value));
+        }
+
+        static Calc()
+        {
+            Type.register(typeof(Calc), new Type.Args {
+                name = "Calc",
+                module = Type.coreModule,
+                extends = Type.Value,
+                nativeType = NativeType.Static
+            });
+        }
+    }
+}

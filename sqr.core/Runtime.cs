@@ -78,9 +78,6 @@ namespace Qrakhen.Sqr.Core
                 "cout",
                 new Qallable(new InternalFunqtion((p, q, s) => { log.success(p[0].raw); return Value.Void; })));
             qontext.register(
-                "rand",
-                new Qallable(new InternalFunqtion((p, q, s) => { return new Number(new Random().NextDouble()); })));
-            qontext.register(
                 "log",
                 new Qallable(new InternalFunqtion((p, q, s) => { log.setLoggingLevel((Logger.Level)int.Parse(p[0].raw.ToString())); return Value.Void; })));
             qontext.register(
