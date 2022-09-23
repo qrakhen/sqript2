@@ -1,0 +1,21 @@
+﻿qlass Enemy
+{
+	Number hp <~ 100;
+	Number dmg <~ 5;
+	String name <~ '';
+
+	funq Enemy(name, hp, dmg {
+		this:name <~ name;
+		this:hp <~ hp;
+		this:dmg <~ dmg;
+	});
+
+	funq attack(dmg {
+		this:hp <~ this:hp - dmg;
+		if (this:hp <= 0) {
+			cout(this:name + " just died");
+		} else {
+			cout(this:name + " took " + dmg + " damage and is on " + this:hp + " hp");
+		}
+	});
+};
