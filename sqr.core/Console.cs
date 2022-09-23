@@ -135,6 +135,7 @@ namespace Qrakhen.Sqr.Core
                     draw();
                 }
                 if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != ConsoleModifiers.Shift) {
+                    history.RemoveAll(_ => _ == input);
                     history.Add(input);
                     historyIndex = history.Count;
                     File.WriteAllText(HISTORY_FILE, string.Join<string>('\n', history.Select(_ => _.Replace("\n", " ").Trim()).ToArray<string>()));

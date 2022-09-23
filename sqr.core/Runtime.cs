@@ -182,9 +182,14 @@ namespace Qrakhen.Sqr.Core
             } else if (input == "t") {
                 var t = File.ReadAllText("tests.sqr");
                 execute(t, qontext);
+            } else if (input.StartsWith("run")) {
+                var t = File.ReadAllText(args[1]);
+                execute(t, qontext);
             } else if (input == "c") {
                 qontext.names.clear();
                 log.cmd("cleared global qontext");
+            } else {
+                log.error("unknown command " + input);
             }
         }
 
