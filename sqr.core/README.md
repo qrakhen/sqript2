@@ -19,7 +19,7 @@ This behaviour can be configured to your needs, i.e. to enforce the usage of typ
 or to disable types entirely.
 
 ## Demo
-```cpp
+```js
 module MyModule;
 
 import('sqript/core/http');
@@ -28,30 +28,30 @@ import('sqript/core/http');
 ### Basics
 #### Variables
 ##### Dynamic Declaration 
-```cpp
+```js
 *~ x;
 ```
 
 ##### Typed Declaration 
-```cpp
+```js
 Number x;
 ```
 
 ##### Reference Declaration
-```cpp
+```js
 *~ &r;
 Number &r;
 ```
 
 ##### Assign by Value
-```cpp
+```js
 *~ a <~ 10;
 *~ x <~ 'hello';
 x <~ a;
 ```
 
 ##### Assign by Reference
-```cpp
+```js
 *~ a <~ 10;
 *~ b <& a;
 ```
@@ -66,7 +66,7 @@ x <~ a;
 
 ### Funqtions
 #### Syntax
-```cpp
+```js
 // all flags in [...] are optional 
 [ReturnType[&]]funqtion <name> ([ParamType]<param1>[? (=OptionalParam)], ... { 
 	return ...;
@@ -76,7 +76,7 @@ x <~ a;
 ```
 
 #### Example Dynamic Funqtion
-```cpp
+```js
 // fq is an alias
 fq add (a, b { 
 	return a + b;
@@ -85,7 +85,7 @@ fq add (a, b {
 ```
 
 #### Example Typed Funqtion
-```cpp
+```js
 //                                we don't have to type all params
 String funqtion concat (String a, b { 
 	return a + b;
@@ -94,7 +94,7 @@ String x <~ concat('hello', 'world');
 ```
 
 #### Inline
-```cpp
+```js
 *~ f <~ ~:(x { return x; });
 f(5);
 ```
@@ -119,7 +119,7 @@ f(5);
 ### Precompiled
 #### Simple
 #### Placeholder
-```cpp
+```js
 (str_$) -> ("$");
 ```
 Would change all occurences of (str_*) to ("*")
