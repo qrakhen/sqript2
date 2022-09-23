@@ -68,7 +68,7 @@ namespace Qrakhen.Sqr.Core
 
         protected Node build(Stack<Token> input, Qontext qontext, Node node = null, int level = 0)
         {
-            log.debug("in " + GetType().Name);
+            log.verbose("in " + GetType().Name);
             if (input.done)
                 return null;
 

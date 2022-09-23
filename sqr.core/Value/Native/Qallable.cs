@@ -26,7 +26,7 @@ namespace Qrakhen.Sqr.Core
             if (__value == null || __value.parameters == null)
                 return "Qallable (null)";
 
-            return "(" + string.Join(", ", __value.parameters.ToList().Select(_ => _.name).ToArray()) + " {\n" + "    return @any;\n})";
+            return "(" + string.Join(", ", __value.parameters.ToList().Select(_ => _.name).ToArray()) + " {\n" + "    return " + __value.returnType?.name + ";\n})";
         }
     }
 }

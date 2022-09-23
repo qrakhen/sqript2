@@ -21,7 +21,7 @@ namespace Qrakhen.Sqr.Core
         /// <returns></returns>
         public Qollection resolve(Stack<Token> input, Qontext qontext)
         {
-            log.debug("in " + GetType().Name);
+            log.verbose("in " + GetType().Name);
             var qollection = new Qollection();
             var separator = Structure.get(Structure.Type.QOLLECTION).separator;
             input.process((current, take, index, abort) => {

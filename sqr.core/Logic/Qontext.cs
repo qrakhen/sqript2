@@ -23,9 +23,13 @@ namespace Qrakhen.Sqr.Core
             this.parent = parent;
         }
 
-        public Variable get(string name)
+        public Value get(string name)
         {
-            return names[name];
+            if (names.contains(name))
+                return names[name];
+            else if (imports.contains(name))
+                return imports[name];
+            return null;
         }
 
         public Variable register(

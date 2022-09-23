@@ -12,7 +12,7 @@ namespace Qrakhen.Sqr.Core
 
         public Objeqt resolve(Stack<Token> input, Qontext qontext)
         {
-            log.debug("in " + GetType().Name);
+            log.verbose("in " + GetType().Name);
             var objeqt = new Objeqt();
             var separator = Structure.get(Structure.Type.BODY).separator;
             input.process((current, take, index, abort) => 

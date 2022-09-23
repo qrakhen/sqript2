@@ -56,9 +56,9 @@ namespace Qrakhen.SqrDI
                     throw new Exception("DI Error: " + t.Name + " needs to have either no, or one empty public constructor.");
 
                 injectables.Add(t, Activator.CreateInstance(t));
-
-                Console.WriteLine(" # Dependor: registered service " + t);
             }
+
+            injectables.forEach(_ => Logger.TEMP_STATIC_DEBUG.spam("    ~: Dependor: Registered " + _.GetType().Name));
 
             foreach (var i in injectables.Values) {
                 apply(i);

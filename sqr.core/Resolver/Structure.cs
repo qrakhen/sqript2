@@ -11,7 +11,7 @@ namespace Qrakhen.Sqr.Core
     {
         public Stack<Token> resolve(Stack<Token> input, Qontext qontext)
         {
-            log.debug("in " + GetType().Name);
+            log.verbose("in " + GetType().Name);
             int level = 0;
             List<Token> buffer = new List<Token>();
             var t = input.peek();
@@ -54,7 +54,7 @@ namespace Qrakhen.Sqr.Core
         /// <returns></returns>
         public Stack<Token> resolveUntil(Stack<Token> input, Qontext qontext, string[] until, bool includeLast = false)
         {
-            log.debug("in " + GetType().Name);
+            log.verbose("in " + GetType().Name);
             int level = 0;
             List<Token> buffer = new List<Token>();
             var t = input.peek();

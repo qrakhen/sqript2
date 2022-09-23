@@ -9,7 +9,7 @@ namespace Qrakhen.Sqr.Core
 {
     public class Qollection : ItemSet
     {
-        [NativeField] public List<Value> items = new List<Value>();
+        [NativeField] public List<Variable> items = new List<Variable>();
         [NativeField] public override int length => items.Count;
 
         public Qollection() : base(Type.Qollection)
@@ -33,7 +33,7 @@ namespace Qrakhen.Sqr.Core
         [NativeMethod]
         public void add(Value value)
         {
-            items.Add(value);
+            items.Add(new Variable(value));
         }
 
         [NativeMethod]
@@ -45,7 +45,7 @@ namespace Qrakhen.Sqr.Core
         [NativeMethod]
         public override void set(Value index, Value value)
         {
-            items[(index as Number).asInteger()] = value;
+            items[(index as Number).asInteger()] = new Variable(value);
         }
 
         public override string ToString()

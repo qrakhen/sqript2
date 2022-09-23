@@ -9,7 +9,7 @@ namespace Qrakhen.Sqr.Core
     public class Array : ItemSet
     {
         public override int length => items.Length;
-        public Value[] items;
+        public Variable[] items;
 
         public Array() : base(Type.Array)
         {
@@ -37,7 +37,7 @@ namespace Qrakhen.Sqr.Core
         [NativeMethod]
         public override void set(Value index, Value value)
         {
-            items[(index as Number).asInteger()] = value;
+            items[(index as Number).asInteger()] = new Variable(value);
         }
 
         public override string ToString()

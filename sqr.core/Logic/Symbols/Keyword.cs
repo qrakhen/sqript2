@@ -74,7 +74,8 @@ namespace Qrakhen.Sqr.Core
 
         static Keyword()
         {
-            register(Type.DECLARE_DYN, "var");
+            register(Type.DECLARE_DYN, "var")
+                .alias("*~");
             /*register(Type.INSTANCE_THIS, "this")
                 .alias(".");*/
             register(Type.DECLARE_TYPED, "@");

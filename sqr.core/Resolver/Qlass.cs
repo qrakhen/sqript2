@@ -14,7 +14,7 @@ namespace Qrakhen.Sqr.Core
 
         public Qlass resolve(Stack<Token> input, Qontext qontext)
         {
-            log.debug("in " + GetType().Name);
+            log.verbose("in " + GetType().Name);
 
             var args = new Type.Args();
             args.methods = new Storage<string, Type.Method>();

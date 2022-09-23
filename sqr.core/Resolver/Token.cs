@@ -13,7 +13,7 @@ namespace Qrakhen.Sqr.Core
 
         public Stack<Token> resolve(Stack<char> input)
         {
-            log.debug("in " + GetType().Name);
+            log.verbose("in " + GetType().Name);
             var result = new List<Token>();
             long row = 0, count = 0, __prev = 0, __end;
             while (!input.done) {
@@ -128,7 +128,7 @@ namespace Qrakhen.Sqr.Core
         }
 
         static readonly private Dictionary<Token.Type, string> matches = new Dictionary<Token.Type, string>() {
-            { Token.Type.Operator, @"[\/\-\*+=&<>^?!~:.]" },
+            { Token.Type.Operator, @"[\/\-\*+=&<>^?!~:]" },
             { Token.Type.Number, @"[\d.]" },
             { Token.Type.String, "[\"']" },
             { Token.Type.Structure, @"[{}()[\],]" },
