@@ -174,6 +174,10 @@ namespace Qrakhen.Sqr.Core
             if (type == Type.Float) return new Number((float)value);
             if (type == Type.Number) return new Number((double)value);
             if (type == Type.String) return new String((string)value);
+            if (type == Type.String) return new String((string)value);
+            if (type == Type.String) return new String((string)value);
+            if (type == Type.Null) return Value.Null;
+            if (type == Type.Void) return Value.Void;
             throw new SqrError("no known native type applied to token " + this, this);
         }
 
@@ -210,6 +214,10 @@ namespace Qrakhen.Sqr.Core
         {
             try {
                 parsedType = type;
+                if (raw == "null" || raw == "void") {
+                    parsedType = (raw == "null" ? Type.Null : Type.Void);
+                    return (raw == "null" ? Value.Null : Value.Void);
+                }
                 if (raw == "true" || raw == "false") {
                     parsedType = Type.Boolean;
                     return (raw == "true" ? true : false);
@@ -274,8 +282,10 @@ namespace Qrakhen.Sqr.Core
             Comment = 1024,
             End = 2048,
             Type = 4096,
+            Null = Type * 2,
+            Void = Null * 2,
 
-            Value = Boolean | Float | Number | String | Identifier
+            Value = Boolean | Float | Number | String | Identifier | Null | Void
         }
     }
 }
