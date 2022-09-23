@@ -100,7 +100,7 @@ namespace Qrakhen.Sqr.Core
             if (type == Token.Type.String)
                 return readString(input);
 
-            if (type == Token.Type.Type) { 
+            if (type == Token.Type.ValueOf) { 
                 var r = input.digest() + readType(input, Token.Type.Identifier);
                 return r;
             }
@@ -134,7 +134,7 @@ namespace Qrakhen.Sqr.Core
             { Token.Type.Structure, @"[{}()[\],]" },
             { Token.Type.End, @";" },
             //{ Token.Type.Accessor, @"[:]" },
-            { Token.Type.Type, "@" },
+            { Token.Type.ValueOf, "@" },
             { Token.Type.Whitespace, @"\s" },
             { Token.Type.Comment, @"#" },
         };
@@ -170,14 +170,14 @@ namespace Qrakhen.Sqr.Core
             if (!isType(Type.Value))
                 throw new SqrError("can not make value out of token: not a value token" + this, this);
 
-            if (type == Type.Boolean) return new Boolean((bool)value);
-            if (type == Type.Float) return new Number((float)value);
-            if (type == Type.Number) return new Number((double)value);
-            if (type == Type.String) return new String((string)value);
-            if (type == Type.String) return new String((string)value);
-            if (type == Type.String) return new String((string)value);
-            if (type == Type.Null) return Value.Null;
-            if (type == Type.Void) return Value.Void;
+            if (isType(Type.Boolean)) return new Boolean((bool)value);
+            if (isType(Type.Float)) return new Number((float)value);
+            if (isType(Type.Number)) return new Number((double)value);
+            if (isType(Type.String)) return new String((string)value);
+            if (isType(Type.String)) return new String((string)value);
+            if (isType(Type.String)) return new String((string)value);
+            if (isType(Type.Null)) return Value.Null;
+            if (isType(Type.Void)) return Value.Void;
             throw new SqrError("no known native type applied to token " + this, this);
         }
 
@@ -239,9 +239,15 @@ namespace Qrakhen.Sqr.Core
                     parsedType = Type.Structure;
                     return Structure.get(raw); 
                 }
-                if (raw.StartsWith("@")) {
-                    parsedType = Type.TypeValue;
-                    return Core.Type.get(raw.Substring(1));
+                if (type == Type.ValueOf) {
+                    object v = Core.Type.get(raw.Substring(1));
+                    if (v != null) {
+                        parsedType = Type.TypeValue;
+                    } else {
+                        parsedType = Type.IdentifierValue;
+                        v = raw.Substring(1);
+                    }
+                    return v;
                 }
                 if (type == Type.Keyword || type == Type.Type || type == Type.Identifier) {
                     var v = Keyword.get(raw);
@@ -284,9 +290,11 @@ namespace Qrakhen.Sqr.Core
             Type = 4096,
             Null = Type * 2,
             Void = Null * 2,
+            ValueOf = Void * 2,
 
-            Value = Boolean | Float | Number | String | Identifier | Null | Void,
-            TypeValue = Value | Type
+            Value = Boolean | Float | Number | String | Identifier | Null | Void | ValueOf,
+            TypeValue = ValueOf | Type,
+            IdentifierValue = ValueOf | Identifier
         }
     }
 }

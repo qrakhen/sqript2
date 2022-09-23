@@ -11,18 +11,21 @@ namespace Qrakhen.Sqr.Core
     {
         [NativeField] public List<Variable> items = new List<Variable>();
         [NativeField] public List<Value> values => items.Select(_ => _.obj).ToList();
-        [NativeField] public override int length => items.Count;
+        [NativeMethod] public override Number length() => items.Count;
 
         public Qollection() : base(Type.Qollection)
         {
 
         }
 
-        public override Value accessMember(string name)
+        public override Value accessMember(Value name)
         {
-            var member = base.accessMember(name);
-            if (member == Null) {
-                var index = Convert.ToInt32(name);
+            Value member = null;
+            if (name is String)
+                member = base.accessMember(name);
+
+            if (member == null) {
+                var index = Convert.ToInt32((name as Number)?.asInteger());
                 if (items.Count > index && index > 0)
                     return items[index];
                 else

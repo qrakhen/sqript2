@@ -61,6 +61,7 @@ namespace Qrakhen.Sqr.Core
         private List<char> buffer = new List<char>();
         private List<char> chars => buffer.Concat(line).ToList();
         private string input => new string(chars.ToArray());
+        private string word => input.Split(" ").Last();
 
         private int cx => Console.CursorLeft - prefix.Length;
         private int cy => Console.CursorTop;
@@ -133,6 +134,16 @@ namespace Qrakhen.Sqr.Core
                         line.Insert(Math.Min(cx, line.Count), keyInfo.KeyChar);
                         setCursor(cx + 1);
                     }
+
+                    /*if (word.Length > 2) {
+                        var match = qontext.names.Keys
+                            .FirstOrDefault(item => item != input && item.StartsWith(input, true, CultureInfo.InvariantCulture));
+                        if (string.IsNullOrEmpty(match))
+                            continue;
+
+                        //line.Insert(Math.Min(cx, line.Count), keyInfo.KeyChar);
+                    }*/
+
                     draw();
                 }
                 if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != ConsoleModifiers.Shift) {

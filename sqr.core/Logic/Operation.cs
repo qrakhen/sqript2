@@ -120,7 +120,7 @@ namespace Qrakhen.Sqr.Core
                     _value = mod.resolve(null, _value);
                 }
                 
-                if (_value.obj is Qallable && data != null) {
+                if (_value?.obj is Qallable && data != null) {
                     return (_value.obj as Qallable).execute((data as Qollection).values.ToArray(), qontext);
                 } else {
                     return _value;

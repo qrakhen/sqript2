@@ -71,14 +71,12 @@ namespace Qrakhen.Sqr.Core
             }
         }
 
-        public Value resolveName(string name) => resolveName(new string[] { name });
+        public Value resolveName(Value name) => resolveName(new Value[] { name });
 
-        public Value resolveName(string[] name)
+        public Value resolveName(Value[] name)
         {
-            var qontext = lookUp(name[0]);
-            var value = qontext.get(name[0]);
-            if (name.Length > 1)
-                return value.lookAhead(name.AsSpan(1).ToArray());
+            var qontext = lookUp(name[0] as String);
+            var value = qontext.get(name[0] as String);
             return value;
         }
 

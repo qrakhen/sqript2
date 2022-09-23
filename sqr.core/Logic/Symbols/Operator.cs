@@ -168,7 +168,7 @@ namespace Qrakhen.Sqr.Core
             });
 
             register(Type.ACCESSOR, ":", 8, (left, right) => {
-                return left.accessMember(right as String);
+                return left.accessMember(right);
             });
 
             register(Type.LOGIC_NOT, "!", 0, (left, right) => {

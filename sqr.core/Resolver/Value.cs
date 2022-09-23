@@ -24,14 +24,14 @@ namespace Qrakhen.Sqr.Core
 
             Value value = null;
 
-            if (!t.isType(Token.Type.Identifier)) {
+            if (!t.hasType(Token.Type.Identifier)) {
                 log.spam("got primitive " + t);
                 if (value == null)
                     value = input.digest().makeValue();
             } else {
                 log.spam("got identifier " + t.raw);
                 if (value == null) // root identifier of possible member chain
-                    value = qontext.resolveName(input.digest().raw);
+                    value = qontext.resolveName(new String(input.digest().get<string>()));
             }
 
             return value;

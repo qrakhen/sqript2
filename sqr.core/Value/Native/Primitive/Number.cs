@@ -19,5 +19,7 @@ namespace Qrakhen.Sqr.Core
 
         public static implicit operator double(Number n) => n.__value;
         public static implicit operator Number(double d) => new Number(d);
-    }
+        public static implicit operator Number(int d) => new Number(d);
+        public static implicit operator Number(float d) => new Number(d);
+        public static implicit operator Number(long d) => new Number(d);}
 }

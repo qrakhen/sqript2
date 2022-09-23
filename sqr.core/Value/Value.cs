@@ -21,12 +21,13 @@ namespace Qrakhen.Sqr.Core
             this.type = type;
         }
 
-        public virtual Value accessMember(string name)
+        public virtual Value accessMember(Value name)
         {
-            if (type.methods.contains(name))
-                return type.methods[name].makeQallable(this);
-            else if (fields != null && fields.contains(name))
-                return fields[name];
+            string key = name as String;
+            if (type.methods.contains(key))
+                return type.methods[key].makeQallable(this);
+            else if (fields != null && fields.contains(key))
+                return fields[key];
             else
                 throw new SqrTypeError("unknown member " + name + " of type " + type?.name);
         }
@@ -34,12 +35,12 @@ namespace Qrakhen.Sqr.Core
         public Value lookAhead(string[] memberNames)
         {
             Value v = this;
-            for (int i = 0; i < memberNames.Length; i++)
+            /*for (int i = 0; i < memberNames.Length; i++)
             {
                 v = v.accessMember(memberNames[i]);
                 if (v == null)
                     throw new SqrError("could not find name " + memberNames[i] + " in the current qontext (recursive look ahead)");
-            }
+            }*/
             return v;
         }
 
