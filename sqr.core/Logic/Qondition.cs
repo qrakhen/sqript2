@@ -71,6 +71,7 @@ namespace Qrakhen.Sqr.Core
                 jumpTarget = t; 
             };
             while (condition?.execute(qontext) as Boolean) {
+                qontext.names.clear();
                 body.execute(qontext, localCallback);
                 if (statement == Statement.Return) {
                     log.spam("return jump statement called. value: " + result);
