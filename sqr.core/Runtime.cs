@@ -76,6 +76,7 @@ namespace Qrakhen.Sqr.Core
             if (qontext.names["cout"] != null)
                 return;
 
+            
             qontext.register(
                 "cout",
                 new Qallable(new InternalFunqtion((p, q, s) => { log.success(p[0].raw); return Value.Void; })));

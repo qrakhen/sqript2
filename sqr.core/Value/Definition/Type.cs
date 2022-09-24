@@ -92,7 +92,7 @@ namespace Qrakhen.Sqr.Core
                 }
                 if (methods.contains(name)) {
                     methods[name].makeQallable(obj).execute(parameters, qontext);
-                    methods.remove(name);
+                    //methods.remove(name);
                 }
             }
             return obj;

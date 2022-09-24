@@ -1,20 +1,31 @@
-﻿qlass PieceType {
+﻿qlass A { *~x; *~y; fq A(x, y { this:x <~ x; this:y <~ y; }); };
+*~ a <~ new A(5, 7);
+cout(a:x);
+cout(a:y);
+
+
+qlass PieceType {
 	String name;
 	Qollection symbols;
 	Qallable isLegalCallback; 
 	Number value;
 
 	fq PieceType(name, symbols, value, isLegalCallback {
+	cout(this);
 		this:name <~ name;
+	cout(this:name);
 		this:symbols <~ symbols;
 		this:value <~ value;
 		this:isLegalCallback <~ isLegalCallback;
+		return this;
 	});
 
 	fq isLegal(board, pos, isAttack {
 		<: this:isLegalCallback(board, pos, isAttack);
 	});
 };
+
+new PieceType('a', [], 4, ~:({})):name;
 
 qlass Pos {
 	Number x;
@@ -56,4 +67,4 @@ qlass Game {
 	Qollection pieces;
 };
 
-@Chess:definePieceTypes();
+#@Chess:definePieceTypes();
