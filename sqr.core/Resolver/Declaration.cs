@@ -95,7 +95,7 @@ namespace Qrakhen.Sqr.Core
                 }
 
             } catch (Exception e) {
-                throw new SqrError("error encountered when trying to parse declaration: " + e.Message);
+                throw new SqrError("error encountered when trying to parse declaration: " + e.Message, input.peek());
             }
             
             return info;

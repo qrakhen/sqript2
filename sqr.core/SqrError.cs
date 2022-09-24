@@ -31,6 +31,7 @@ namespace Qrakhen.Sqr.Core
         public SqrParseError(string message, Token token = null, object data = null) : base(message, data)
         {
             this.token = token;
+            this.data = token;
         }
     }
 

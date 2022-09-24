@@ -151,8 +151,7 @@ namespace Qrakhen.Sqr.Core
         public long __row, __col, __pos = -1, __end = -1;
 
         public readonly string raw;
-        public readonly object value;
-        public new Type type => base.type;
+        public object value;
 
         private Token(object value, Type type, string raw)
         {
@@ -167,6 +166,20 @@ namespace Qrakhen.Sqr.Core
                 return default(T);
 
             return (T)value;
+        }
+
+        public new bool isType(Type types)
+        {
+            // ouch
+            if (!base.hasType(Type.Type) && (types & Type.Type) >= Type.Type && value is string) {
+                var t = Core.Type.get((string)value);
+                if (t != null) {
+                    type = Type.Type | (raw.StartsWith("@") ? Type.ValueOf : 0);
+                    value = t;
+                    return true;
+                }
+            }
+            return base.isType(types);
         }
 
         public Value makeValue()

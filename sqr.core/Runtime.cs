@@ -151,7 +151,7 @@ namespace Qrakhen.Sqr.Core
                         new Stack<Token>(
                             new Token[] {
                                 Token.create(args[1], Token.Type.Identifier)
-                            }), Qontext.globalContext)));
+                            }), qontext)));
                 return;
             } else if (input.StartsWith("alias")) {
                 if (args.Length == 1) {

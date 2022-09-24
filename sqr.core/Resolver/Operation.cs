@@ -117,6 +117,8 @@ namespace Qrakhen.Sqr.Core
                 node.leftMod = node.op;
                 node.op = null;
             }
+
+            input.peek().isType(Token.Type.Type);
             
             if (    
                     node.op != null &&
