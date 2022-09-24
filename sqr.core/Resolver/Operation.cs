@@ -118,7 +118,7 @@ namespace Qrakhen.Sqr.Core
                 node.op = null;
             }
 
-            input.peek().isType(Token.Type.Type);
+            var type = input.peek().resolveType(qontext);
             
             if (    
                     node.op != null &&
@@ -126,8 +126,9 @@ namespace Qrakhen.Sqr.Core
                     !input.peek().hasType(Token.Type.ValueOf) &&
                     input.peek().isType(Token.Type.Identifier)) {
                 value = new String(input.digest().raw);
-            } else if (input.peek().type == Token.Type.TypeValue) {
-                value = new Qlass(input.digest().get<Type>());
+            } else if (type != null) {
+                input.digest();
+                value = new Qlass(type);
             } else { 
                 value = valueResolver.resolve(input, qontext);
             }
@@ -179,21 +180,35 @@ namespace Qrakhen.Sqr.Core
             if (!node.empty || level > 0) {
                 throw new SqrError("unexpected keyword " + t, t);
             } else {
+                Value result = null;
                 var k = input.peek().get<Keyword>();
+                bool export = false;
+                if (k != null && k.isType(Keyword.Type.EXPORT)) {
+                    export = true;
+                    input.digest();
+                    log.spam("exporting following value");
+                    k = input.peek().get<Keyword>();
+                }
                 if (k != null && k.isType(Keyword.Type.QONDITION)) {
                     node.left = qonditionResolver.resolve(input, qontext);
                 } else if (k != null && k.isType(Keyword.Type.DECLARE_QLASS)) {
-                    node.left = qlassResolver.resolve(input, qontext);
+                    result = qlassResolver.resolve(input, qontext);
                 } else {
                     var info = declarationResolver.resolve(input, qontext);
                     if (info.isFunqtion) {
                         var funqtion = funqtionResolver.resolve(
                             structureResolver.resolve(input, qontext), qontext, info);
-                        node.left = qontext.register(info.name, new Qallable(funqtion));
+                        result = qontext.register(info.name, new Qallable(funqtion));
                     } else {
-                        node.left = qontext.register(info.name, null, info.isReference, info.type, info.isReadonly);
+                        result = qontext.register(info.name, null, info.isReference, info.type, info.isReadonly);
                     }
                     log.spam("registered name " + t + " in qontext");
+                }
+
+                if (result != null) {
+                    node.left = result;
+                    if (export)
+                        qontext.module.export(result);                    
                 }
             }
         }

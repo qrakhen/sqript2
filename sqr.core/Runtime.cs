@@ -44,7 +44,7 @@ namespace Qrakhen.Sqr.Core
         {           
             var content = file != null ? File.ReadAllText(file) : null;
             if (content != null) {
-                log.setLoggingLevel(Logger.Level.INFO);
+                log.setLoggingLevel(Logger.Level.SPAM);
                 if (content.StartsWith("!!")) {
                     content = content[2..];
                     __DEV_DEBUG = true;
@@ -105,7 +105,7 @@ namespace Qrakhen.Sqr.Core
             qontext.register(
                 "import",
                 new Qallable(new InternalFunqtion((p, q, s) => {
-                    var module = run(File.ReadAllText(p[0] as String));
+                    var module = run(p[0] as String);
                     qontext.import(module);
                     return module;
                 })));

@@ -1,5 +1,7 @@
 ﻿module ChessGame;
 
+*~ a <~ 5;
+
 qlass PieceType {
 	String name;
 	Qollection symbols;

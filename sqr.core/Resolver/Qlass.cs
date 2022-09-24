@@ -24,8 +24,6 @@ namespace Qrakhen.Sqr.Core
 
             if (Validator.Token.raw(input.peek(), Token.Type.Identifier, out string name, false)) {
                 args.name = input.digest().raw;
-                qontext.resolveName(args.name);
-
                 log.spam("declaring new qlass '" + name + "'");
             } else {
                 log.verbose("already declared qlass '" + name + "', ignoring");
