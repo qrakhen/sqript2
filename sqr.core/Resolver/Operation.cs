@@ -156,7 +156,7 @@ namespace Qrakhen.Sqr.Core
 
             if (Validator.Token.tryGetSubType(t, Keyword.Type.INSTANCE_CREATE, out Keyword keyword)) {
                 input.digest();
-                Validator.Token.tryGetType(input.digest(), Token.Type.Type, out Type type, true);
+                var type = input.digest().resolveType(qontext, true);
                 var parameters = qollectionResolver.resolve(
                     structureResolver.resolve(
                         input,

@@ -31,7 +31,7 @@ namespace Qrakhen.Sqr.Core
             } else {
                 log.spam("got identifier " + t.raw);
                 if (value == null) // root identifier of possible member chain
-                    value = qontext.resolveName(new String(input.digest().get<string>()));
+                    value = qontext.resolveName(input.digest().get<string>());
             }
 
             return value;

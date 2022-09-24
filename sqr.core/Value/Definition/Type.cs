@@ -11,21 +11,20 @@ namespace Qrakhen.Sqr.Core
         private static readonly Storage<string, Type> definitions = new Storage<string, Type>();
         public static List<string> typeList => definitions.Keys.ToList();
 
-        public static Type Value        => get("Value");
-        public static Type Boolean      => get("Boolean");
-        public static Type Float        => get("Float");
-        public static Type Integer      => get("Integer");
-        public static Type Number       => get("Number");
-        public static Type String       => get("String");
-        public static Type Array        => get("Array");
-        public static Type List         => get("List");
-        public static Type Qollection   => get("Qollection");
-        public static Type Qallable     => get("Qallable");
-        public static Type Objeqt       => get("Objeqt");
-        public static Type Variable     => get("Variable");
-        public static Type Qlass        => get("Qlass");
-
-        internal static readonly Module coreModule = new Module("Core", new Module("Sqript", null));
+        public static Type Value        => CoreModule.instance.getType("Value");
+        public static Type Boolean      => CoreModule.instance.getType("Boolean");
+        public static Type Float        => CoreModule.instance.getType("Float");
+        public static Type Integer      => CoreModule.instance.getType("Integer");
+        public static Type Number       => CoreModule.instance.getType("Number");
+        public static Type String       => CoreModule.instance.getType("String");
+        public static Type Array        => CoreModule.instance.getType("Array");
+        public static Type List         => CoreModule.instance.getType("List");
+        public static Type Qollection   => CoreModule.instance.getType("Qollection");
+        public static Type Qallable     => CoreModule.instance.getType("Qallable");
+        public static Type Objeqt       => CoreModule.instance.getType("Objeqt");
+        public static Type Variable     => CoreModule.instance.getType("Variable");
+        public static Type Qlass        => CoreModule.instance.getType("Qlass");
+        public static Type Module       => CoreModule.instance.getType("Module");
 
         [NativeField] public readonly string id;
         [NativeField] public readonly string name;
@@ -47,9 +46,7 @@ namespace Qrakhen.Sqr.Core
             fields = args.fields ?? new Storage<string, Field>();
             methods = args.methods ?? new Storage<string, Method>();
             extends = args.extends;
-            nativeClass = args.nativeClass;
-
-            id = buildTypeId(this);            
+            nativeClass = args.nativeClass;        
 
             if (extends != null)
                 extend();
@@ -68,7 +65,6 @@ namespace Qrakhen.Sqr.Core
             }
         }
 
-        // native types are instantiated by just using new() since theyre hard coded
         public Value spawn(Qontext qontext, Value[] parameters)
         {
             if (nativeType == NativeType.Static)
@@ -98,12 +94,7 @@ namespace Qrakhen.Sqr.Core
             return name;
         }
 
-        public static Type get(string name, Module module = null)
-        {
-            return definitions[name];
-        }
-
-        public static Type register(System.Type systemType, Args args)
+        public static Type create(System.Type systemType, Args args)
         {
             args.nativeClass = systemType;
 
@@ -117,29 +108,7 @@ namespace Qrakhen.Sqr.Core
             foreach (var m in buildNativeMethods(systemType))
                 args.methods[m.name] = m;
 
-            var t = new Type(args);
-
-            if (definitions.contains(args.name))
-                throw new SqrError("can not redeclare type " + args.name);
-
-            if (definitions[args.name] == null) {
-                definitions[args.name] = t;
-            } else {
-                //definitions[id] = t;
-            }
-
-            return t;
-        }
-
-        public static string buildTypeId(Type type)
-        {
-            var id = type.name;
-            var m = type.module;
-            while(m != null)  {
-                id = m.name + "/" + id;
-                m = m.parent;
-            }
-            return id;
+            return new Type(args);
         }
 
         private static List<Field> buildNativeFields(System.Type type)
@@ -151,7 +120,7 @@ namespace Qrakhen.Sqr.Core
                     Attribute.GetCustomAttribute(_, typeof(NativeFieldAttribute)) != null)) {
                     fields.Add(new Type.Field(new IDeclareInfo() {
                         name = f.Name,
-                        type = get(f.FieldType.Name),
+                        type = CoreModule.instance.getType(f.FieldType.Name),
                         access = Access.Public,
                         isReadonly = Attribute.GetCustomAttribute(f, typeof(NativeGetterAttribute)) != null
                     }));
@@ -170,7 +139,7 @@ namespace Qrakhen.Sqr.Core
                         new InternalFunqtion((v, q, s) => { return (Value)m.Invoke(m.IsStatic ? null : s?.obj, v); }),
                         new IDeclareInfo() {
                             name = m.Name,
-                            type = get(m.ReturnType.Name),
+                            type = CoreModule.instance.getType(m.ReturnType.Name),
                             access = Access.Public
                         }));
             }
@@ -249,86 +218,6 @@ namespace Qrakhen.Sqr.Core
             public Storage<string, Field> fields;
             public Storage<string, Method> methods;
         }
-
-        static Type()
-        {
-            new Qonsole();
-            new Time();
-            new Random();
-            new Calc();
-            new Parse();
-
-            var value = register(typeof(Value), new Args
-            {
-                name = "Value",
-                nativeType = NativeType.None,
-                module = coreModule
-            });
-
-            var _string = register(typeof(String), new Args
-            {
-                name = "String",
-                nativeType = NativeType.String,
-                extends = value,
-                module = coreModule
-            });
-
-            var number = register(typeof(Number), new Args {
-                name = "Number",
-                nativeType = NativeType.Number,
-                extends = value,
-                module = coreModule
-            });
-
-            var integer = register(typeof(Integer), new Args {
-                name = "Integer",
-                nativeType = NativeType.Integer,
-                extends = value,
-                module = coreModule,
-            });
-
-            var boolean = register(typeof(Boolean), new Args {
-                name = "Boolean",
-                nativeType = NativeType.Boolean,
-                extends = value,
-                module = coreModule
-            });
-
-            var qollection = register(typeof(Qollection), new Args {
-                name = "Qollection",
-                nativeType = NativeType.Qollection,
-                extends = value,
-                module = coreModule
-            });
-
-            var objeqt = register(typeof(Objeqt), new Args {
-                name = "Objeqt",
-                nativeType = NativeType.Objeqt,
-                extends = value,
-                module = coreModule                
-            });
-
-            var array = register(typeof(Array), new Args {
-                name = "Array",
-                nativeType = NativeType.Array,
-                extends = value,
-                module = coreModule
-            });
-
-            var qallable = register(typeof(Qallable), new Args {
-                name = "Qallable",
-                nativeType = NativeType.Funqtion,
-                extends = value,
-                module = coreModule,
-            });
-
-            var variable = register(typeof(Variable), new Args {
-                name = "Variable",
-                nativeType = NativeType.Variable,
-                extends = value,
-                module = coreModule
-            });
-        }
     }
 
     [Flags]
@@ -354,6 +243,7 @@ namespace Qrakhen.Sqr.Core
         Variable = BitFlag._11,
         Funqtion = BitFlag._12,
         Null = BitFlag._13,
+        Module = BitFlag._14
 
     }
 }

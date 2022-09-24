@@ -15,8 +15,7 @@ namespace Qrakhen.Sqr.shell
 				if (args[1] == "--version") {
 					Console.WriteLine("Sqript v" + Runtime.version);
 				} else {
-					var content = File.ReadAllText(args[0] + (args[0].EndsWith(".sq") ? "" : ".sq"));
-					SqrDI.Dependor.get<Runtime>().run(content);
+					SqrDI.Dependor.get<Runtime>().run(args[0] + (args[0].EndsWith(".sq") ? "" : ".sq"));
 				}
 			}
 		}

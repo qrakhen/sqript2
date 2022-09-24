@@ -11,7 +11,7 @@ namespace Qrakhen.Sqr.Core
     {       
         private static Random staticInstance = new Random();
 
-        public Random() : base(new System.Random(), Type.get("Random"))
+        public Random() : base(new System.Random(), CoreModule.instance.getType("Random"))
         {
 
         }
@@ -32,16 +32,6 @@ namespace Qrakhen.Sqr.Core
         public static Number random()
         {
             return new Number(staticInstance.next());
-        }
-
-        static Random()
-        {
-            Type.register(typeof(Random), new Type.Args {
-                name = "Random",
-                module = Type.coreModule,
-                extends = Type.Value,
-                nativeType = NativeType.Instance
-            });
         }
     }
 }

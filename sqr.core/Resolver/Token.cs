@@ -168,20 +168,6 @@ namespace Qrakhen.Sqr.Core
             return (T)value;
         }
 
-        public new bool isType(Type types)
-        {
-            // ouch
-            if (!base.hasType(Type.Type) && (types & Type.Type) >= Type.Type && value is string) {
-                var t = Core.Type.get((string)value);
-                if (t != null) {
-                    type = Type.Type | (raw.StartsWith("@") ? Type.ValueOf : 0);
-                    value = t;
-                    return true;
-                }
-            }
-            return base.isType(types);
-        }
-
         public Value makeValue()
         {
             if (!isType(Type.Value))
@@ -257,7 +243,7 @@ namespace Qrakhen.Sqr.Core
                     return Structure.get(raw); 
                 }
                 if (type == Type.ValueOf) {
-                    object v = Core.Type.get(raw.Substring(1));
+                    object v = CoreModule.instance.getType(raw.Substring(1));
                     if (v != null) {
                         parsedType = Type.TypeValue;
                     } else {
@@ -266,22 +252,35 @@ namespace Qrakhen.Sqr.Core
                     }
                     return v;
                 }
-                if (type == Type.Keyword || type == Type.Type || type == Type.Identifier) {
+                if (type == Type.Keyword || type == Type.Identifier) {
                     var v = Keyword.get(raw);
                     if (v != null) {
                         parsedType = Type.Keyword;
                         return v;
-                    }
-                    var t = Core.Type.get(raw);
-                    if (t != null) {
-                        parsedType = Type.Type;                        
-                        return t;
-                    }
+                    }                    
                 }
                 return raw;
             } catch (Exception e) {
                 throw new SqrError("trying to parse raw token value " + raw + " as " + type + ". didn't work.");
             }
+        }
+
+        public Core.Type resolveType(Qontext qontext, bool doThrow = false)
+        {
+            if (!Validator.Token.tryGetType(this, Type.Type, out Core.Type type)) {
+                if (Validator.Token.tryGetType(this, Type.Identifier, out string name)) {
+                    type = qontext.resolveType(name);
+                    this.type = Type.Type | (this.type & Type.ValueOf);
+                    this.value = type;
+                    Logger.TEMP_STATIC_DEBUG.verbose("could resolve type " + type + " for token " + this);
+                }
+            }
+
+            if (type == null && doThrow) {
+                throw new SqrTypeError("a value of Type or Qlass was expected, got " + this + " instead");
+            }
+
+            return type;
         }
 
         public override string ToString()

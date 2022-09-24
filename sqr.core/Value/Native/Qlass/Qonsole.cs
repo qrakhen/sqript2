@@ -9,7 +9,7 @@ namespace Qrakhen.Sqr.Core
 {
     public class Qonsole : Value
     {       
-        public Qonsole() : base(Type.get("Qonsole"))
+        public Qonsole() : base(CoreModule.instance.getType("Qonsole"))
         {
 
         }
@@ -36,16 +36,6 @@ namespace Qrakhen.Sqr.Core
         public static String readLine()
         {
             return new String(Console.ReadLine());
-        }
-
-        static Qonsole()
-        {
-            Type.register(typeof(Qonsole), new Type.Args {
-                name = "Qonsole",
-                module = Type.coreModule,
-                extends = Type.Value,
-                nativeType = NativeType.Static
-            });
         }
     }
 }

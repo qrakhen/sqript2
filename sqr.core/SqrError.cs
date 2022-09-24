@@ -45,6 +45,16 @@ namespace Qrakhen.Sqr.Core
         }
     }
 
+    public class SqrModuleError : SqrError
+    {
+        public Module module;
+
+        public SqrModuleError(string message, Module module = null, object data = null) : base(message, data)
+        {
+            this.module = module;
+        }
+    }
+
     public class SqrTypeError : SqrError
     {
         public SqrTypeError(string message, object data = null) : base(message, data)

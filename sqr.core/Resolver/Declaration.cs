@@ -33,13 +33,10 @@ namespace Qrakhen.Sqr.Core
             try {
 
                 // check for type or dynamic declaration
-                if (input.peek().isType(Token.Type.Type)) {
-                    info.type = input.digest().get<Type>();
-                    if (info.type != null) {
-                        log.spam("detected typed declaration: " + info.type.name);
-                    } else {
-                        throw new SqrError("unkown type: " + input.peek().raw);
-                    }
+                var type = input.peek().resolveType(qontext);
+                if (type != null) {
+                    input.digest();
+                    info.type = type;
                 } else {
                     if (Runtime.qonfig.forceTypes)
                         throw new SqrTypeError("enforce types is enabled in qonfig. dynamic variables forbidden.");

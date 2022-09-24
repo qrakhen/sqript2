@@ -24,9 +24,8 @@ namespace Qrakhen.Sqr.Core
 
             if (Validator.Token.raw(input.peek(), Token.Type.Identifier, out string name, false)) {
                 args.name = input.digest().raw;
-                if (Type.get(args.name) != null) {
-                    throw new SqrTypeError("can not redeclare class " + args.name);
-                }
+                qontext.resolveName(args.name);
+
                 log.spam("declaring new qlass '" + name + "'");
             } else {
                 log.verbose("already declared qlass '" + name + "', ignoring");
@@ -58,9 +57,8 @@ namespace Qrakhen.Sqr.Core
                 }         
             });
 
-            var type = Type.register(typeof(Instance), args);
-
-            return new Qlass(type);
+            var type = Type.create(typeof(Instance), args);
+            return qontext.declareType(type);
         }
     }
 }

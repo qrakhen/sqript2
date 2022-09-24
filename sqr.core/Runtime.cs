@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -33,8 +34,9 @@ namespace Qrakhen.Sqr.Core
             log.setLoggingLevel(Logger.Level.VERBOSE);
         }
 
-        public Module run(string content = null, bool __DEV_DEBUG = false) 
+        public Module run(string file = null, bool __DEV_DEBUG = false) 
         {           
+            var content = File.ReadAllText(file);
             if (content != null) {
                 log.setLoggingLevel(Logger.Level.INFO);
                 if (content.StartsWith("!!")) {
@@ -49,27 +51,33 @@ namespace Qrakhen.Sqr.Core
                 var moduleKeyword = Keyword.get(Keyword.Type.MODULE).symbol;
                 if (content.StartsWith(moduleKeyword)) {
                     string name = content.Substring(moduleKeyword.Length, content.IndexOf(";")).Trim();
-                    module = new Module(name, null, Qontext.globalContext);
+                    if (name.Contains(":"))
+                        throw new SqrError("sorry multidimensional modules not yet implemented, give me a week or so");
+
+                    module = new Module(name);
                     content = content.Substring(content.IndexOf(";"));
                 } else {
-                    module = new Module("Unknown", null, Qontext.globalContext);
+                    var name = BitConverter.ToString(MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(file)));
+                    module = new Module(name);
                 }
+
+                Qontext qontext = new Qontext(Qontext.globalContext, module);
 
                 if (__DEV_DEBUG)
                     log.setLoggingLevel(Logger.Level.SPAM);
 
-                execute(content, module.qontext);
+                execute(content, qontext);
                 return module;
             } else {
-                var module = new Module("Qonsole", null, Qontext.globalContext);
-                //log.write(Properties.strings.ASCII_Logo, ConsoleColor.DarkGray, prefix: "    ");
+                var module = new Module("Qonsole");
+                Qontext qontext = new Qontext(Qontext.globalContext, module);
                 log.success(Properties.strings.Message_Welcome);
                 if (qonfig.useExtendedConsole) {
-                    userControlInterface.run(module.qontext);
-                } else {
-                    
+                    userControlInterface.run(qontext);
+                } else {                    
                     do {
-                        execute(Console.ReadLine(), module.qontext);
+                        Console.Write("     <: ");
+                        execute(Console.ReadLine(), qontext);
                     } while (true);
                 }
                 return module;
@@ -91,13 +99,14 @@ namespace Qrakhen.Sqr.Core
             qontext.register(
                 "import",
                 new Qallable(new InternalFunqtion((p, q, s) => {
-                    qontext.import(run(File.ReadAllText(p[0] as String)).qontext);
-                    return Value.Void;
+                    var module = run(File.ReadAllText(p[0] as String));
+                    qontext.import(module);
+                    return module;
                 })));
             qontext.register(
                "export",
                new Qallable(new InternalFunqtion((p, q, s) => {
-                   qontext.export(p[0].raw as string, p[0]);
+                   qontext.export(p[0]);
                    return Value.Void;
                })));
         }        
