@@ -4,13 +4,17 @@ namespace Qrakhen.Sqr.Core
     {
         public readonly string name;
         public readonly Module parent;
-        public readonly Qontext qontext;
+        public readonly Storage<string, Value> exports = new Storage<string, Value>();
 
-        public Module(string name, Module parent, Qontext parentQontext = null)
+        public Module(string name, Module parent)
         {
             this.name = name;
             this.parent = parent;
-            this.qontext = new Qontext(parentQontext);
+        }
+
+        public void export(Value value, string asName = null)
+        {
+
         }
     }
 }

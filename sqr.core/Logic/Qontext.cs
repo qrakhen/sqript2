@@ -11,16 +11,19 @@ namespace Qrakhen.Sqr.Core
     {
         [JsonProperty]
         public readonly Storage<string, Variable> names = new Storage<string, Variable>();
-        public readonly Storage<string, Value> exports = new Storage<string, Value>();
-        public readonly Storage<string, Value> imports = new Storage<string, Value>();
+        public readonly Storage<string, Module> imports = new Storage<string, Module>();
+
+        private readonly Module __module;
+        public Module module => __module == null ? parent.module : __module;
 
         public static readonly Qontext globalContext = new Qontext();
 
         public Qontext parent { get; protected set; }
 
-        public Qontext(Qontext parent = null)
+        public Qontext(Qontext parent = null, Module module = null)
         {
             this.parent = parent;
+            this.__module = module;
         }
 
         public Value get(string name)

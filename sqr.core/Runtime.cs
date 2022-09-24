@@ -18,6 +18,8 @@ namespace Qrakhen.Sqr.Core
 
         public static readonly Qonfig qonfig = new Qonfig();
 
+        public static readonly Storage<string, Module> moduleCache = new Storage<string, Module>();
+
         private readonly Logger log;
         private readonly UCI userControlInterface;
         private readonly TokenResolver tokenResolver;
@@ -89,7 +91,7 @@ namespace Qrakhen.Sqr.Core
             qontext.register(
                 "import",
                 new Qallable(new InternalFunqtion((p, q, s) => {
-                    qontext.import(run(File.ReadAllText(p[0] as String)));
+                    qontext.import(run(File.ReadAllText(p[0] as String)).qontext);
                     return Value.Void;
                 })));
             qontext.register(

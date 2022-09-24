@@ -39,7 +39,7 @@ namespace Qrakhen.Sqr.Core
         public bool isPrimitive => (nativeType & NativeType.Primitive) > nativeType;
         public bool isNative => (nativeType != NativeType.Instance);
                 
-        private Type(Args args, Qontext qontext)
+        private Type(Args args)
         {
             name = args.name;
             module = args.module;
@@ -49,16 +49,7 @@ namespace Qrakhen.Sqr.Core
             extends = args.extends;
             nativeClass = args.nativeClass;
 
-            id = buildTypeId(this);
-
-            if (definitions.contains(name))
-                throw new SqrError("can not redeclare type " + name);
-
-            if (definitions[args.name] == null) {
-                definitions[name] = this;
-            } else {
-                definitions[id] = this;
-            }
+            id = buildTypeId(this);            
 
             if (extends != null)
                 extend();
@@ -126,7 +117,18 @@ namespace Qrakhen.Sqr.Core
             foreach (var m in buildNativeMethods(systemType))
                 args.methods[m.name] = m;
 
-            return new Type(args);
+            var t = new Type(args);
+
+            if (definitions.contains(args.name))
+                throw new SqrError("can not redeclare type " + args.name);
+
+            if (definitions[args.name] == null) {
+                definitions[args.name] = t;
+            } else {
+                //definitions[id] = t;
+            }
+
+            return t;
         }
 
         public static string buildTypeId(Type type)

@@ -22,12 +22,15 @@ namespace Qrakhen.Sqr.Core
 
             Validator.Token.isSubType<Keyword, Keyword.Type>(input.digest(), Keyword.Type.DECLARE_QLASS, true);
 
-            if (Validator.Token.raw(input.peek(), Token.Type.Identifier, out string name, true)) {
+            if (Validator.Token.raw(input.peek(), Token.Type.Identifier, out string name, false)) {
                 args.name = input.digest().raw;
-                if (Type.get(args.name, qontext) != null) {
+                if (Type.get(args.name) != null) {
                     throw new SqrTypeError("can not redeclare class " + args.name);
                 }
                 log.spam("declaring new qlass '" + name + "'");
+            } else {
+                log.verbose("already declared qlass '" + name + "', ignoring");
+                return null;
             }
 
             var body = structureResolver.resolve(input, qontext);
