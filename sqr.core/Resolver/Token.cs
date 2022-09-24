@@ -271,7 +271,7 @@ namespace Qrakhen.Sqr.Core
         {
             if (!Validator.Token.tryGetType(this, Type.Type, out Core.Type type)) {
                 if (Validator.Token.tryGetType(this, Type.Identifier, out string name)) {
-                    type = qontext.resolveType(name);
+                    type = qontext.resolveType(name, false);
                     if (type != null) {
                         this.type = Type.Type | (this.type & Type.ValueOf);
                         this.value = type;

@@ -203,7 +203,7 @@ namespace Qrakhen.Sqr.Core
                 var t = File.ReadAllText("tests.sqr");
                 execute(t, qontext);
             } else if (input.StartsWith("run")) {
-                run(File.ReadAllText(args[1]));
+                run(args[1]);
             } else if (input == "c") {
                 qontext.names.clear();
                 log.cmd("cleared global qontext");

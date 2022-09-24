@@ -86,34 +86,35 @@ namespace Qrakhen.Sqr.Core
             module?.export(value, asName);
         }
 
-        public Type resolveType(string name)
+        public Type resolveType(string name, bool doThrow = true)
         {
-            var v = resolveName(name);
+            var v = resolveName(name, doThrow);
             if (v != null && v is Qlass) {
                 return (v as Qlass).raw;
             }
             return null;
         }
 
-        public Value resolveName(string name)
+        public Value resolveName(string name, bool doThrow = true)
         {
             Value value = null;
             var qontext = lookUp(name);
             if (qontext != null) {
-                value = qontext.names[name];
-                if (!value) {
-                    var r = imports
-                        .findAll(_ => _.get(name))
-                        .Select(_ => _.get(name))
-                        .Concat(imports.findAll(_ => _.name == name))
-                        .ToArray();
-                    if (r.Length == 0)
-                        throw new SqrQontextError("could not find the name " + name + " within the current qontext or any imported modules (recursive lookup)", this);
-                    if (r.Length > 1)
-                        throw new SqrQontextError(name + " is an ambigious name between several modules: " + string.Join(", ", r.Select(_ => _.toDebugString())), this);
-                    else
-                        return r[0];
-                }
+                value = qontext.names[name];                
+            }
+
+            if (!value) {
+                var r = imports
+                    .findAll(_ => _.get(name))
+                    .Select(_ => _.get(name))
+                    .Concat(imports.findAll(_ => _.name == name))
+                    .ToArray();
+                if (doThrow && r.Length == 0)
+                    throw new SqrQontextError("could not find the name " + name + " within the current qontext or any imported modules (recursive lookup)", this);
+                if (doThrow && r.Length > 1)
+                    throw new SqrQontextError(name + " is an ambigious name between several modules: " + string.Join(", ", r.Select(_ => _.toDebugString())), this);
+                else if (r.Length == 1)
+                    return r[0];
             }
 
             return value;
