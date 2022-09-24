@@ -256,6 +256,7 @@ namespace Qrakhen.Sqr.Core
 
         private void draw()
         {
+            Console.CursorVisible = false;
             var colored = color(line);
             var str = new string(colored);          
             int x = cx;
@@ -264,10 +265,12 @@ namespace Qrakhen.Sqr.Core
             setCursor(0, 0);
             write(str);
             setCursor(x, 0);
+            Console.CursorVisible = true;
         }
 
         private void drawReset()
         {
+            Console.CursorVisible = false;
             int y = lines.Count - 1;
             int h = y;
             setCursor(-prefix.Length, -currentLine);
@@ -279,6 +282,7 @@ namespace Qrakhen.Sqr.Core
                 h--;
             }
             setCursor(0, -(y));
+            Console.CursorVisible = true;
         }
 
         private void setCursor(int x = 0, int y = 0)
