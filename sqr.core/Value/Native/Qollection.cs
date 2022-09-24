@@ -20,11 +20,11 @@ namespace Qrakhen.Sqr.Core
 
         public override Value accessMember(Value name)
         {
-            Value member = null;
+            Value member = Null;
             if (name is String)
                 member = base.accessMember(name);
 
-            if (member == null) {
+            if (member == Null) {
                 var index = Convert.ToInt32((name as Number)?.asInteger());
                 if (items.Count > index && index > 0)
                     return items[index];
