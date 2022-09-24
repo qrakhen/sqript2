@@ -24,7 +24,7 @@ namespace Qrakhen.Sqr.Core
 
             if (Validator.Token.raw(input.peek(), Token.Type.Identifier, out string name, true)) {
                 args.name = input.digest().raw;
-                if (Type.get(args.name) != null) {
+                if (Type.get(args.name, qontext) != null) {
                     throw new SqrTypeError("can not redeclare class " + args.name);
                 }
                 log.spam("declaring new qlass '" + name + "'");

@@ -31,10 +31,10 @@ namespace Qrakhen.Sqr.Core
             log.setLoggingLevel(Logger.Level.VERBOSE);
         }
 
-        public Qontext run(string content = null, bool __DEV_DEBUG = false) 
+        public Module run(string content = null, bool __DEV_DEBUG = false) 
         {           
             if (content != null) {
-                log.setLoggingLevel(Logger.Level.CRITICAL);
+                log.setLoggingLevel(Logger.Level.INFO);
                 if (content.StartsWith("!!")) {
                     content = content[2..];
                     __DEV_DEBUG = true;
@@ -48,26 +48,29 @@ namespace Qrakhen.Sqr.Core
                 if (content.StartsWith(moduleKeyword)) {
                     string name = content.Substring(moduleKeyword.Length, content.IndexOf(";")).Trim();
                     module = new Module(name, null, Qontext.globalContext);
+                    content = content.Substring(content.IndexOf(";"));
+                } else {
+                    module = new Module("Unknown", null, Qontext.globalContext);
                 }
-                Qontext qontext = module == null ? Qontext.globalContext : module.qontext;
 
                 if (__DEV_DEBUG)
                     log.setLoggingLevel(Logger.Level.SPAM);
 
-                execute(content, qontext);
-                return qontext;
+                execute(content, module.qontext);
+                return module;
             } else {
+                var module = new Module("Qonsole", null, Qontext.globalContext);
                 //log.write(Properties.strings.ASCII_Logo, ConsoleColor.DarkGray, prefix: "    ");
                 log.success(Properties.strings.Message_Welcome);
                 if (qonfig.useExtendedConsole) {
-                    userControlInterface.run();
+                    userControlInterface.run(module.qontext);
                 } else {
-                    Qontext consoleQontext = new Qontext();
+                    
                     do {
-                        execute(Console.ReadLine(), consoleQontext);
+                        execute(Console.ReadLine(), module.qontext);
                     } while (true);
                 }
-                return null;
+                return module;
             }
         }
 
@@ -182,8 +185,7 @@ namespace Qrakhen.Sqr.Core
                 var t = File.ReadAllText("tests.sqr");
                 execute(t, qontext);
             } else if (input.StartsWith("run")) {
-                var t = File.ReadAllText(args[1]);
-                execute(t, qontext);
+                run(File.ReadAllText(args[1]));
             } else if (input == "c") {
                 qontext.names.clear();
                 log.cmd("cleared global qontext");

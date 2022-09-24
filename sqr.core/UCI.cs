@@ -70,7 +70,7 @@ namespace Qrakhen.Sqr.Core
         public List<string> history { get; private set; } = new List<string>();
         public int exitCode { get; private set; } = 0;
 
-        public void run()
+        public void run(Qontext qontext)
         {
             if (!File.Exists(HISTORY_FILE)) {
                 File.Create(HISTORY_FILE);
@@ -82,13 +82,12 @@ namespace Qrakhen.Sqr.Core
             //thread = new Thread(__run);
             clock.Start();
             //thread.Start();
-            __run();
+            __run(qontext);
         }
 
-        private void __run()
+        private void __run(Qontext qontext)
         {
             reset();
-            qontext = new Qontext(Qontext.globalContext);
             ConsoleKeyInfo keyInfo;
             draw();
             setCursor(0);

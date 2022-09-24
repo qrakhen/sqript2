@@ -39,7 +39,7 @@ namespace Qrakhen.Sqr.Core
         public bool isPrimitive => (nativeType & NativeType.Primitive) > nativeType;
         public bool isNative => (nativeType != NativeType.Instance);
                 
-        private Type(Args args)
+        private Type(Args args, Qontext qontext)
         {
             name = args.name;
             module = args.module;
@@ -92,7 +92,6 @@ namespace Qrakhen.Sqr.Core
                 }
                 if (methods.contains(name)) {
                     methods[name].makeQallable(obj).execute(parameters, qontext);
-                    //methods.remove(name);
                 }
             }
             return obj;
@@ -108,7 +107,7 @@ namespace Qrakhen.Sqr.Core
             return name;
         }
 
-        public static Type get(string name)
+        public static Type get(string name, Module module = null)
         {
             return definitions[name];
         }
