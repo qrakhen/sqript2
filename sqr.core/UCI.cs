@@ -214,6 +214,9 @@ namespace Qrakhen.Sqr.Core
         {
             var str = concatLines().Replace("\n", "%N%");
             history.RemoveAll(_ => _ == str);
+            while (history.Count > 100) {
+                history.RemoveAt(0);
+            } 
             history.Add(str);
             historyIndex = history.Count;
             File.WriteAllText(HISTORY_FILE, string.Join<string>('\n', history.Select(_ => _.Trim()).ToArray<string>()));

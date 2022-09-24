@@ -1,31 +1,29 @@
-﻿log(3);
-
-funq printBoard (board {
-	cout(" 1 2 3 4 5 6 7 ");
-	cout("---------------");
+﻿funq printBoard (board {
+	@Qonsole:writeLine(" 1 2 3 4 5 6 7 ");
+	@Qonsole:writeLine("---------------");
 	*~ r <~ 0;
 	*~ c <~ 0;
-	loop(r < board:len) {
-		console:write(' ');
-		loop(c < board:r:len) {
-			*~ tempRow <~ board:r;
-			console:write(tempRow:c + ' ');
+	while(r < board:length()) {
+		@Qonsole:write(' ');
+		while(c < board:@r:length()) {
+			*~ tempRow <~ board:@r;
+			@Qonsole:write(tempRow:c + ' ');
 			c <~ c + 1;
 		}
 		c <~ 0;
-		console:writeln('');
+		@Qonsole:writeLine('');
 		r <~ r + 1;
 	}
 
-	console:writeln("---------------");
-	console:writeln(" 1 2 3 4 5 6 7 ");
+	@Qonsole:writeLine("---------------");
+	@Qonsole:writeLine(" 1 2 3 4 5 6 7 ");
 });
 
-fq dropInBoard ~(board column symbol {
-	*~ r <~ board:len - 1;
+fq dropInBoard (board, column, symbol {
+	*~ r <~ board:length() - 1;
 	*~ c <~ 0;
-	loop(r >= 0) {
-		*~ tempRow <~ board:r;
+	while(r >= 0) {
+		*~ tempRow <~ board:@r;
 		if(tempRow:column == ' ') {
 			tempRow:column <~ symbol;
 			r <~ 0;
@@ -36,26 +34,26 @@ fq dropInBoard ~(board column symbol {
 	return board;
 });
 
-fq checkIfWon ~(board symbol playerId {
+fq checkIfWon (board, symbol, playerId {
 	*~ r <~ 0;
 	*~ c <~ 0;
 	*~ count <~ 0;
-	*~ rows <~ board:len;
-	~? (rows < 1) {
+	*~ rows <~ board:length();
+	if (rows < 1) {
 		return -1;
 	}
 	*~ tempRow <~ board:0;
-	*~ columns <~ tempRow:len;
+	*~ columns <~ tempRow:length();
 	# horizontal
-	loop(r < rows) {
-		tempRow <~ board:r;
-		loop(c < columns) {
-			~? (count == 4) {
+	while(r < rows) {
+		tempRow <~ board:@r;
+		while(c < columns) {
+			if (count == 4) {
 				return playerId;
 			}
-			~? (tempRow:c == symbol) {				
+			if (tempRow:@c == symbol) {				
 				count <~ count + 1;
-			} ?~ {
+			} else {
 				count <~ 0;
 			}
 			c <~ c + 1;
@@ -67,15 +65,15 @@ fq checkIfWon ~(board symbol playerId {
 	r <~ 0;
 	c <~ 0;
 	count <~ 0;
-	loop(c < columns) {
-		loop(r < rows) {
-			tempRow <~ board:r;
-			~? (count == 4) {
+	while(c < columns) {
+		while(r < rows) {
+			tempRow <~ board:@r;
+			if (count == 4) {
 				return playerId;
 			}
-			~? (tempRow:c == symbol) {				
+			if (tempRow:c == symbol) {				
 				count <~ count + 1;
-			} ?~ {
+			} else {
 				count <~ 0;
 			}
 			r <~ r + 1;
@@ -87,21 +85,21 @@ fq checkIfWon ~(board symbol playerId {
 	r <~ 0;
 	c <~ 0;
 	count <~ 0;
-	loop (r < (rows - 3)) {
-		loop (c < (columns - 3)) {
+	while (r < (rows - 3)) {
+		while (c < (columns - 3)) {
 			count <~ 0;
 			*~ indexer <~ 0;
 			*~ index <~ 0;
-			loop (indexer < 4) {
+			while (indexer < 4) {
 				index <~ r + indexer;
-				tempRow <~ board:index;
+				tempRow <~ board:@index;
 				index <~ c + indexer;
-				~? (tempRow:index == symbol) {
+				if (tempRow:@index == symbol) {
 					count <~ count + 1;
 				}
 				indexer <~ indexer + 1;
 			}
-			~? (count == 4) {
+			if (count == 4) {
 				return playerId;
 			}
 			c <~ c + 1;
@@ -112,21 +110,21 @@ fq checkIfWon ~(board symbol playerId {
 	r <~ rows - 1;
 	c <~ 0;
 	count <~ 0;
-	loop (r >= 3) {
-		loop (c < (columns - 3)) {
+	while (r >= 3) {
+		while (c < (columns - 3)) {
 			count <~ 0;
 			*~ indexer <~ 0;
 			*~ index <~ 0;
-			loop (indexer < 4) {
+			while (indexer < 4) {
 				index <~ r - indexer;
-				tempRow <~ board:index;
+				tempRow <~ board:@index;
 				index <~ c + indexer;
-				~? (tempRow:index == symbol) {
+				if (tempRow:@index == symbol) {
 					count <~ count + 1;
 				}
 				indexer <~ indexer + 1;
 			}
-			~? (count == 4) {
+			if (count == 4) {
 				return playerId;
 			}
 			c <~ c + 1;
@@ -138,10 +136,10 @@ fq checkIfWon ~(board symbol playerId {
 	return 0;
 });
 
-fq columnInBoardHasSpace ~(board column {
+fq columnInBoardHasSpace (board, column {
 	*~ tempRow <~ board:0;
 	*~ ret <~ 0;
-	~? (tempRow:column == ' ') { ret <~ 1; }
+	if (tempRow:@column == ' ') { ret <~ 1; }
 	return ret;
 });
 
@@ -153,7 +151,7 @@ fq columnInBoardHasSpace ~(board column {
 *~ currentboard <~ '';
 
 *~ run <~ 1;
-loop(run > 0) {
+while(run > 0) {
 	currentboard <~ 
 	[
 		[' ', ' ', ' ', ' ', ' ', ' ', ' '],
@@ -163,63 +161,64 @@ loop(run > 0) {
 		[' ', ' ', ' ', ' ', ' ', ' ', ' '],
 		[' ', ' ', ' ', ' ', ' ', ' ', ' ']
 	];
-	*~ startPlayer <~ random:range(1, 2);
+	*~ rand <~ new Random();
+	*~ startPlayer <~ @Calc:round(rand:range(1, 2));
 	currentPlayer <~ startPlayer;
 
 	*~ winner <~ 0;
 
-	console:writeln('--------| 4-Gewinnt |--------');
-	console:write('Player 1: ');
-	*~ player1Name <~ console:read();
-	console:write('Player 2: ');
-	*~ player2Name <~ console:read();
+	@Qonsole:writeLine('--------| 4-Gewinnt |--------');
+	@Qonsole:write('Player 1: ');
+	*~ player1Name <~ @Qonsole:readLine();
+	@Qonsole:write('Player 2: ');
+	*~ player2Name <~ @Qonsole:readLine();
 
-	loop(winner == 0) {
-		~?(currentPlayer == 1) {
+	while(winner == 0) {
+		if (currentPlayer == 1) {
 			currentPlayerName <~ player1Name;
 			currentPlayerSymbol <~ player1Symbol;
-		} ?~ {
+		} else {
 			currentPlayerName <~ player2Name;
 			currentPlayerSymbol <~ player2Symbol;
-		}
+		};
 		printBoard(currentboard);		
-		console:writeln('Turn of ' + currentPlayerName + '(' + currentPlayerSymbol + '): ');
+		@Qonsole:writeLine(currentPlayerName);
 
 		*~ column <~ -1;
 		*~ validInput <~ false;
-		loop(validInput == false) {
-			column <~ parser:toInt(console:read());
+		while(validInput == false) {
+			column <~ @Parse:asInt(@Qonsole:readLine());
 			validInput <~ true;
-			~? ((column < 1) || (column > currentboard:len)) {
+			if ((column < 1) || (column > currentboard:length())) {
 					validInput <~ false;
-			} ?~ {
-				~? (columnInBoardHasSpace(currentboard, column - 1) == 0) {
+			} else {
+				if (columnInBoardHasSpace(currentboard, column - 1) == 0) {
 					validInput <~ false;
 				}
 			}
 		}
 
-		~? (currentPlayer == 1) {		
+		if (currentPlayer == 1) {		
 			dropInBoard(currentboard, column - 1, player1Symbol);
-		} ?~ {
+		} else {
 			dropInBoard(currentboard, column - 1, player2Symbol);
 		}
 
 		winner <~ checkIfWon(currentboard, currentPlayerSymbol, currentPlayer);
-		~? (winner == 0) {
-			~? (currentPlayer == 1) { currentPlayer <~ 2; } ?~ { currentPlayer <~ 1; }
+		if (winner == 0) {
+			if (currentPlayer == 1) { currentPlayer <~ 2; } else { currentPlayer <~ 1; }
 		}
 	}
 
 	printBoard(currentboard);
-	console:writeln("--------Winner--------", "DarkBlue");
-	console:write("Congratulations:", "DarkBlue");
-	console:writeln(currentPlayerName, "Blue");
-	console:writeln("----------------------\n\n", "DarkBlue");
+	@Qonsole:writeLine("--------Winner--------");
+	@Qonsole:write("Congratulations:");
+	@Qonsole:writeLine(currentPlayerName);
+	@Qonsole:writeLine("----------------------\n\n");
 	
-	console:write('Again? [y/n]: ');
-	*~ input <~ console:read();
-	~? ((input != 'y') && (input != 'Y')) {
+	@Qonsole:write('Again? [y/n]: ');
+	*~ input <~ @Qonsole:readLine();
+	if ((input != 'y') && (input != 'Y')) {
 		run <~ 0;
 	}
 }

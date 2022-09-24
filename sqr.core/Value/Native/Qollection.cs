@@ -26,10 +26,10 @@ namespace Qrakhen.Sqr.Core
 
             if (member == Null) {
                 var index = Convert.ToInt32((name as Number)?.asInteger());
-                if (items.Count > index && index > 0)
+                if (items.Count > index && index >= 0)
                     return items[index];
                 else
-                    throw new SqrError("index " + index + " outside of Qollection's boundaries");
+                    throw new SqrError("index " + index + " (" + name + ") outside of Qollection's boundaries");
             }
             return member;
         }

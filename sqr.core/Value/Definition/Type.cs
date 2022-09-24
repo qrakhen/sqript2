@@ -255,6 +255,7 @@ namespace Qrakhen.Sqr.Core
             new Time();
             new Random();
             new Calc();
+            new Parse();
 
             var value = register(typeof(Value), new Args
             {

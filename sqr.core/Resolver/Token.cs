@@ -17,24 +17,28 @@ namespace Qrakhen.Sqr.Core
             var result = new List<Token>();
             long row = 0, count = 0, __prev = 0, __end;
             while (!input.done) {
-                var pos = input.index;
-                if (input.peek() == '\n') {
-                    row++;
-                    __prev = pos;
-                }
-                if (input.peek() == '\0') {
-                    input.digest();
-                }
-                var type = matchType(input.peek());
-                var value = readValue(type, input);
-                __end = input.index;
-                if (value != null) {
-                    var token = Token.create(value, type);
-                    token.__row = row;
-                    token.__col = pos - __prev;
-                    token.__pos = pos;
-                    token.__end = __end;
-                    result.Add(token);
+                try {
+                    var pos = input.index;
+                    if (input.peek() == '\n') {
+                        row++;
+                        __prev = pos;
+                    }
+                    if (input.peek() == '\0') {
+                        input.digest();
+                    }
+                    var type = matchType(input.peek());
+                    var value = readValue(type, input);
+                    __end = input.index;
+                    if (value != null) {
+                        var token = Token.create(value, type);
+                        token.__row = row;
+                        token.__col = pos - __prev;
+                        token.__pos = pos;
+                        token.__end = __end;
+                        result.Add(token);
+                    }
+                } catch(SqrError e) {
+                    throw new SqrParseError("error occured when parsing sqript @" + row + ":" + (input.index - __prev) + "(" + input.index + "): " + e.Message);
                 }
             }
             log.spam(string.Join(", ", result.Select(_ => _.type + ": '" + _.raw + "'")));
@@ -128,7 +132,7 @@ namespace Qrakhen.Sqr.Core
         }
 
         static readonly private Dictionary<Token.Type, string> matches = new Dictionary<Token.Type, string>() {
-            { Token.Type.Operator, @"[\/\-\*+=&<>^?!~:]" },
+            { Token.Type.Operator, @"[\/\-\*+=&<>^?!~:|]" },
             { Token.Type.Number, @"[\d.]" },
             { Token.Type.String, "[\"']" },
             { Token.Type.Structure, @"[{}()[\],]" },
@@ -205,7 +209,7 @@ namespace Qrakhen.Sqr.Core
             var value = parse(raw, type, out parsedType);
 
             if (value == null)
-                throw new SqrError("could not parse value " + raw + ", it's not a known " + type);
+                throw new SqrParseError("could not parse value " + raw + ", it's not a known " + type);
 
             return new Token(value, parsedType, raw);
         }
