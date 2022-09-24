@@ -120,7 +120,7 @@ namespace Qrakhen.Sqr.Core
                     Attribute.GetCustomAttribute(_, typeof(NativeFieldAttribute)) != null)) {
                     fields.Add(new Type.Field(new IDeclareInfo() {
                         name = f.Name,
-                        type = CoreModule.instance.getType(f.FieldType.Name),
+                        type = null,
                         access = Access.Public,
                         isReadonly = Attribute.GetCustomAttribute(f, typeof(NativeGetterAttribute)) != null
                     }));
@@ -139,7 +139,7 @@ namespace Qrakhen.Sqr.Core
                         new InternalFunqtion((v, q, s) => { return (Value)m.Invoke(m.IsStatic ? null : s?.obj, v); }),
                         new IDeclareInfo() {
                             name = m.Name,
-                            type = CoreModule.instance.getType(m.ReturnType.Name),
+                            type = null,
                             access = Access.Public
                         }));
             }

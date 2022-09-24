@@ -29,14 +29,20 @@ namespace Qrakhen.Sqr.Core
 
         public bool alive { get; private set; } = true;
 
+        public Runtime() => init();
+
         public void init()
         {
-            log.setLoggingLevel(Logger.Level.VERBOSE);
+            CoreModule.init();
         }
+
+        public void executeFile() { }
+        public void executeString() { }
+        private void __execute() { }
 
         public Module run(string file = null, bool __DEV_DEBUG = false) 
         {           
-            var content = File.ReadAllText(file);
+            var content = file != null ? File.ReadAllText(file) : null;
             if (content != null) {
                 log.setLoggingLevel(Logger.Level.INFO);
                 if (content.StartsWith("!!")) {
@@ -126,21 +132,22 @@ namespace Qrakhen.Sqr.Core
                 var t = new Stopwatch();
                 t.Restart();
                 long _ms = 0, _t = 0;
-                var tokenStack = tokenResolver.resolve(new Core.Stack<char>(applyAliases(input).ToCharArray()));
+                var tokenStack = tokenResolver.resolve(new Core.Stack<char>(applyAliases(input).ToCharArray()), qontext);
+                log.verbose("all tokens resolved in " + (t.ElapsedMilliseconds - _ms) + "ms, " + (t.ElapsedTicks - _t) + " ticks");
                 while (!tokenStack.done) {
                     var operation = operationResolver.resolveOne(tokenStack, qontext);
                     var result = operation.execute(qontext);
                     if (result != null) {
                         if (log.loggingLevel > Logger.Level.INFO)
                             log.success(result.toDebugString());
-                        else
+                        else if (log.loggingLevel == Logger.Level.INFO)
                             log.success(result.ToString());
                     }
                     log.verbose("operation time " + (t.ElapsedMilliseconds - _ms) + "ms, " + (t.ElapsedTicks - _t) + " ticks");
                     _ms = t.ElapsedMilliseconds;
                     _t = t.ElapsedTicks;
                 }
-                log.info("execution time " + (t.ElapsedMilliseconds) + "ms, " + (t.ElapsedTicks) + " ticks");
+                log.debug("execution time " + (t.ElapsedMilliseconds) + "ms, " + (t.ElapsedTicks) + " ticks");
             } catch (SqrError e) {
                 log.error(log.loggingLevel > Logger.Level.INFO ? e : (object)e.Message);
                 //log.warn("Sqr stacktrace:\n" + string.Join("\n", SqrError.stackTrace.ToArray()));

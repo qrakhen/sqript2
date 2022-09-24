@@ -26,6 +26,7 @@ namespace Qrakhen.Sqr.Core
             __module = module;
 
             if (module) {
+                import(CoreModule.instance);
                 Logger.TEMP_STATIC_DEBUG.debug("New Qontext in module: " + module.name);
             }
         }
@@ -96,20 +97,23 @@ namespace Qrakhen.Sqr.Core
 
         public Value resolveName(string name)
         {
+            Value value = null;
             var qontext = lookUp(name);
-            var value = qontext.names[name];
-            if (!value) {
-                var r = imports
-                    .findAll(_ => _.get(name))
-                    .Select(_ => _.get(name))
-                    .Concat(imports.findAll(_ => _.name == name))
-                    .ToArray();
-                if (r.Length == 0)
-                    throw new SqrQontextError("could not find the name " + name + " within the current qontext or any imported modules (recursive lookup)", this);
-                if (r.Length > 1)
-                    throw new SqrQontextError(name + " is an ambigious name between several modules: " + string.Join(", ", r.Select(_ => _.toDebugString())), this);
-                else
-                    return r[0];
+            if (qontext != null) {
+                value = qontext.names[name];
+                if (!value) {
+                    var r = imports
+                        .findAll(_ => _.get(name))
+                        .Select(_ => _.get(name))
+                        .Concat(imports.findAll(_ => _.name == name))
+                        .ToArray();
+                    if (r.Length == 0)
+                        throw new SqrQontextError("could not find the name " + name + " within the current qontext or any imported modules (recursive lookup)", this);
+                    if (r.Length > 1)
+                        throw new SqrQontextError(name + " is an ambigious name between several modules: " + string.Join(", ", r.Select(_ => _.toDebugString())), this);
+                    else
+                        return r[0];
+                }
             }
 
             return value;

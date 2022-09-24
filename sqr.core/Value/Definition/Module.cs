@@ -2,11 +2,17 @@ namespace Qrakhen.Sqr.Core
 {
     public class Module : Value
     {
+        internal static Type type = 
+            Type.create(typeof(Module), new Type.Args {
+                name = "Module",
+                nativeType = NativeType.Module
+            });
+
         public readonly string name;
         public readonly Storage<string, Module> children = new Storage<string, Module>();
         public readonly Storage<string, Value> exports = new Storage<string, Value>();
 
-        public Module(string name) : base(Type.Module)
+        public Module(string name) : base(type)
         {
             this.name = name;
         }
@@ -54,5 +60,7 @@ namespace Qrakhen.Sqr.Core
             exports[name] = value;
             Logger.TEMP_STATIC_DEBUG.debug("exported " + value + " as " + name);
         }
+
+        public void export(Type type) => export(new Qlass(type), type.name);
     }
 }

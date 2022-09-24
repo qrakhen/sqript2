@@ -72,6 +72,8 @@ namespace Qrakhen.Sqr.Core
 
         public void run(Qontext qontext)
         {
+            this.qontext = qontext;
+
             if (!File.Exists(HISTORY_FILE)) {
                 File.Create(HISTORY_FILE);
             } else {
@@ -79,9 +81,7 @@ namespace Qrakhen.Sqr.Core
             }
             historyIndex = history.Count;
             clock = new Stopwatch();
-            //thread = new Thread(__run);
             clock.Start();
-            //thread.Start();
             __run(qontext);
         }
 
@@ -236,7 +236,7 @@ namespace Qrakhen.Sqr.Core
             log.setLoggingLevel(Logger.Level.MUFFLE);
             try {
                 int i = 0;
-                var tokens = tokenResolver.resolve(new Stack<char>(chars.ToArray()));
+                var tokens = tokenResolver.resolve(new Stack<char>(chars.ToArray()), qontext);
                 tokens.process((current, next, index, end) => {
                     var t = next();
                     if (mapping.contains(t.type)) {

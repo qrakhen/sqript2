@@ -11,7 +11,7 @@ namespace Qrakhen.Sqr.Core
     {
         private readonly Logger log;
 
-        public Stack<Token> resolve(Stack<char> input)
+        public Stack<Token> resolve(Stack<char> input, Qontext qontext = null)
         {
             log.verbose("in " + GetType().Name);
             var result = new List<Token>();
@@ -31,6 +31,8 @@ namespace Qrakhen.Sqr.Core
                     __end = input.index;
                     if (value != null) {
                         var token = Token.create(value, type);
+                        if (qontext != null && token.hasType(Token.Type.Identifier))
+                            token.resolveType(qontext, false);
                         token.__row = row;
                         token.__col = pos - __prev;
                         token.__pos = pos;
@@ -270,9 +272,11 @@ namespace Qrakhen.Sqr.Core
             if (!Validator.Token.tryGetType(this, Type.Type, out Core.Type type)) {
                 if (Validator.Token.tryGetType(this, Type.Identifier, out string name)) {
                     type = qontext.resolveType(name);
-                    this.type = Type.Type | (this.type & Type.ValueOf);
-                    this.value = type;
-                    Logger.TEMP_STATIC_DEBUG.verbose("could resolve type " + type + " for token " + this);
+                    if (type != null) {
+                        this.type = Type.Type | (this.type & Type.ValueOf);
+                        this.value = type;
+                        Logger.TEMP_STATIC_DEBUG.verbose("could resolve type " + type + " for token " + this);
+                    }
                 }
             }
 
