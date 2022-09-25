@@ -71,7 +71,7 @@ fq checkIfWon (board, symbol, playerId {
 			if (count == 4) {
 				return playerId;
 			}
-			if (tempRow:c == symbol) {				
+			if (tempRow:@c == symbol) {				
 				count <~ count + 1;
 			} else {
 				count <~ 0;
@@ -211,10 +211,10 @@ while(run > 0) {
 	}
 
 	printBoard(currentboard);
-	@Qonsole:writeLine("--------Winner--------");
+	@Qonsole:writeLineC("--------Winner--------", "DarkBlue");
 	@Qonsole:write("Congratulations:");
-	@Qonsole:writeLine(currentPlayerName);
-	@Qonsole:writeLine("----------------------\n\n");
+	@Qonsole:writeLineC(currentPlayerName, "Blue");
+	@Qonsole:writeLineC("----------------------\n\n", "DarkBlue");
 	
 	@Qonsole:write('Again? [y/n]: ');
 	*~ input <~ @Qonsole:readLine();
