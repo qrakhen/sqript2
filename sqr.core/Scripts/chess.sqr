@@ -50,13 +50,43 @@ export qlass Chess {
 };
 
 qlass Board {
+	Objeqt pieces;
 	
+	fq Board({
+		this:pieces <~ {
+			A <~ [ 1, 2, 3, 4, 5, 6, 7, 8 ],
+			B <~ [ 1, 2, 3, 4, 5, 6, 7, 8 ],
+			C <~ [ 1, 2, 3, 4, 5, 6, 7, 8 ],
+			D <~ [ 1, 2, 3, 4, 5, 6, 7, 8 ],
+			E <~ [ 1, 2, 3, 4, 5, 6, 7, 8 ],
+			F <~ [ 1, 2, 3, 4, 5, 6, 7, 8 ],
+			G <~ [ 1, 2, 3, 4, 5, 6, 7, 8 ],
+			H <~ [ 1, 2, 3, 4, 5, 6, 7, 8 ]
+		};
+	});
+
+	Piece fq get(x, y { 
+		<: this:pieces:@x:@y; 
+	});
 };
 
 qlass Game {
 	Objeqt pieceTypes;
 	Board board;
 	Qollection pieces;
+};
+
+qlass Input {
+	*~ from;
+	*~ to;
+
+	fq read({ 
+		*~ v <~ @Qonsole:readLine();
+		cout(v);
+		this:from <~ [ v:0, v:1 ];
+		this:to <~ [ v:3, v:4 ];
+		<: this;
+	});
 };
 
 

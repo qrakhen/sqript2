@@ -44,6 +44,8 @@ namespace Qrakhen.Sqr.Core
         public Module run(string file = null, bool __DEV_DEBUG = false) 
         {           
             var content = file != null ? File.ReadAllText(file) : null;
+            Module module = null;
+            Qontext qontext = null;
             if (content != null) {
                 if (content.StartsWith("!!")) {
                     content = content[2..];
@@ -53,7 +55,6 @@ namespace Qrakhen.Sqr.Core
                     __DEV_DEBUG = true;
                 }
 
-                Module module = null;
                 var moduleKeyword = Keyword.get(Keyword.Type.MODULE).symbol;
                 if (content.StartsWith(moduleKeyword)) {
                     string name = content.Substring(moduleKeyword.Length, content.IndexOf(";") - moduleKeyword.Length).Trim();
@@ -67,7 +68,7 @@ namespace Qrakhen.Sqr.Core
                     module = new Module(name);
                 }
 
-                Qontext qontext = new Qontext(Qontext.globalContext, module);
+                qontext = new Qontext(Qontext.globalContext, module);
 
                 if (__DEV_DEBUG)
                     log.setLoggingLevel(Logger.Level.SPAM);
@@ -75,8 +76,8 @@ namespace Qrakhen.Sqr.Core
                 execute(content, qontext);
                 return module;
             } else {
-                var module = new Module("Qonsole");
-                Qontext qontext = new Qontext(Qontext.globalContext, module);
+                module = new Module("Qonsole");
+                qontext = new Qontext(Qontext.globalContext, module);
                 log.success(Properties.strings.Message_Welcome);
                 if (qonfig.useExtendedConsole) {
                     userControlInterface.run(qontext);
@@ -119,7 +120,7 @@ namespace Qrakhen.Sqr.Core
 
         public void execute(string input, Qontext qontext)
         {
-            //qontext = qontext ?? Qontext.globalContext;
+            
             registerGlobalFunqtions(qontext);
             try {                
                 if (input.StartsWith("/")) {
@@ -204,7 +205,11 @@ namespace Qrakhen.Sqr.Core
             } else if (input == "t") {
                 run("tests.sqr");
             } else if (input.StartsWith("run")) {
-                run(args[1]);
+                var text = File.ReadAllText(args[1]);
+                if (text.StartsWith("module")) {
+                    text = text.Substring(text.IndexOf(";"));
+                }
+                execute(text, qontext);
             } else if (input == "c") {
                 qontext.names.clear();
                 log.cmd("cleared global qontext");

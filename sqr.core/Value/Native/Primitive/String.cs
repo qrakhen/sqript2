@@ -17,7 +17,7 @@ namespace Qrakhen.Sqr.Core
         {
             if (key is Number) {
                 int index = (key as Number).asInteger();
-                if (index > 0 && __value?.Length > index)
+                if (index >= 0 && __value?.Length > index)
                     return new String(__value[index].ToString());
                 else
                     throw new SqrParameterError("index " + index + " outside of string's boundaries (" + __value + ")");
