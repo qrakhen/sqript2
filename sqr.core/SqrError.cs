@@ -61,4 +61,11 @@ namespace Qrakhen.Sqr.Core
         {
         }
     }
+
+    public class SqrParameterError : SqrError
+    {
+        public SqrParameterError(string message, object data = null, object context = null) : base(message, data, context)
+        {
+        }
+    }
 }

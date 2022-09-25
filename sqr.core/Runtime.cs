@@ -56,7 +56,7 @@ namespace Qrakhen.Sqr.Core
                 Module module = null;
                 var moduleKeyword = Keyword.get(Keyword.Type.MODULE).symbol;
                 if (content.StartsWith(moduleKeyword)) {
-                    string name = content.Substring(moduleKeyword.Length, content.IndexOf(";")).Trim();
+                    string name = content.Substring(moduleKeyword.Length, content.IndexOf(";") - moduleKeyword.Length).Trim();
                     if (name.Contains(":"))
                         throw new SqrError("sorry multidimensional modules not yet implemented, give me a week or so");
 
@@ -152,7 +152,9 @@ namespace Qrakhen.Sqr.Core
                 log.error(log.loggingLevel > Logger.Level.INFO ? e : (object)e.Message);
                 //log.warn("Sqr stacktrace:\n" + string.Join("\n", SqrError.stackTrace.ToArray()));
                 if (e.data != null && log.loggingLevel >= Logger.Level.DEBUG)
-                    log.warn(json(e.data));
+                    log.warn((e.data is Value) ? (e.data as Value).toDebugString() : e.data.ToString());
+                if (e.context != null && log.loggingLevel >= Logger.Level.DEBUG)
+                    log.warn((e.context is Value) ? (e.context as Value).toDebugString() : e.context.ToString());
             } /* catch (Exception e) {
                     log.error("### system exceptions need to be completely eradicated ###");
                     log.error(e);

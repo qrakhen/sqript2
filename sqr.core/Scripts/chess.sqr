@@ -1,6 +1,6 @@
 ﻿module ChessGame;
 
-export qlass PieceType {
+qlass PieceType {
 	String name;
 	Qollection symbols;
 	Qallable isLegalCallback; 
@@ -39,7 +39,7 @@ qlass Piece {
 	String owner;
 };
 
-qlass Chess {
+export qlass Chess {
 	fq definePieceTypes({
 		*~ r <~ [];
 		r:add(new PieceType('pawn', [ '♙', '♟' ], 1, ~:(board, pos, isAttack {
@@ -58,5 +58,6 @@ qlass Game {
 	Board board;
 	Qollection pieces;
 };
+
 
 @Chess:definePieceTypes();
