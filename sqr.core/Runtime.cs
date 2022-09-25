@@ -34,6 +34,7 @@ namespace Qrakhen.Sqr.Core
         public void init()
         {
             CoreModule.init();
+            Dependor.get<Logger>().setLoggingLevel(Logger.Level.INFO);
         }
 
         public void executeFile() { }
@@ -44,7 +45,6 @@ namespace Qrakhen.Sqr.Core
         {           
             var content = file != null ? File.ReadAllText(file) : null;
             if (content != null) {
-                log.setLoggingLevel(Logger.Level.SPAM);
                 if (content.StartsWith("!!")) {
                     content = content[2..];
                     __DEV_DEBUG = true;
@@ -200,8 +200,7 @@ namespace Qrakhen.Sqr.Core
                     log.cmd("set logging level to " + log.loggingLevel);
                 }
             } else if (input == "t") {
-                var t = File.ReadAllText("tests.sqr");
-                execute(t, qontext);
+                run("tests.sqr");
             } else if (input.StartsWith("run")) {
                 run(args[1]);
             } else if (input == "c") {
