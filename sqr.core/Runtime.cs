@@ -172,7 +172,7 @@ namespace Qrakhen.Sqr.Core
                     valueResolver.resolve(
                         new Stack<Token>(
                             new Token[] {
-                                Token.create(args[1], Token.Type.Identifier)
+                                new Token(args[1], Token.Type.Identifier, null)
                             }), qontext)));
                 return;
             } else if (input.StartsWith("alias")) {

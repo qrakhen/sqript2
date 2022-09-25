@@ -249,6 +249,17 @@ namespace Qrakhen.Sqr.Core
                     }
                 });
             } catch (Exception e) {
+                if (e is SqrError) {
+                    var d = (e as SqrError).data;
+                    if (d is Token) {
+                        temp.Insert(Math.Max(0, (int)(d as Token).__pos), colors[ConsoleColor.Red]);
+                        temp.Insert(Math.Min((int)(d as Token).__end + 1, temp.Count), colors[ConsoleColor.White]);
+                        log.setLoggingLevel(level);
+                        return new string(temp.ToArray());
+
+                    }
+                }
+
                 temp.Insert(0, colors[ConsoleColor.Red]);
                 temp.Add(colors[ConsoleColor.White]);
             }

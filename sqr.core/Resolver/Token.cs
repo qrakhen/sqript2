@@ -16,6 +16,9 @@ namespace Qrakhen.Sqr.Core
             log.verbose("in " + GetType().Name);
             var result = new List<Token>();
             long row = 0, count = 0, __prev = 0, __end;
+            string value = null;
+            Token.Type type = (Token.Type)0;
+            Token token = null;
             while (!input.done) {
                 try {
                     var pos = input.index;
@@ -26,21 +29,23 @@ namespace Qrakhen.Sqr.Core
                     if (input.peek() == '\0') {
                         input.digest();
                     }
-                    var type = matchType(input.peek());
-                    var value = readValue(type, input);
+                    type = matchType(input.peek());
+                    value = readValue(type, input);
                     __end = input.index;
                     if (value != null) {
-                        var token = Token.create(value, type);
-                        if (qontext != null && token.hasType(Token.Type.Identifier))
-                            token.resolveType(qontext, false);
+                        token = new Token(null, type, value);
                         token.__row = row;
                         token.__col = pos - __prev;
                         token.__pos = pos;
                         token.__end = __end;
+                        // split for debugging reasons
+                        token = Token.parse(token);
+                        if (qontext != null && token.hasType(Token.Type.Identifier))
+                            token.resolveType(qontext, false);
                         result.Add(token);
                     }
                 } catch(SqrError e) {
-                    throw new SqrParseError("error occured when parsing sqript @" + row + ":" + (input.index - __prev) + "(" + input.index + "): " + e.Message);
+                    throw new SqrParseError("error occured when parsing sqript @" + row + ":" + (input.index - __prev) + "(" + input.index + "): " + e.Message, token);
                 }
             }
             log.spam(string.Join(", ", result.Select(_ => _.type + ": '" + _.raw + "'")));
@@ -150,12 +155,12 @@ namespace Qrakhen.Sqr.Core
     {
         public const string end = ";";
 
-        public long __row, __col, __pos = -1, __end = -1;
+        public long __row, __col, __pos, __end;
 
         public readonly string raw;
         public object value;
 
-        private Token(object value, Type type, string raw)
+        public Token(object value, Type type, string raw)
         {
             this.value = value;
             base.type = type;
@@ -204,18 +209,21 @@ namespace Qrakhen.Sqr.Core
             return NativeType.None;
         }
 
-        public static Token create(string raw, Type type)
+        public static Token parse(Token token)
         {
             Type parsedType;
-            var value = parse(raw, type, out parsedType);
+            var value = __parse(token.raw, token.type, out parsedType);
 
             if (value == null)
-                throw new SqrParseError("could not parse value " + raw + ", it's not a known " + type);
+                throw new SqrParseError("could not parse value " + token.raw + ", it's not a known " + token.type);
 
-            return new Token(value, parsedType, raw);
+            token.value = value;
+            token.type = parsedType;
+
+            return token;
         }
 
-        public static object parse(string raw, Type type, out Type parsedType)
+        private static object __parse(string raw, Type type, out Type parsedType)
         {
             try {
                 parsedType = type;
@@ -269,7 +277,8 @@ namespace Qrakhen.Sqr.Core
 
         public Core.Type resolveType(Qontext qontext, bool doThrow = false)
         {
-            if (!Validator.Token.tryGetType(this, Type.Type, out Core.Type type)) {
+            Core.Type type = null;
+            if (!Validator.Token.tryGetType(this, Type.Type, out type)) {
                 if (Validator.Token.tryGetType(this, Type.Identifier, out string name)) {
                     type = qontext.resolveType(name, false);
                     if (type != null) {
