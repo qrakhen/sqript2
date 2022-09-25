@@ -207,8 +207,13 @@ namespace Qrakhen.Sqr.Core
 
                 if (result != null) {
                     node.left = result;
-                    if (export)
-                        qontext.module.export(result);                    
+                    if (export) {
+                        if (result is Qlass)
+                            qontext.module.export((result as Qlass).raw);
+                        else
+                            qontext.module.export(result);
+                    }
+                                            
                 }
             }
         }

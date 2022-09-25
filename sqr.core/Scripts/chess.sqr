@@ -1,6 +1,6 @@
 ﻿module ChessGame;
 
-qlass PieceType {
+export qlass PieceType {
 	String name;
 	Qollection symbols;
 	Qallable isLegalCallback; 
