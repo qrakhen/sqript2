@@ -1,6 +1,28 @@
 ﻿module ChessGame;
 
+*~ BLACK <~ 64;
+*~ WHITE <~ 128;
+
+*~ PAWN <~ 1; 
+*~ BISHOP <~ 2; 
+*~ KNIGHT <~ 4; 
+*~ ROOK <~ 8; 
+*~ QUEEN <~ 16; 
+*~ KING <~ 32; 
+
+*~ FILE_TO_X <~ {
+	A <~ 0,
+	B <~ 1,
+	C <~ 2,
+	D <~ 3,
+	E <~ 4,
+	F <~ 5,
+	G <~ 6,
+	H <~ 7
+};
+
 qlass PieceType {
+	Number id;
 	String name;
 	Qollection symbols;
 	Qallable isLegalCallback; 
@@ -31,6 +53,18 @@ qlass Pos {
 	fq delta(pos { 
 		<: new Pos(this:x - pos:x, this:y - pos:y);
 	});
+
+	fq dir({
+		*~ x <~ 1;
+		*~ y <~ 1;
+		if (this:x < 0) {
+			x <~ -1;
+		}
+		if (this:y < 0) {
+			y <~ -1;
+		}
+		<: new Pos(x, y);
+	});
 };
 
 qlass Piece {
@@ -42,7 +76,22 @@ qlass Piece {
 export qlass Chess {
 	fq definePieceTypes({
 		*~ r <~ [];
-		r:add(new PieceType('pawn', [ '♙', '♟' ], 1, ~:(board, pos, isAttack {
+		r:add(new PieceType('Pawn', [ 'p', '♟' ], 1, ~:(board, pos, isAttack {
+			return isAttack;
+		})));
+		r:add(new PieceType('Bishop', [ 'B', '♟' ], 3, ~:(board, pos, isAttack {
+			return isAttack;
+		})));
+		r:add(new PieceType('Knight', [ 'N', '♟' ], 3, ~:(board, pos, isAttack {
+			return isAttack;
+		})));
+		r:add(new PieceType('Rook', [ 'R', '♟' ], 5, ~:(board, pos, isAttack {
+			return isAttack;
+		})));
+		r:add(new PieceType('Queen', [ 'Q', '♟' ], 9, ~:(board, pos, isAttack {
+			return isAttack;
+		})));
+		r:add(new PieceType('King', [ 'K', '♟' ], -1, ~:(board, pos, isAttack {
 			return isAttack;
 		})));
 		return r;
@@ -50,41 +99,81 @@ export qlass Chess {
 };
 
 qlass Board {
-	Objeqt pieces;
+	Qollection pieces;
 	
 	fq Board({
-		this:pieces <~ {
-			A <~ [ 1, 2, 3, 4, 5, 6, 7, 8 ],
-			B <~ [ 1, 2, 3, 4, 5, 6, 7, 8 ],
-			C <~ [ 1, 2, 3, 4, 5, 6, 7, 8 ],
-			D <~ [ 1, 2, 3, 4, 5, 6, 7, 8 ],
-			E <~ [ 1, 2, 3, 4, 5, 6, 7, 8 ],
-			F <~ [ 1, 2, 3, 4, 5, 6, 7, 8 ],
-			G <~ [ 1, 2, 3, 4, 5, 6, 7, 8 ],
-			H <~ [ 1, 2, 3, 4, 5, 6, 7, 8 ]
-		};
+		this:pieces <~  [
+			[ WHITE | ROOK,		WHITE | PAWN, null, null, null, null, BLACK | PAWN, BLACK | ROOK ],
+			[ WHITE | KNIGHT,	WHITE | PAWN, null, null, null, null, BLACK | PAWN, BLACK | KNIGHT ],
+			[ WHITE | BISHOP,	WHITE | PAWN, null, null, null, null, BLACK | PAWN, BLACK | BISHOP ],
+			[ WHITE | QUEEN,	WHITE | PAWN, null, null, null, null, BLACK | PAWN, BLACK | QUEEN ],
+			[ WHITE | KING,		WHITE | PAWN, null, null, null, null, BLACK | PAWN, BLACK | KING ],
+			[ WHITE | BISHOP,	WHITE | PAWN, null, null, null, null, BLACK | PAWN, BLACK | BISHOP ],
+			[ WHITE | KNIGHT,	WHITE | PAWN, null, null, null, null, BLACK | PAWN, BLACK | KNIGHT ],
+			[ WHITE | ROOK,		WHITE | PAWN, null, null, null, null, BLACK | PAWN, BLACK | ROOK ],
+		];
 	});
 
-	Piece fq get(x, y { 
-		<: this:pieces:@x:@y; 
+	Piece fq get(pos { 
+		<: this:pieces:(pos:x):(pos:y); 
+	});
+
+	Piece fq collision(from, to {
+		*~ delta <~ to:delta(from);
+		*~ dir <~ delta:dir();
+		*~ h <~ delta:x - 1;
+		*~ v <~ delta:y - 1;
+		while (h + v > 0) {
+			*~ pos <~ new Pos(from:x + (delta:x - h), from:y + (delta:y - v));
+			cout (pos:x + ":" + pos:y);
+			*~ p <~ board:(pos:x):(pos:y);
+			if (p != null) {
+				<: p;
+			}
+			h <~ h - dir:x;
+			v <~ v - dir:y;
+		}
+		return null;
+	});
+
+	String fq render({
+		*~ r <~ ' x  A  B  C  D  E  F  G  H 
+';
+		*~ y <~ 1;
+		while (y < 9) {
+			r <~ r + ' ' + y + ' ';
+			*~ x <~ 1;
+			while (x < 9) {
+				r <~ r + ' ' + this:pieces:(x - 1):(y - 1) + ' ';
+				x <~ x + 1;
+			}
+			y <~ y + 1;
+			r <~ r + '
+';
+		}
+		<: r;
 	});
 };
 
 qlass Game {
+	Number currentTurn <~ WHITE;
 	Objeqt pieceTypes;
 	Board board;
 	Qollection pieces;
 };
 
 qlass Input {
-	*~ from;
-	*~ to;
+	Pos from;
+	Pos to;
 
 	fq read({ 
 		*~ v <~ @Qonsole:readLine();
-		cout(v);
-		this:from <~ [ v:0, v:1 ];
-		this:to <~ [ v:3, v:4 ];
+		*~ fx <~ @Parse:asInt(FILE_TO_X:(v:0));
+		*~ fy <~ @Parse:asInt(v:1);
+		*~ tx <~ @Parse:asInt(FILE_TO_X:(v:3));
+		*~ ty <~ @Parse:asInt(v:4);
+		this:from <~ new Pos(fx, fy);
+		this:to <~ new Pos(tx, ty);
 		<: this;
 	});
 };

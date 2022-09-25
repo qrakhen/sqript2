@@ -39,6 +39,12 @@ namespace Qrakhen.Sqr.Core
                 (int)(to as Number)));
         }
 
+        [NativeMethod]
+        public String lower()
+        {
+            return new String(__value.ToLower());
+        }
+
         public override string ToString()
         {
             return __value?.ToString();

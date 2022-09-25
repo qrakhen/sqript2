@@ -25,5 +25,11 @@ namespace Qrakhen.Sqr.Core
         {
             return new Number(Math.Sqrt(value));
         }
+
+        [NativeMethod]
+        public static Number abs(Number value)
+        {
+            return new Number(Math.Abs(value));
+        }
     }
 }
