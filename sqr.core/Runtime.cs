@@ -18,7 +18,7 @@ namespace Qrakhen.Sqr.Core
         public static readonly Version version = new Version(0, 1, 0);
 
         public static Qonfig qonfig { get; private set; } = new Qonfig();
-        public static string defaultQonfigPath { get; private set; } = "sqript.qonfig";
+        public static string defaultQonfigPath { get; private set; } = "sqr.qonfig";
 
         public static readonly Storage<string, Module> moduleCache = new Storage<string, Module>();
 
