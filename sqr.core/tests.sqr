@@ -54,16 +54,16 @@ funq fib (a, b {
 });
 
 cout("types and typing");
-@Number num <~ 100;
-@String str <~ 'hello my friends';
+Number num <~ 100;
+String str <~ 'hello my friends';
 
 cout("if an error appears, it works. no try catch yet.");
 num <~ str;
 
 cout("qlasses and instancing");
 qlass Q {
-	@Number x <~ 10;
-	@Number y <~ 20;
+	Number x <~ 10;
+	Number y <~ 20;
 
 	funq x ({
 		return this:x * this:y;

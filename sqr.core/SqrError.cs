@@ -9,44 +9,55 @@ namespace Qrakhen.Sqr.Core
         public static List<string> stackTrace = new List<string>();
 
         public object data;
+        public object context;
 
-        public SqrError(string message, object data = null) : base(message)
+        public SqrError(string message, object data = null, object context = null) : base(message)
         {
             this.data = data;
-        }
+            this.context = context;
+    }
     }
     
-    public class SqrNullError : SqrError
+    public class SqrNullReferenceError : SqrError
     {
-        public SqrNullError(string message, object data = null) : base(message, data)
+        public SqrNullReferenceError(string message, object data = null, object context = null) : base(message, data, context)
         {
-            this.data = data;
         }
     }
 
     public class SqrParseError : SqrError
     {
-        public Token token;
+        public new Token data;
 
-        public SqrParseError(string message, Token token = null, object data = null) : base(message, data)
+        public SqrParseError(string message, Token token = null, object context = null) : base(message, token, context)
         {
-            this.token = token;
+            data = token;
         }
     }
 
     public class SqrQontextError : SqrError
     {
-        public Qontext qontext;
+        public new Qontext data;
 
-        public SqrQontextError(string message, Qontext qontext = null, object data = null) : base(message, data)
+        public SqrQontextError(string message, Qontext qontext = null, object context = null) : base(message, qontext, context)
         {
-            this.qontext = qontext;
+            this.data = qontext;
+        }
+    }
+
+    public class SqrModuleError : SqrError
+    {
+        public new Module data;
+
+        public SqrModuleError(string message, Module module = null, object context = null) : base(message, module, context)
+        {
+            this.data = module;
         }
     }
 
     public class SqrTypeError : SqrError
     {
-        public SqrTypeError(string message, object data = null) : base(message, data)
+        public SqrTypeError(string message, object data = null, object context = null) : base(message, data, context)
         {
         }
     }

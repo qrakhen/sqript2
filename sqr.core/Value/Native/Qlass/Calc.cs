@@ -9,7 +9,7 @@ namespace Qrakhen.Sqr.Core
 {
     public class Calc : Value
     {
-        public Calc() : base(Type.get("Calc"))
+        public Calc() : base(CoreModule.instance.getType("Calc"))
         {
 
         }

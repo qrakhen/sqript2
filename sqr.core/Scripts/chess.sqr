@@ -1,0 +1,62 @@
+﻿module ChessGame;
+
+export qlass PieceType {
+	String name;
+	Qollection symbols;
+	Qallable isLegalCallback; 
+	Number value;
+
+	fq PieceType(name, symbols, value, isLegalCallback {
+		this:name <~ name;
+		this:symbols <~ symbols;
+		this:value <~ value;
+		this:isLegalCallback <~ isLegalCallback;
+		return this;
+	});
+
+	fq isLegal(board, pos, isAttack {
+		<: this:isLegalCallback(board, pos, isAttack);
+	});
+};
+
+qlass Pos {
+	Number x;
+	Number y;
+
+	fq Pos(x, y {
+		this:x <~ x;
+		this:y <~ y;
+	});
+
+	fq delta(pos { 
+		<: new Pos(this:x - pos:x, this:y - pos:y);
+	});
+};
+
+qlass Piece {
+	PieceType type;
+	Pos pos;
+	String owner;
+};
+
+qlass Chess {
+	fq definePieceTypes({
+		*~ r <~ [];
+		r:add(new PieceType('pawn', [ '♙', '♟' ], 1, ~:(board, pos, isAttack {
+			return isAttack;
+		})));
+		return r;
+	});
+};
+
+qlass Board {
+	
+};
+
+qlass Game {
+	Objeqt pieceTypes;
+	Board board;
+	Qollection pieces;
+};
+
+@Chess:definePieceTypes();

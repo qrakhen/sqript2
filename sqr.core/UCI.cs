@@ -70,8 +70,10 @@ namespace Qrakhen.Sqr.Core
         public List<string> history { get; private set; } = new List<string>();
         public int exitCode { get; private set; } = 0;
 
-        public void run()
+        public void run(Qontext qontext)
         {
+            this.qontext = qontext;
+
             if (!File.Exists(HISTORY_FILE)) {
                 File.Create(HISTORY_FILE);
             } else {
@@ -79,16 +81,13 @@ namespace Qrakhen.Sqr.Core
             }
             historyIndex = history.Count;
             clock = new Stopwatch();
-            //thread = new Thread(__run);
             clock.Start();
-            //thread.Start();
-            __run();
+            __run(qontext);
         }
 
-        private void __run()
+        private void __run(Qontext qontext)
         {
             reset();
-            qontext = new Qontext(Qontext.globalContext);
             ConsoleKeyInfo keyInfo;
             draw();
             setCursor(0);
@@ -237,7 +236,7 @@ namespace Qrakhen.Sqr.Core
             log.setLoggingLevel(Logger.Level.MUFFLE);
             try {
                 int i = 0;
-                var tokens = tokenResolver.resolve(new Stack<char>(chars.ToArray()));
+                var tokens = tokenResolver.resolve(new Stack<char>(chars.ToArray()), qontext);
                 tokens.process((current, next, index, end) => {
                     var t = next();
                     if (mapping.contains(t.type)) {
@@ -250,6 +249,17 @@ namespace Qrakhen.Sqr.Core
                     }
                 });
             } catch (Exception e) {
+                if (e is SqrError) {
+                    var d = (e as SqrError).data;
+                    if (d is Token) {
+                        temp.Insert(Math.Max(0, (int)(d as Token).__pos), colors[ConsoleColor.Red]);
+                        temp.Insert(Math.Min((int)(d as Token).__end + 1, temp.Count), colors[ConsoleColor.White]);
+                        log.setLoggingLevel(level);
+                        return new string(temp.ToArray());
+
+                    }
+                }
+
                 temp.Insert(0, colors[ConsoleColor.Red]);
                 temp.Add(colors[ConsoleColor.White]);
             }

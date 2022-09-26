@@ -12,8 +12,8 @@ namespace Qrakhen.Sqr.Core
         public const int WIN_TICKS = 10000000;
         public const long SEC_TO_UNIX_EPOCH = 11644473600L;
 
-        public Time(DateTime value) : base(value, Type.get("Time")) { }
-        public Time() : base(DateTime.Now, Type.get("Time"))
+        public Time(DateTime value) : base(value, CoreModule.instance.getType("Time")) { }
+        public Time() : base(DateTime.Now, CoreModule.instance.getType("Time"))
         {
 
         }
@@ -46,15 +46,5 @@ namespace Qrakhen.Sqr.Core
 
         public static implicit operator DateTime(Time t) => t.__value;
         public static implicit operator Time(DateTime t) => new Time(t);
-
-        static Time()
-        {
-            Type.register(typeof(Time), new Type.Args {
-                name = "Time",
-                module = Type.coreModule,
-                extends = Type.Value,
-                nativeType = NativeType.Instance
-            });
-        }
     }
 }

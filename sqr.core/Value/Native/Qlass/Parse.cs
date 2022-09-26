@@ -9,7 +9,7 @@ namespace Qrakhen.Sqr.Core
 {
     public class Parse : Value
     {
-        public Parse() : base(Type.get("Parse"))
+        public Parse() : base(CoreModule.instance.getType("Parse"))
         {
 
         }
@@ -18,16 +18,6 @@ namespace Qrakhen.Sqr.Core
         public static Number asInt(Value value)
         {
             return int.Parse(value.raw?.ToString());
-        }
-
-        static Parse()
-        {
-            Type.register(typeof(Parse), new Type.Args {
-                name = "Parse",
-                module = Type.coreModule,
-                extends = Type.Value,
-                nativeType = NativeType.Static
-            });
         }
     }
 }
