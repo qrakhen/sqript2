@@ -7,7 +7,7 @@
 		@Qonsole:write(' ');
 		while(c < board:@r:length()) {
 			*~ tempRow <~ board:@r;
-			@Qonsole:write(tempRow:c + ' ');
+			@Qonsole:write(tempRow:@c + ' ');
 			c <~ c + 1;
 		}
 		c <~ 0;
@@ -24,8 +24,8 @@ fq dropInBoard (board, column, symbol {
 	*~ c <~ 0;
 	while(r >= 0) {
 		*~ tempRow <~ board:@r;
-		if(tempRow:column == ' ') {
-			tempRow:column <~ symbol;
+		if(tempRow:@column == ' ') {
+			tempRow:@column <~ symbol;
 			r <~ 0;
 			return board;
 		}
@@ -71,7 +71,7 @@ fq checkIfWon (board, symbol, playerId {
 			if (count == 4) {
 				return playerId;
 			}
-			if (tempRow:c == symbol) {				
+			if (tempRow:@c == symbol) {				
 				count <~ count + 1;
 			} else {
 				count <~ 0;
@@ -211,10 +211,10 @@ while(run > 0) {
 	}
 
 	printBoard(currentboard);
-	@Qonsole:writeLine("--------Winner--------");
+	@Qonsole:writeLineC("--------Winner--------", "DarkBlue");
 	@Qonsole:write("Congratulations:");
-	@Qonsole:writeLine(currentPlayerName);
-	@Qonsole:writeLine("----------------------\n\n");
+	@Qonsole:writeLineC(currentPlayerName, "Blue");
+	@Qonsole:writeLineC("----------------------\n\n", "DarkBlue");
 	
 	@Qonsole:write('Again? [y/n]: ');
 	*~ input <~ @Qonsole:readLine();
