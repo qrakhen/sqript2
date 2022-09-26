@@ -11,16 +11,12 @@ using static System.Net.Mime.MediaTypeNames;
 namespace Qrakhen.Sqr.Core
 {
     public class Qonsole : Value
-    {       
-        public Qonsole() : base(CoreModule.instance.getType("Qonsole"))
-        {
+	{
+		private static ConsoleColor _consoleColor = ConsoleColor.White;
 
-        private static ConsoleColor _consoleColor = ConsoleColor.White;
-
-		public Qonsole() : base(Type.get("Qonsole"))
-        {
-
-        }
+		public Qonsole() 
+			: base(CoreModule.instance.getType("Qonsole"))
+		{ }
 
 		[NativeMethod]
 		public static void setColor(String color) {
