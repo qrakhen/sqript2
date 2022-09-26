@@ -16,7 +16,7 @@ namespace Qrakhen.Sqr.Core
                         throw new SqrParseError("expected a token, got nothing instead.");
                     return false;
                 }
-                if (!token.isType(type)) {
+                if (!token.hasType(type)) {
                     if (throwError)
                         throw new SqrParseError("expected token of type " + type + ", got " + token.type + " instead.", token);
                     return false;
@@ -57,7 +57,7 @@ namespace Qrakhen.Sqr.Core
                         throw new SqrParseError("expected token of type " + typeof(T).Name + ", got " + token + " instead.", token);
                     return false;
                 }
-                if (!t.isType(type)) {
+                if (!t.hasType(type)) {
                     if (throwError)
                         throw new SqrParseError("expected token of type " + type.ToString() + ", got " + token + " instead.", token);
                     return false;

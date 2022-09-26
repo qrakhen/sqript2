@@ -77,12 +77,18 @@ namespace Qrakhen.Sqr.Core
             register(Type.CALC_ADD, "+", 2, (left, right) => {
                 if (left is Number && right is Number)
                     return new Number((left as Number) + (right as Number));
+                if (left is String)
+                    return new String((left.raw as String) + (right.raw));
+                if (right is String)
+                    return new String((left.raw) + (right.raw as String));
                 return new Number(0);
             });
 
             register(Type.CALC_SUB, "-", 2, (left, right) => {
                 if (left is Number && right is Number)
                     return new Number((left as Number) - (right as Number));
+                if (left == null && right is Number)
+                    return new Number((right as Number) *- 1);
                 return new Number(0);
             });
 
@@ -107,26 +113,38 @@ namespace Qrakhen.Sqr.Core
             });
 
             register(Type.COMP_EQUAL, "==", 1, (left, right) => {
+                if (left is Time && right is Time)
+                    return new Boolean((left as Time).raw == (right as Time).raw);
                 return new Boolean(left.Equals(right));
             });
 
             register(Type.COMP_NOTEQUAL, "!=", 1, (left, right) => {
+                if (left is Time && right is Time)
+                    return new Boolean((left as Time).raw != (right as Time).raw);
                 return new Boolean(!left.Equals(right));
             });
 
             register(Type.COMP_GT, ">", 1, (left, right) => {
+                if (left is Time && right is Time)
+                    return new Boolean((left as Time).raw > (right as Time).raw);
                 return new Boolean((left as Number) > (right as Number));
             });
 
             register(Type.COMP_GTEQUAL, ">=", 1, (left, right) => {
+                if (left is Time && right is Time)
+                    return new Boolean((left as Time).raw >= (right as Time).raw);
                 return new Boolean((left as Number) >= (right as Number));
             });
 
             register(Type.COMP_LT, "<", 1, (left, right) => {
+                if (left is Time && right is Time)
+                    return new Boolean((left as Time).raw < (right as Time).raw);
                 return new Boolean((left as Number) < (right as Number));
             });
 
             register(Type.COMP_LTEQUAL, "<=", 1, (left, right) => {
+                if (left is Time && right is Time)
+                    return new Boolean((left as Time).raw <= (right as Time).raw);
                 return new Boolean((left as Number) <= (right as Number));
             });
 
@@ -150,7 +168,7 @@ namespace Qrakhen.Sqr.Core
             });
 
             register(Type.ACCESSOR, ":", 8, (left, right) => {
-                return left.accessMember(right as String);
+                return left.accessMember(right);
             });
 
             register(Type.LOGIC_NOT, "!", 0, (left, right) => {

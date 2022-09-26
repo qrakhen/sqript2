@@ -11,21 +11,22 @@ namespace Qrakhen.Sqr.Core
         public Storage<string, Variable> properties = new Storage<string, Variable>();
 
         [NativeField]
-        public override int length => properties.count;
+        public override Number length() => properties.count;
 
         public Objeqt() : base(Type.Objeqt)
         {
 
         }
 
-        public override Value accessMember(string name)
+        public override Value accessMember(Value name)
         {
             var member = base.accessMember(name);
+            string key = name as String;
             if (member == Null) {
-                if (properties.contains(name))
-                    return properties[name];
+                if (properties.contains(key))
+                    return properties[key];
                 else
-                    return null;
+                    return Null;
             }
             return member;
         }

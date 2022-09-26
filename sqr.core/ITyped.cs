@@ -12,6 +12,11 @@ namespace Qrakhen.Sqr.Core
         {
             return (((int)(object)types) & ((int)(object)type)) >= (int)(object)type;
         }
+
+        public bool hasType(T types)
+        {
+            return (((int)(object)types) & ((int)(object)type)) > 0;
+        }
     }
 
     internal enum BitFlag

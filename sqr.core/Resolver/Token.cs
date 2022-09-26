@@ -11,30 +11,41 @@ namespace Qrakhen.Sqr.Core
     {
         private readonly Logger log;
 
-        public Stack<Token> resolve(Stack<char> input)
+        public Stack<Token> resolve(Stack<char> input, Qontext qontext = null)
         {
             log.verbose("in " + GetType().Name);
             var result = new List<Token>();
             long row = 0, count = 0, __prev = 0, __end;
+            string value = null;
+            Token.Type type = (Token.Type)0;
+            Token token = null;
             while (!input.done) {
-                var pos = input.index;
-                if (input.peek() == '\n') {
-                    row++;
-                    __prev = pos;
-                }
-                if (input.peek() == '\0') {
-                    input.digest();
-                }
-                var type = matchType(input.peek());
-                var value = readValue(type, input);
-                __end = input.index;
-                if (value != null) {
-                    var token = Token.create(value, type);
-                    token.__row = row;
-                    token.__col = pos - __prev;
-                    token.__pos = pos;
-                    token.__end = __end;
-                    result.Add(token);
+                try {
+                    var pos = input.index;
+                    if (input.peek() == '\n') {
+                        row++;
+                        __prev = pos;
+                    }
+                    if (input.peek() == '\0') {
+                        input.digest();
+                    }
+                    type = matchType(input.peek());
+                    value = readValue(type, input);
+                    __end = input.index;
+                    if (value != null) {
+                        token = new Token(null, type, value);
+                        token.__row = row;
+                        token.__col = pos - __prev;
+                        token.__pos = pos;
+                        token.__end = __end;
+                        // split for debugging reasons
+                        token = Token.parse(token);
+                        if (qontext != null && token.hasType(Token.Type.Identifier))
+                            token.resolveType(qontext, false);
+                        result.Add(token);
+                    }
+                } catch(SqrError e) {
+                    throw new SqrParseError("error occured when parsing sqript @" + row + ":" + (input.index - __prev) + "(" + input.index + "): " + e.Message, token);
                 }
             }
             log.spam(string.Join(", ", result.Select(_ => _.type + ": '" + _.raw + "'")));
@@ -100,7 +111,7 @@ namespace Qrakhen.Sqr.Core
             if (type == Token.Type.String)
                 return readString(input);
 
-            if (type == Token.Type.Type) { 
+            if (type == Token.Type.ValueOf) { 
                 var r = input.digest() + readType(input, Token.Type.Identifier);
                 return r;
             }
@@ -128,13 +139,13 @@ namespace Qrakhen.Sqr.Core
         }
 
         static readonly private Dictionary<Token.Type, string> matches = new Dictionary<Token.Type, string>() {
-            { Token.Type.Operator, @"[\/\-\*+=&<>^?!~:]" },
+            { Token.Type.Operator, @"[\/\-\*+=&<>^?!~:|]" },
             { Token.Type.Number, @"[\d.]" },
             { Token.Type.String, "[\"']" },
             { Token.Type.Structure, @"[{}()[\],]" },
             { Token.Type.End, @";" },
             //{ Token.Type.Accessor, @"[:]" },
-            { Token.Type.Type, "@" },
+            { Token.Type.ValueOf, "@" },
             { Token.Type.Whitespace, @"\s" },
             { Token.Type.Comment, @"#" },
         };
@@ -144,13 +155,12 @@ namespace Qrakhen.Sqr.Core
     {
         public const string end = ";";
 
-        public long __row, __col, __pos = -1, __end = -1;
+        public long __row, __col, __pos, __end;
 
         public readonly string raw;
-        public readonly object value;
-        public new Type type => base.type;
+        public object value;
 
-        private Token(object value, Type type, string raw)
+        public Token(object value, Type type, string raw)
         {
             this.value = value;
             base.type = type;
@@ -170,10 +180,14 @@ namespace Qrakhen.Sqr.Core
             if (!isType(Type.Value))
                 throw new SqrError("can not make value out of token: not a value token" + this, this);
 
-            if (type == Type.Boolean) return new Boolean((bool)value);
-            if (type == Type.Float) return new Number((float)value);
-            if (type == Type.Number) return new Number((double)value);
-            if (type == Type.String) return new String((string)value);
+            if (isType(Type.Boolean)) return new Boolean((bool)value);
+            if (isType(Type.Float)) return new Number((float)value);
+            if (isType(Type.Number)) return new Number((double)value);
+            if (isType(Type.String)) return new String((string)value);
+            if (isType(Type.String)) return new String((string)value);
+            if (isType(Type.String)) return new String((string)value);
+            if (isType(Type.Null)) return Value.Null;
+            if (isType(Type.Void)) return Value.Void;
             throw new SqrError("no known native type applied to token " + this, this);
         }
 
@@ -195,21 +209,28 @@ namespace Qrakhen.Sqr.Core
             return NativeType.None;
         }
 
-        public static Token create(string raw, Type type)
+        public static Token parse(Token token)
         {
             Type parsedType;
-            var value = parse(raw, type, out parsedType);
+            var value = __parse(token.raw, token.type, out parsedType);
 
             if (value == null)
-                throw new SqrError("could not parse value " + raw + ", it's not a known " + type);
+                throw new SqrParseError("could not parse value " + token.raw + ", it's not a known " + token.type);
 
-            return new Token(value, parsedType, raw);
+            token.value = value;
+            token.type = parsedType;
+
+            return token;
         }
 
-        public static object parse(string raw, Type type, out Type parsedType)
+        private static object __parse(string raw, Type type, out Type parsedType)
         {
             try {
                 parsedType = type;
+                if (raw == "null" || raw == "void") {
+                    parsedType = (raw == "null" ? Type.Null : Type.Void);
+                    return (raw == "null" ? Value.Null : Value.Void);
+                }
                 if (raw == "true" || raw == "false") {
                     parsedType = Type.Boolean;
                     return (raw == "true" ? true : false);
@@ -231,26 +252,48 @@ namespace Qrakhen.Sqr.Core
                     parsedType = Type.Structure;
                     return Structure.get(raw); 
                 }
-                if (raw.StartsWith("@")) {
-                    parsedType = Type.Type;
-                    return Core.Type.get(raw.Substring(1));
+                if (type == Type.ValueOf) {
+                    object v = CoreModule.instance.getType(raw.Substring(1));
+                    if (v != null) {
+                        parsedType = Type.TypeValue;
+                    } else {
+                        parsedType = Type.IdentifierValue;
+                        v = raw.Substring(1);
+                    }
+                    return v;
                 }
-                if (type == Type.Keyword || type == Type.Type || type == Type.Identifier) {
+                if (type == Type.Keyword || type == Type.Identifier) {
                     var v = Keyword.get(raw);
                     if (v != null) {
                         parsedType = Type.Keyword;
                         return v;
-                    }
-                    var t = Core.Type.get(raw);
-                    if (t != null) { 
-                        parsedType = Type.Type;
-                        return t;
-                    }
+                    }                    
                 }
                 return raw;
             } catch (Exception e) {
                 throw new SqrError("trying to parse raw token value " + raw + " as " + type + ". didn't work.");
             }
+        }
+
+        public Core.Type resolveType(Qontext qontext, bool doThrow = false)
+        {
+            Core.Type type = null;
+            if (!Validator.Token.tryGetType(this, Type.Type, out type)) {
+                if (Validator.Token.tryGetType(this, Type.Identifier, out string name)) {
+                    type = qontext.resolveType(name, false);
+                    if (type != null) {
+                        this.type = Type.Type | (this.type & Type.ValueOf);
+                        this.value = type;
+                        Logger.TEMP_STATIC_DEBUG.verbose("could resolve type " + type + " for token " + this);
+                    }
+                }
+            }
+
+            if (type == null && doThrow) {
+                throw new SqrTypeError("a value of Type or Qlass was expected, got " + this + " instead");
+            }
+
+            return type;
         }
 
         public override string ToString()
@@ -274,8 +317,13 @@ namespace Qrakhen.Sqr.Core
             Comment = 1024,
             End = 2048,
             Type = 4096,
+            Null = Type * 2,
+            Void = Null * 2,
+            ValueOf = Void * 2,
 
-            Value = Boolean | Float | Number | String | Identifier
+            Value = Boolean | Float | Number | String | Identifier | Null | Void | ValueOf,
+            TypeValue = ValueOf | Type,
+            IdentifierValue = ValueOf | Identifier
         }
     }
 }

@@ -63,7 +63,9 @@ namespace Qrakhen.Sqr.Core
         public class Node
         {
             public object left;
+            public Operator leftMod;
             public object right;
+            public Operator rightMod;
             public object data;
             public Operator op;
 
@@ -77,9 +79,9 @@ namespace Qrakhen.Sqr.Core
             public Value execute(Qontext qontext)
             {
                 if (left != null) {
-                    Value _left = resolveValue(left, qontext);
+                    Value _left = resolveValue(left, leftMod, qontext);
                     if (op != null && right != null) {
-                        Value _right = resolveValue(right, qontext);
+                        Value _right = resolveValue(right, rightMod, qontext);
 
                         if (op.isType(Operator.Type.ASSIGN_REF)) {
 
@@ -96,7 +98,7 @@ namespace Qrakhen.Sqr.Core
                         Logger.TEMP_STATIC_DEBUG.spam("result " + op.resolve(_left, _right));
 
                         var result = op.resolve(_left, _right);                        
-                        return resolveValue(result, qontext);
+                        return resolveValue(result, null, qontext);
                     } else {
                         return _left;
                     }
@@ -105,7 +107,7 @@ namespace Qrakhen.Sqr.Core
                 }
             }
 
-            private Value resolveValue(object value, Qontext qontext)
+            private Value resolveValue(object value, Operator mod, Qontext qontext)
             {
                 Value _value;
                 if (value is Node) {
@@ -113,9 +115,13 @@ namespace Qrakhen.Sqr.Core
                 } else {
                     _value = value as Value;
                 }
+
+                if (mod != null) {
+                    _value = mod.resolve(null, _value);
+                }
                 
-                if (_value.obj is Qallable && data != null) {
-                    return (_value.obj as Qallable).execute((data as Qollection).items.ToArray(), qontext);
+                if (_value?.obj is Qallable && data != null) {
+                    return (_value.obj as Qallable).execute((data as Qollection).values.ToArray(), qontext);
                 } else {
                     return _value;
                 }

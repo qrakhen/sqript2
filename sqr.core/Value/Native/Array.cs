@@ -8,18 +8,18 @@ namespace Qrakhen.Sqr.Core
 {
     public class Array : ItemSet
     {
-        public override int length => items.Length;
+        public override Number length() => items.Length;
         public Variable[] items;
 
         public Array() : base(Type.Array)
         {
         }
 
-        public override Value accessMember(string name)
+        public override Value accessMember(Value name)
         {
             var member = base.accessMember(name);
             if (member == Null) {
-                var index = Convert.ToInt32(name);
+                var index = Convert.ToInt32((name as Number)?.asInteger());
                 if (items.Length > index && index > 0)
                     return items[index];
                 else

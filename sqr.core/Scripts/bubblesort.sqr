@@ -1,0 +1,21 @@
+﻿funqtion sort (Qollection q { 
+	*~ sorted <~ false;
+	while (sorted == false) {
+		*~ i <~ 0;
+		*~ swapped <~ false;
+		while (i < q:length() - 1) {
+			*~ temp <~ q:get(i + 1);
+			if (temp > q:get(i)) {
+				q:set(i + 1, q:get(i));
+				q:set(i, temp);
+				swapped <~ true;
+			}
+			i <~ i + 1;
+		}
+		if (swapped == false) {
+			sorted <~ true;
+			break;
+		}
+	}
+	return q;
+});

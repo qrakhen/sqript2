@@ -8,9 +8,21 @@ namespace Qrakhen.Sqr.Core
 {
     public class String : Value<string>
     {
-        public String(string value) : base(value, Type.String)
+        public String(string value = null) : base(value, Type.String)
         {
             
+        }
+
+        public override Value accessMember(Value key)
+        {
+            if (key is Number) {
+                int index = (key as Number).asInteger();
+                if (index >= 0 && __value?.Length > index)
+                    return new String(__value[index].ToString());
+                else
+                    throw new SqrParameterError("index " + index + " outside of string's boundaries (" + __value + ")");
+            }
+            return base.accessMember(key);
         }
 
         [NativeMethod]
@@ -27,9 +39,15 @@ namespace Qrakhen.Sqr.Core
                 (int)(to as Number)));
         }
 
+        [NativeMethod]
+        public String lower()
+        {
+            return new String(__value.ToLower());
+        }
+
         public override string ToString()
         {
-            return "'" + __value?.ToString() + "'";
+            return __value?.ToString();
         }
 
         public static implicit operator string(String s) => s.__value;

@@ -13,6 +13,18 @@ namespace Qrakhen.Sqr.Core
             
         }
 
+        public override Value accessMember(Value name)
+        {
+            if (__value == null)
+                return Null;
+
+            string key = name as String;
+            if (__value.methods.contains(key))
+                return __value.methods[key].makeQallable(this);
+            else
+                throw new SqrTypeError("unknown member " + name + " of type " + __value.name);
+        }
+
         public override string ToString()
         {
             return __value?.name;

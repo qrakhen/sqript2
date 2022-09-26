@@ -79,7 +79,7 @@ namespace Qrakhen.Sqr.Core
                 Token t = input.peek();
                 log.spam("token peeked: " + t);
 
-                if (t.isType(Token.Type.Value))
+                if (t.isType(Token.Type.Value) || t.hasType(Token.Type.ValueOf))
                     handleValue(input, ref node, qontext, level);
 
                 else if (t.isType(Token.Type.Keyword | Token.Type.Type))
@@ -113,9 +113,26 @@ namespace Qrakhen.Sqr.Core
         private void handleValue(Stack<Token> input, ref Node node, Qontext qontext, int level = 0)
         {
             Value value;
-            if (node.op != null && node.op.type == Operator.Type.ACCESSOR) {
-                value = new String(input.digest().raw);               
-            } else {
+            if (node.left == null && node.op != null) {
+                node.leftMod = node.op;
+                node.op = null;
+            }
+
+            Token t = input.peek();
+            var type = t.resolveType(qontext);
+            
+            if (    
+                    node.op != null &&
+                    node.op.type == Operator.Type.ACCESSOR && 
+                    !t.hasType(Token.Type.ValueOf) &&
+                    t.isType(Token.Type.Identifier | Token.Type.Type)) {
+                value = new String(input.digest().raw);
+            } else if (
+                    type != null &&
+                    t.hasType(Token.Type.ValueOf)) {
+                input.digest();
+                value = new Qlass(type);
+            } else { 
                 value = valueResolver.resolve(input, qontext);
             }
 
@@ -143,7 +160,7 @@ namespace Qrakhen.Sqr.Core
 
             if (Validator.Token.tryGetSubType(t, Keyword.Type.INSTANCE_CREATE, out Keyword keyword)) {
                 input.digest();
-                Validator.Token.tryGetType(input.digest(), Token.Type.Type, out Type type, true);
+                var type = input.digest().resolveType(qontext, true);
                 var parameters = qollectionResolver.resolve(
                     structureResolver.resolve(
                         input,
@@ -153,25 +170,63 @@ namespace Qrakhen.Sqr.Core
                     throw new SqrError("weird spot to instantiate something.", t);
                 return;
             }
-                
+
+            if (Validator.Token.tryGetSubType(t, Keyword.Type.FUNQTION_INLINE, out keyword)) {
+                input.digest();
+                var funqtion = funqtionResolver.resolve(
+                    structureResolver.resolve(input, qontext), qontext);
+                if (!node.put(new Qallable(funqtion)))
+                    throw new SqrError("weird spot to write an inline funqtion.", t);
+                return;
+            }
+
+            if (
+                    node.op != null && 
+                    node.op.type == Operator.Type.ACCESSOR && 
+                    Validator.Token.tryGetType(t, Token.Type.Type, out Type at)) {
+                if (!node.put(new String(input.digest().raw)))
+                    throw new SqrError("weird spot to do this.", t);                
+                return;
+            }
+
+
             if (!node.empty || level > 0) {
                 throw new SqrError("unexpected keyword " + t, t);
             } else {
+                Value result = null;
                 var k = input.peek().get<Keyword>();
+                bool export = false;
+                if (k != null && k.isType(Keyword.Type.EXPORT)) {
+                    export = true;
+                    input.digest();
+                    log.spam("exporting following value");
+                    k = input.peek().get<Keyword>();
+                }
                 if (k != null && k.isType(Keyword.Type.QONDITION)) {
                     node.left = qonditionResolver.resolve(input, qontext);
                 } else if (k != null && k.isType(Keyword.Type.DECLARE_QLASS)) {
-                    node.left = qlassResolver.resolve(input, qontext);
+                    result = qlassResolver.resolve(input, qontext);
                 } else {
                     var info = declarationResolver.resolve(input, qontext);
                     if (info.isFunqtion) {
                         var funqtion = funqtionResolver.resolve(
                             structureResolver.resolve(input, qontext), qontext, info);
-                        node.left = qontext.register(info.name, new Qallable(funqtion));
+                        result = qontext.register(info.name, new Qallable(funqtion));
                     } else {
-                        node.left = qontext.register(info.name, null, info.isReference, info.type, info.isReadonly);
+                        result = qontext.register(info.name, null, info.isReference, info.type, info.isReadonly);
                     }
                     log.spam("registered name " + t + " in qontext");
+                }
+
+                if (result != null) {
+                    node.left = result;
+                    if (export) {
+                        if (result is Qlass)
+                            qontext.module.export((result as Qlass).raw);
+                        else
+                            qontext.module.export(result);
+                    }
+                                            
                 }
             }
         }
@@ -192,8 +247,10 @@ namespace Qrakhen.Sqr.Core
                         } else {
                             node = build(input, qontext, new Node(node, null, op), level + 1);
                         }
+                    } else if (node.left != null && node.right == null) {
+                        node.rightMod = op;
                     } else {
-                        throw new SqrError("2 operatorss? " + node, node);
+                        throw new SqrError("operators are weird" + node, node);
                     }
                 }
             }
