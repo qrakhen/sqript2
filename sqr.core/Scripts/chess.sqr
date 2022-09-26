@@ -121,15 +121,17 @@ qlass Board {
 	Piece fq collision(from, to {
 		*~ delta <~ to:delta(from);
 		*~ dir <~ delta:dir();
-		*~ h <~ delta:x - 1;
-		*~ v <~ delta:y - 1;
+		*~ h <~ @Calc:abs(delta:x);
+		*~ v <~ @Calc:abs(delta:y);
+		*~ i <~ 1;
 		while (h + v > 0) {
-			*~ pos <~ new Pos(from:x + (delta:x - h), from:y + (delta:y - v));
+			*~ pos <~ new Pos(from:x + (dir:x * i), from:y + (dir:y * i));
 			cout (pos:x + ":" + pos:y);
-			*~ p <~ board:(pos:x):(pos:y);
+			*~ p <~ this:pieces:(pos:x):(pos:y);
 			if (p != null) {
 				<: p;
 			}
+			i <~ i + 1;
 			h <~ h - dir:x;
 			v <~ v - dir:y;
 		}
