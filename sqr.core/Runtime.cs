@@ -85,7 +85,7 @@ namespace Qrakhen.Sqr.Core
                 module = new Module("Qonsole");
                 qontext = new Qontext(Qontext.globalContext, module);
                 log.success(Properties.strings.Message_Welcome);
-                if (qonfig.useExtendedConsole) {
+                if (qonfig.qonsole.useExtended) {
                     userControlInterface.run(qontext);
                 } else {                    
                     do {

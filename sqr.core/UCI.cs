@@ -87,6 +87,11 @@ namespace Qrakhen.Sqr.Core
 
         private void __run(Qontext qontext)
         {
+            foreach (var m in Runtime.qonfig.qonsole.colorMapping) {
+                if (Enum.TryParse(typeof(ConsoleColor), m.Value, out object v))
+                    mapping[m.Key] = (ConsoleColor)v;
+            }
+
             log.cmd("Safe mode: Use shift + enter for a new line. Execute multiple lines using ctrl + enter.");
             reset();
             ConsoleKeyInfo keyInfo;
@@ -98,10 +103,12 @@ namespace Qrakhen.Sqr.Core
                         if (lineStr.Length > 0 && cx > 0) {
                             line.RemoveAt(cx - 1);
                             setCursor(cx - 1);
+                            draw();
                         }
                     } else if (keyInfo.Key == ConsoleKey.Delete) {
                         if (lineStr.Length > 0 && cx < line.Count) {
                             line.RemoveAt(cx);
+                            draw();
                         }
                     } else if (keyInfo.Key == ConsoleKey.Tab) {
                         var match = qontext.names.Keys
@@ -121,6 +128,7 @@ namespace Qrakhen.Sqr.Core
                     } else {
                         line.Insert(Math.Min(cx, line.Count), keyInfo.KeyChar);
                         setCursor(cx + 1);
+                        draw();
                     }
 
                     /*if (word.Length > 2) {
@@ -131,8 +139,6 @@ namespace Qrakhen.Sqr.Core
 
                         //line.Insert(Math.Min(cx, line.Count), keyInfo.KeyChar);
                     }*/
-
-                    draw();
                 }
                 var shift = ((keyInfo.Modifiers & ConsoleModifiers.Shift) == ConsoleModifiers.Shift);
                 if ((lines.Count == 1 && !shift) || ((keyInfo.Modifiers & ConsoleModifiers.Control) == ConsoleModifiers.Control)) {
