@@ -17,6 +17,8 @@ namespace Qrakhen.Sqr.Core
         public float asFloat() => (float)raw;
         public int asInteger() => (int)raw;
 
+        [NativeMethod] public Number toInt() => asInteger();
+
         public static implicit operator double(Number n) => n.__value;
         public static implicit operator Number(double d) => new Number(d);
         public static implicit operator Number(int d) => new Number(d);

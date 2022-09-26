@@ -84,7 +84,7 @@ namespace Qrakhen.Sqr.Core
                 .alias("funq", "fq", "function");
             register(Type.FUNQTION_INLINE, "~:");
             register(Type.DECLARE_QLASS, "qlass");
-            register(Type.IMPORT, "import");
+            //register(Type.IMPORT, "import");
             register(Type.EXPORT, "export");
             register(Type.MODULE, "module");
             register(Type.QONDITION_IF, "if")
