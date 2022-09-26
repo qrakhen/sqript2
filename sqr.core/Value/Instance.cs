@@ -2,6 +2,7 @@
 using Qrakhen.SqrDI;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Qrakhen.Sqr.Core
@@ -15,6 +16,16 @@ namespace Qrakhen.Sqr.Core
         {
             this.fields = new Storage<string, Variable>();
             this.qontext = new Qontext(qontext);
+        }
+
+        public override string ToString()
+        {
+            return "Instance(" + type.name + ")";
+        }
+
+        public override string toDebugString()
+        {
+            return ToString() + "\n" + string.Join("\n", fields.Select(_ => "    " + _.Key + ": " + _.Value.get()));
         }
     }
 }

@@ -52,6 +52,12 @@ namespace Qrakhen.Sqr.Core
             items[(index as Number).asInteger()] = new Variable(value);
         }
 
+        [NativeMethod]
+        public void forEach(Qallable callback)
+        {
+            items.ForEach(_ => callback.execute(new Value[] { _ }, null));
+        }
+
         public override string ToString()
         {
             var r = "[\n";
