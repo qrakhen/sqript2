@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -18,6 +19,8 @@ namespace Qrakhen.Sqr.Core
 
         public static readonly Qonfig qonfig = new Qonfig();
 
+        public static readonly Storage<string, Module> moduleCache = new Storage<string, Module>();
+
         private readonly Logger log;
         private readonly UCI userControlInterface;
         private readonly TokenResolver tokenResolver;
@@ -26,15 +29,24 @@ namespace Qrakhen.Sqr.Core
 
         public bool alive { get; private set; } = true;
 
+        public Runtime() => init();
+
         public void init()
         {
-            log.setLoggingLevel(Logger.Level.VERBOSE);
+            CoreModule.init();
+            Dependor.get<Logger>().setLoggingLevel(Logger.Level.INFO);
         }
 
-        public Qontext run(string content = null, bool __DEV_DEBUG = false) 
+        public void executeFile() { }
+        public void executeString() { }
+        private void __execute() { }
+
+        public Module run(string file = null, bool __DEV_DEBUG = false) 
         {           
+            var content = file != null ? File.ReadAllText(file) : null;
+            Module module = null;
+            Qontext qontext = null;
             if (content != null) {
-                log.setLoggingLevel(Logger.Level.CRITICAL);
                 if (content.StartsWith("!!")) {
                     content = content[2..];
                     __DEV_DEBUG = true;
@@ -43,31 +55,39 @@ namespace Qrakhen.Sqr.Core
                     __DEV_DEBUG = true;
                 }
 
-                Module module = null;
                 var moduleKeyword = Keyword.get(Keyword.Type.MODULE).symbol;
                 if (content.StartsWith(moduleKeyword)) {
-                    string name = content.Substring(moduleKeyword.Length, content.IndexOf(";")).Trim();
-                    module = new Module(name, null, Qontext.globalContext);
+                    string name = content.Substring(moduleKeyword.Length, content.IndexOf(";") - moduleKeyword.Length).Trim();
+                    if (name.Contains(":"))
+                        throw new SqrError("sorry multidimensional modules not yet implemented, give me a week or so");
+
+                    module = new Module(name);
+                    content = content.Substring(content.IndexOf(";"));
+                } else {
+                    var name = BitConverter.ToString(MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(file)));
+                    module = new Module(name);
                 }
-                Qontext qontext = module == null ? Qontext.globalContext : module.qontext;
+
+                qontext = new Qontext(Qontext.globalContext, module);
 
                 if (__DEV_DEBUG)
                     log.setLoggingLevel(Logger.Level.SPAM);
 
                 execute(content, qontext);
-                return qontext;
+                return module;
             } else {
-                //log.write(Properties.strings.ASCII_Logo, ConsoleColor.DarkGray, prefix: "    ");
+                module = new Module("Qonsole");
+                qontext = new Qontext(Qontext.globalContext, module);
                 log.success(Properties.strings.Message_Welcome);
                 if (qonfig.useExtendedConsole) {
-                    userControlInterface.run();
-                } else {
-                    Qontext consoleQontext = new Qontext();
+                    userControlInterface.run(qontext);
+                } else {                    
                     do {
-                        execute(Console.ReadLine(), consoleQontext);
+                        Console.Write("     <: ");
+                        execute(Console.ReadLine(), qontext);
                     } while (true);
                 }
-                return null;
+                return module;
             }
         }
 
@@ -76,6 +96,7 @@ namespace Qrakhen.Sqr.Core
             if (qontext.names["cout"] != null)
                 return;
 
+            
             qontext.register(
                 "cout",
                 new Qallable(new InternalFunqtion((p, q, s) => { log.success(p[0].raw); return Value.Void; })));
@@ -85,20 +106,21 @@ namespace Qrakhen.Sqr.Core
             qontext.register(
                 "import",
                 new Qallable(new InternalFunqtion((p, q, s) => {
-                    qontext.import(run(File.ReadAllText(p[0] as String)));
-                    return Value.Void;
+                    var module = run(p[0] as String);
+                    qontext.import(module);
+                    return module;
                 })));
             qontext.register(
                "export",
                new Qallable(new InternalFunqtion((p, q, s) => {
-                   qontext.export(p[0].raw as string, p[0]);
+                   qontext.export(p[0]);
                    return Value.Void;
                })));
         }        
 
         public void execute(string input, Qontext qontext)
         {
-            //qontext = qontext ?? Qontext.globalContext;
+            
             registerGlobalFunqtions(qontext);
             try {                
                 if (input.StartsWith("/")) {
@@ -111,26 +133,29 @@ namespace Qrakhen.Sqr.Core
                 var t = new Stopwatch();
                 t.Restart();
                 long _ms = 0, _t = 0;
-                var tokenStack = tokenResolver.resolve(new Core.Stack<char>(applyAliases(input).ToCharArray()));
+                var tokenStack = tokenResolver.resolve(new Core.Stack<char>(applyAliases(input).ToCharArray()), qontext);
+                log.verbose("all tokens resolved in " + (t.ElapsedMilliseconds - _ms) + "ms, " + (t.ElapsedTicks - _t) + " ticks");
                 while (!tokenStack.done) {
                     var operation = operationResolver.resolveOne(tokenStack, qontext);
                     var result = operation.execute(qontext);
                     if (result != null) {
                         if (log.loggingLevel > Logger.Level.INFO)
                             log.success(result.toDebugString());
-                        else
+                        else if (log.loggingLevel == Logger.Level.INFO)
                             log.success(result.ToString());
                     }
                     log.verbose("operation time " + (t.ElapsedMilliseconds - _ms) + "ms, " + (t.ElapsedTicks - _t) + " ticks");
                     _ms = t.ElapsedMilliseconds;
                     _t = t.ElapsedTicks;
                 }
-                log.info("execution time " + (t.ElapsedMilliseconds) + "ms, " + (t.ElapsedTicks) + " ticks");
+                log.debug("execution time " + (t.ElapsedMilliseconds) + "ms, " + (t.ElapsedTicks) + " ticks");
             } catch (SqrError e) {
                 log.error(log.loggingLevel > Logger.Level.INFO ? e : (object)e.Message);
-                log.warn("Sqr stacktrace:\n" + string.Join("\n", SqrError.stackTrace.ToArray()));
+                //log.warn("Sqr stacktrace:\n" + string.Join("\n", SqrError.stackTrace.ToArray()));
                 if (e.data != null && log.loggingLevel >= Logger.Level.DEBUG)
-                    log.warn(json(e.data));
+                    log.warn((e.data is Value) ? (e.data as Value).toDebugString() : e.data.ToString());
+                if (e.context != null && log.loggingLevel >= Logger.Level.DEBUG)
+                    log.warn((e.context is Value) ? (e.context as Value).toDebugString() : e.context.ToString());
             } /* catch (Exception e) {
                     log.error("### system exceptions need to be completely eradicated ###");
                     log.error(e);
@@ -150,8 +175,8 @@ namespace Qrakhen.Sqr.Core
                     valueResolver.resolve(
                         new Stack<Token>(
                             new Token[] {
-                                Token.create(args[1], Token.Type.Identifier)
-                            }), Qontext.globalContext)));
+                                new Token(args[1], Token.Type.Identifier, null)
+                            }), qontext)));
                 return;
             } else if (input.StartsWith("alias")) {
                 if (args.Length == 1) {
@@ -178,11 +203,13 @@ namespace Qrakhen.Sqr.Core
                     log.cmd("set logging level to " + log.loggingLevel);
                 }
             } else if (input == "t") {
-                var t = File.ReadAllText("tests.sqr");
-                execute(t, qontext);
+                run("tests.sqr");
             } else if (input.StartsWith("run")) {
-                var t = File.ReadAllText(args[1]);
-                execute(t, qontext);
+                var text = File.ReadAllText(args[1]);
+                if (text.StartsWith("module")) {
+                    text = text.Substring(text.IndexOf(";"));
+                }
+                execute(text, qontext);
             } else if (input == "c") {
                 qontext.names.clear();
                 log.cmd("cleared global qontext");

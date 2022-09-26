@@ -26,7 +26,7 @@ namespace Qrakhen.Sqr.Core
                 if (properties.contains(key))
                     return properties[key];
                 else
-                    return null;
+                    return Null;
             }
             return member;
         }

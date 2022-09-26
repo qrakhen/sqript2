@@ -60,8 +60,7 @@ namespace Qrakhen.Sqr.Core
             if (message == null)
                 message = "null";
             else {
-                //if (message.GetType() == typeof(SqrError))
-                //    v = (message as SqrError).data;
+                
             }
 
             var _color = Console.ForegroundColor;
@@ -72,6 +71,8 @@ namespace Qrakhen.Sqr.Core
                 Console.Write("    ~: ");
                 write(line, color);
             }
+            if (message.GetType() == typeof(SqrError))
+                write((message as SqrError).data, color);
 
             Console.ForegroundColor = _color;
         }

@@ -9,7 +9,7 @@ namespace Qrakhen.Sqr.Core
 {
     public class Calc : Value
     {
-        public Calc() : base(Type.get("Calc"))
+        public Calc() : base(CoreModule.instance.getType("Calc"))
         {
 
         }
@@ -26,14 +26,28 @@ namespace Qrakhen.Sqr.Core
             return new Number(Math.Sqrt(value));
         }
 
-        static Calc()
+        [NativeMethod]
+        public static Number abs(Number value)
         {
-            Type.register(typeof(Calc), new Type.Args {
-                name = "Calc",
-                module = Type.coreModule,
-                extends = Type.Value,
-                nativeType = NativeType.Static
-            });
+            return new Number(Math.Abs(value));
+        }
+        
+        [NativeMethod]
+        public static Number pow(Number value1, Number value2) 
+        {
+            return new Number(Math.Pow(value1, value2));
+        }
+
+        [NativeMethod]
+        public static Number log(Number value) 
+        {
+            return new Number(Math.Log(value));
+        }
+
+        [NativeMethod]
+        public static Number log2(Number value) 
+        {
+            return new Number(Math.Log2(value));
         }
     }
 }
