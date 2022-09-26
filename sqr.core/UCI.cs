@@ -87,6 +87,7 @@ namespace Qrakhen.Sqr.Core
 
         private void __run(Qontext qontext)
         {
+            log.cmd("Safe mode: Use shift + enter for a new line. Execute multiple lines using ctrl + enter.");
             reset();
             ConsoleKeyInfo keyInfo;
             draw();
@@ -133,14 +134,15 @@ namespace Qrakhen.Sqr.Core
 
                     draw();
                 }
-                if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != ConsoleModifiers.Shift) {
+                var shift = ((keyInfo.Modifiers & ConsoleModifiers.Shift) == ConsoleModifiers.Shift);
+                if ((lines.Count == 1 && !shift) || ((keyInfo.Modifiers & ConsoleModifiers.Control) == ConsoleModifiers.Control)) {
                     execute();
-                } else {
+                } else if (lines.Count > 1 || shift) {
                     lines.Add(new List<char>());
                     moveLine(1);
+                    draw();
+                    setCursor(0);
                 }
-                draw();
-                setCursor(0);
             } while (exitCode == 0);
         }
 
@@ -184,6 +186,7 @@ namespace Qrakhen.Sqr.Core
             write("\n");
             runtime.execute(strip(concatLines()), qontext);
             reset(false);
+            setCursor(0);
         }
 
         private string concatLines()

@@ -34,13 +34,13 @@ namespace Qrakhen.Sqr.Core
 
         public void init()
         {
-            CoreModule.init();
-            Dependor.get<Logger>().setLoggingLevel(Logger.Level.INFO);
-
             if (!File.Exists(defaultQonfigPath))
-                File.WriteAllText(defaultQonfigPath, JsonConvert.SerializeObject(qonfig));
+                File.WriteAllText(defaultQonfigPath, JsonConvert.SerializeObject(qonfig, Formatting.Indented));
             else
                 qonfig = JsonConvert.DeserializeObject<Qonfig>(File.ReadAllText(defaultQonfigPath));
+
+            CoreModule.init();
+            Dependor.get<Logger>().setLoggingLevel(qonfig.loggingLevel);
         }
 
         public void executeFile() { }

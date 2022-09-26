@@ -11,7 +11,7 @@ namespace Qrakhen.Sqr.Core
         public bool overwriteExistingNames = true;
         public bool useAliases = true;
         public bool useExtendedConsole = true;
-        public Logger.Level loggingLevel = Logger.Level.CRITICAL;
+        public Logger.Level loggingLevel = Logger.Level.INFO;
 
     }
 }

@@ -9,7 +9,7 @@ namespace Qrakhen.Sqr.Core
     [Injectable]
     public class Logger
     {
-        public Level loggingLevel { get; private set; } = Level.DEBUG;
+        public Level loggingLevel { get; private set; } = Level.MUFFLE;
 
         public static Logger TEMP_STATIC_DEBUG { get; private set; }
 
