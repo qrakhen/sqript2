@@ -172,7 +172,10 @@ namespace Qrakhen.Sqr.Core
             });
 
             register(Type.LOGIC_NOT, "!", 0, (left, right) => {
-                return new Boolean(!(right as Boolean));
+                if (left != null)
+                    return new Boolean(!(left as Boolean));
+                else 
+                    return new Boolean(!(right as Boolean));
             });
 
             register(Type.LOGIC_AND, "&", 0, (left, right) => {

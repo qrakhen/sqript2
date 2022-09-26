@@ -28,6 +28,8 @@ namespace Qrakhen.Sqr.Core
                 return;
             }
 
+            log.spam(head.render());
+
             if (statement == Statement.Continue || statement == Statement.Break) {
                 callback?.Invoke(Value.Void, statement, jumpTarget);
             } else {
@@ -80,25 +82,31 @@ namespace Qrakhen.Sqr.Core
             {
                 if (left != null) {
                     Value _left = resolveValue(left, leftMod, qontext);
-                    if (op != null && right != null) {
-                        Value _right = resolveValue(right, rightMod, qontext);
+                    if (op != null) {                        
+                        if (right != null) { 
+                            Value _right = resolveValue(right, rightMod, qontext);
 
-                        if (op.isType(Operator.Type.ASSIGN_REF)) {
+                            if (op.isType(Operator.Type.ASSIGN_REF)) {
 
-                        } else if (op.isType(Operator.Type.ASSIGN)) {
+                            } else if (op.isType(Operator.Type.ASSIGN)) {
 
+                            } else {
+                                if (_left is Variable)
+                                    _left = (_left as Variable).get();
+                                if (_right is Variable)
+                                    _right = (_right as Variable).get();
+                            }
+
+                            Logger.TEMP_STATIC_DEBUG.spam("resolving " + this);
+                            Logger.TEMP_STATIC_DEBUG.spam("result " + op.resolve(_left, _right));
+
+                            var result = op.resolve(_left, _right);                        
+                            return resolveValue(result, null, qontext);
+                        } else if (op.type == Operator.Type.LOGIC_NOT) {
+                            return resolveValue(_left, op, qontext);
                         } else {
-                            if (_left is Variable)
-                                _left = (_left as Variable).get();
-                            if (_right is Variable)
-                                _right = (_right as Variable).get();
+                            return _left;
                         }
-
-                        Logger.TEMP_STATIC_DEBUG.spam("resolving " + this);
-                        Logger.TEMP_STATIC_DEBUG.spam("result " + op.resolve(_left, _right));
-
-                        var result = op.resolve(_left, _right);                        
-                        return resolveValue(result, null, qontext);
                     } else {
                         return _left;
                     }
@@ -117,7 +125,7 @@ namespace Qrakhen.Sqr.Core
                 }
 
                 if (mod != null) {
-                    _value = mod.resolve(null, _value);
+                    _value = mod.resolve(null, _value.obj);
                 }
                 
                 if (_value?.obj is Qallable && data != null) {
