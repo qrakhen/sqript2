@@ -15,7 +15,7 @@ namespace Qrakhen.Sqr.Core
 
         public double asDouble() => raw_t;
         public float asFloat() => (float)raw;
-        public int asInteger() => (int)raw;
+        public int asInteger() => Convert.ToInt32(raw);
 
         [NativeMethod] public Number toInt() => asInteger();
 
