@@ -222,7 +222,7 @@ namespace Qrakhen.Sqr.Core
                     node.left = result;
                     if (export) {
                         if (result is Qlass)
-                            qontext.module.export((result as Qlass).raw);
+                            qontext.module.export((result as Qlass).raw_t);
                         else
                             qontext.module.export(result);
                     }

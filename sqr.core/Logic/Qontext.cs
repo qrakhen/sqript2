@@ -90,7 +90,7 @@ namespace Qrakhen.Sqr.Core
         {
             var v = resolveName(name, doThrow);
             if (v != null && v is Qlass) {
-                return (v as Qlass).raw;
+                return (v as Qlass).raw_t;
             }
             return null;
         }

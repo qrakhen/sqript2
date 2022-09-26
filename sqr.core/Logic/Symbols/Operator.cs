@@ -126,25 +126,25 @@ namespace Qrakhen.Sqr.Core
 
             register(Type.COMP_GT, ">", 1, (left, right) => {
                 if (left is Time && right is Time)
-                    return new Boolean((left as Time).raw > (right as Time).raw);
+                    return new Boolean((left as Time).raw_t > (right as Time).raw_t);
                 return new Boolean((left as Number) > (right as Number));
             });
 
             register(Type.COMP_GTEQUAL, ">=", 1, (left, right) => {
                 if (left is Time && right is Time)
-                    return new Boolean((left as Time).raw >= (right as Time).raw);
+                    return new Boolean((left as Time).raw_t >= (right as Time).raw_t);
                 return new Boolean((left as Number) >= (right as Number));
             });
 
             register(Type.COMP_LT, "<", 1, (left, right) => {
                 if (left is Time && right is Time)
-                    return new Boolean((left as Time).raw < (right as Time).raw);
+                    return new Boolean((left as Time).raw_t < (right as Time).raw_t);
                 return new Boolean((left as Number) < (right as Number));
             });
 
             register(Type.COMP_LTEQUAL, "<=", 1, (left, right) => {
                 if (left is Time && right is Time)
-                    return new Boolean((left as Time).raw <= (right as Time).raw);
+                    return new Boolean((left as Time).raw_t <= (right as Time).raw_t);
                 return new Boolean((left as Number) <= (right as Number));
             });
 

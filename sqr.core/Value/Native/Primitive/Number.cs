@@ -13,7 +13,7 @@ namespace Qrakhen.Sqr.Core
 
         }
 
-        public double asDouble() => raw;
+        public double asDouble() => raw_t;
         public float asFloat() => (float)raw;
         public int asInteger() => (int)raw;
 

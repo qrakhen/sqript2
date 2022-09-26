@@ -33,7 +33,7 @@ namespace Qrakhen.Sqr.Core
         [NativeMethod]
         public String format(String format)
         {
-            var r = format.raw
+            var r = format.raw_t
                 .Replace("Y", __value.Year.ToString())
                 .Replace("y", __value.Year.ToString().Substring(2))
                 .Replace("m", __value.Month.ToString())

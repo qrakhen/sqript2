@@ -7,7 +7,7 @@ namespace Qrakhen.Sqr.Core
     {
         private bool __set;
 
-        [JsonIgnore] public override Value raw => (Value)obj?.raw;
+        [JsonIgnore] public override object raw => obj?.raw;
         [JsonIgnore] public override Value obj { get => get(); }
 
         public new Type type => obj == null ? Type.Variable : obj.type;

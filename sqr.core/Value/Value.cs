@@ -94,7 +94,8 @@ namespace Qrakhen.Sqr.Core
     {
         protected T __value;
 
-        public new virtual T raw => __value;
+        public override object raw => __value;
+        public T raw_t => __value;
         public override Value obj { get => this; }
 
         public Value(T value = default(T), Qrakhen.Sqr.Core.Type type = null) : base(type)
