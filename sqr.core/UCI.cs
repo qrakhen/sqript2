@@ -180,9 +180,9 @@ namespace Qrakhen.Sqr.Core
 
         private void execute()
         {
+            storeHistory();
             write("\n");
             runtime.execute(strip(concatLines()), qontext);
-            storeHistory();
             reset(false);
         }
 

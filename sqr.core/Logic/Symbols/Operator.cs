@@ -78,9 +78,9 @@ namespace Qrakhen.Sqr.Core
                 if (left is Number && right is Number)
                     return new Number((left as Number) + (right as Number));
                 if (left is String)
-                    return new String((left.raw as String) + (right.raw));
+                    return new String((left as String).raw_t + (right.raw));
                 if (right is String)
-                    return new String((left.raw) + (right.raw as String));
+                    return new String((left.raw) + (right as String).raw_t);
                 return new Number(0);
             });
 
