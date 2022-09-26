@@ -28,8 +28,6 @@ namespace Qrakhen.Sqr.Core
                 return;
             }
 
-            log.spam(head.render());
-
             if (statement == Statement.Continue || statement == Statement.Break) {
                 callback?.Invoke(Value.Void, statement, jumpTarget);
             } else {
