@@ -118,15 +118,18 @@ namespace Qrakhen.Sqr.Core
                 node.op = null;
             }
 
-            var type = input.peek().resolveType(qontext);
+            Token t = input.peek();
+            var type = t.resolveType(qontext);
             
             if (    
                     node.op != null &&
                     node.op.type == Operator.Type.ACCESSOR && 
-                    !input.peek().hasType(Token.Type.ValueOf) &&
-                    input.peek().isType(Token.Type.Identifier)) {
+                    !t.hasType(Token.Type.ValueOf) &&
+                    t.isType(Token.Type.Identifier | Token.Type.Type)) {
                 value = new String(input.digest().raw);
-            } else if (type != null) {
+            } else if (
+                    type != null &&
+                    t.hasType(Token.Type.ValueOf)) {
                 input.digest();
                 value = new Qlass(type);
             } else { 
@@ -176,6 +179,16 @@ namespace Qrakhen.Sqr.Core
                     throw new SqrError("weird spot to write an inline funqtion.", t);
                 return;
             }
+
+            if (
+                    node.op != null && 
+                    node.op.type == Operator.Type.ACCESSOR && 
+                    Validator.Token.tryGetType(t, Token.Type.Type, out Type at)) {
+                if (!node.put(new String(input.digest().raw)))
+                    throw new SqrError("weird spot to do this.", t);                
+                return;
+            }
+
 
             if (!node.empty || level > 0) {
                 throw new SqrError("unexpected keyword " + t, t);

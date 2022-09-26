@@ -55,7 +55,7 @@ namespace Qrakhen.Sqr.Core
                 var p = this.parameters[i];
                 if (parameters.Length <= i) {
                     if (p.isOptional) break;
-                    else throw new SqrError("parameter " + p.name + " missing");
+                    else throw new SqrParameterError("parameter " + p.name + " missing: " + this, this);
                 } 
                 tempQontext.register(this.parameters[i].name, new Variable(parameters[i]));
             }

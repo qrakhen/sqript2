@@ -27,28 +27,27 @@ namespace Qrakhen.Sqr.Core
         }
 
         [NativeMethod]
-        public static Number pow(Number value1, Number value2) {
+        public static Number abs(Number value)
+        {
+            return new Number(Math.Abs(value));
+        }
+        
+        [NativeMethod]
+        public static Number pow(Number value1, Number value2) 
+        {
             return new Number(Math.Pow(value1, value2));
         }
 
         [NativeMethod]
-        public static Number log(Number value) {
+        public static Number log(Number value) 
+        {
             return new Number(Math.Log(value));
         }
 
         [NativeMethod]
-        public static Number log2(Number value) {
-            return new Number(Math.Log2(value));
-        }
-
-        static Calc()
+        public static Number log2(Number value) 
         {
-            Type.register(typeof(Calc), new Type.Args {
-                name = "Calc",
-                module = Type.coreModule,
-                extends = Type.Value,
-                nativeType = NativeType.Static
-            });
+            return new Number(Math.Log2(value));
         }
     }
 }
