@@ -34,13 +34,16 @@ namespace Qrakhen.Sqr.Core
         [NativeMethod]
         public override Value get(Value index)
         {
-            return properties[(string)index.raw].obj;
+            return properties[(string)index.raw]?.obj;
         }
 
         [NativeMethod]
         public override void set(Value index, Value value)
         {
-            properties[(string)index.raw].set(value);
+            var key = (string)index.raw;
+            if (!properties.contains(key))
+                properties[key] = new Variable();
+            properties[key].set(value);
         }
 
         public override string ToString()

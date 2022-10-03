@@ -1,14 +1,13 @@
 ﻿module ChessGame;
 
-*~ BLACK <~ 64;
-*~ WHITE <~ 128;
-
 *~ PAWN <~ 1; 
 *~ BISHOP <~ 2; 
 *~ KNIGHT <~ 4; 
 *~ ROOK <~ 8; 
 *~ QUEEN <~ 16; 
 *~ KING <~ 32; 
+*~ BLACK <~ 64;
+*~ WHITE <~ 128;
 
 *~ FILE_TO_X <~ {
 	A <~ 0,
@@ -28,7 +27,8 @@ qlass PieceType {
 	Qallable isLegalCallback; 
 	Number value;
 
-	fq PieceType(name, symbols, value, isLegalCallback {
+	fq PieceType(id, name, symbols, value, isLegalCallback {
+		this:id <~ id;
 		this:name <~ name;
 		this:symbols <~ symbols;
 		this:value <~ value;
@@ -54,6 +54,10 @@ qlass Pos {
 		<: new Pos(this:x - pos:x, this:y - pos:y);
 	});
 
+	fq add(pos { 
+		<: new Pos(this:x + pos:x, this:y + pos:y);
+	});
+
 	fq dir({
 		*~ x <~ 1;
 		*~ y <~ 1;
@@ -68,33 +72,82 @@ qlass Pos {
 };
 
 qlass Piece {
-	PieceType type;
+	*~ type;
+	Number color;
 	Pos pos;
-	String owner;
+
+	fq Piece(board, pos {
+		*~ id <~ board:get(pos);
+		this:color <~ this:getColor(id);
+		*~ typeId <~ id - this:color;
+		this:type <~ chess:pieceTypes:('' + typeId);
+		this:pos <~ pos;
+	});	
+
+	fq getColor(id {
+		if ((id & WHITE) == WHITE) {
+			return WHITE;
+		} else {
+			return BLACK;
+		}
+	});
 };
 
 export qlass Chess {
+	Objeqt pieceTypes;
+
+	fq add(type {
+		this:pieceTypes:set('' + type:id, type);	
+	});
+
+	fq isMoveLegal(board, from, to {
+		*~ idFrom <~ board:get(from);
+		*~ pFrom <~ null;
+		if (idFrom != null) {
+			pFrom <~ new Piece(board, from);
+		}
+		*~ idTo <~ board:get(to);
+		*~ pTo <~ null;
+		if (idTo != null) {
+			pTo <~ new Piece(board, to);
+		}
+		*~ isAttack <~ false;
+		if (pTo != null) {
+			if (pTo:color != pFrom:color) {
+				isAttack <~ true;
+			}
+		}
+		<: pFrom:type:isMoveLegal(board, pFrom, pTo, isAttack);
+	});
+
 	fq definePieceTypes({
-		*~ r <~ [];
-		r:add(new PieceType('Pawn', [ 'p', '♟' ], 1, ~:(board, pos, isAttack {
+		this:pieceTypes <~ { };
+		this:add(new PieceType(PAWN, 'Pawn', [ 'p', '♟' ], 1, ~:(board, from, to, isAttack {
+			cout(from);
+			cout(to);
+			cout(isAttack);
+			if (isAttack) {
+
+			} else {
+
+			}
 			return isAttack;
 		})));
-		r:add(new PieceType('Bishop', [ 'B', '♟' ], 3, ~:(board, pos, isAttack {
+		this:add(new PieceType(BISHOP, 'Bishop', [ 'p', '♟' ], 3, ~:(board, from, to, isAttack {
 			return isAttack;
 		})));
-		r:add(new PieceType('Knight', [ 'N', '♟' ], 3, ~:(board, pos, isAttack {
+		this:add(new PieceType(KNIGHT, 'Knight', [ 'p', '♟' ], 3, ~:(board, from, to, isAttack {
 			return isAttack;
 		})));
-		r:add(new PieceType('Rook', [ 'R', '♟' ], 5, ~:(board, pos, isAttack {
+		this:add(new PieceType(ROOK, 'Rook', [ 'p', '♟' ], 5, ~:(board, from, to, isAttack {
 			return isAttack;
 		})));
-		r:add(new PieceType('Queen', [ 'Q', '♟' ], 9, ~:(board, pos, isAttack {
+		this:add(new PieceType(QUEEN, 'Queen', [ 'p', '♟' ], 9, ~:(board, from, to, isAttack {
 			return isAttack;
 		})));
-		r:add(new PieceType('King', [ 'K', '♟' ], -1, ~:(board, pos, isAttack {
+		this:add(new PieceType(KING, 'King', [ 'p', '♟' ], -1, ~:(board, from, to, isAttack {
 			return isAttack;
 		})));
-		return r;
 	});
 };
 
@@ -114,11 +167,11 @@ qlass Board {
 		];
 	});
 
-	Piece fq get(pos { 
+	Number fq get(pos { 
 		<: this:pieces:(pos:x):(pos:y); 
 	});
 
-	Piece fq collision(from, to {
+	Number fq collision(from, to {
 		*~ delta <~ to:delta(from);
 		*~ dir <~ delta:dir();
 		*~ h <~ @Calc:abs(delta:x);
@@ -181,4 +234,7 @@ qlass Input {
 };
 
 
-@Chess:definePieceTypes();
+*~ chess <~ new Chess();
+*~ board <~ new Board();
+chess:definePieceTypes();
+chess:isMoveLegal(board, new Pos(1, 1), new Pos(7, 7));
