@@ -109,42 +109,58 @@ namespace Qrakhen.Sqr.Core
                 args.methods[m.name] = m;
 
             return new Type(args);
-        }
+		}
 
-        private static List<Field> buildNativeFields(System.Type type)
+		/*public static Type createLibType(System.Type libType, Args args) 
         {
-            var fields = new List<Type.Field>();
-            foreach (var f in type
-                .GetFields()
-                .Where(_ =>
-                    Attribute.GetCustomAttribute(_, typeof(NativeFieldAttribute)) != null)) {
-                    fields.Add(new Type.Field(new IDeclareInfo() {
-                        name = f.Name,
-                        type = null,
-                        access = Access.Public,
-                        isReadonly = Attribute.GetCustomAttribute(f, typeof(NativeGetterAttribute)) != null
-                    }));
-            }
-            return fields;
-        }
+			args.nativeClass = libType;
 
-        private static List<Method> buildNativeMethods(System.Type type)
+			if (args.fields == null)
+				args.fields = new Storage<string, Field>();
+			foreach (var f in buildLibFields(libType))
+				args.fields[f.name] = f;
+
+			if (args.methods == null)
+				args.methods = new Storage<string, Method>();
+			foreach (var m in buildLibMethods(libType))
+				args.methods[m.name] = m;
+
+			return new Type(args);
+		}*/
+
+		private static List<Field> buildNativeFields(System.Type type) 
         {
-            var methods = new List<Method>();
-            foreach (var m in type
-                .GetMethods()
-                .Where(_ =>
-                    Attribute.GetCustomAttribute(_, typeof(NativeMethodAttribute)) != null)) {
-                    methods.Add(new Type.Method(
-                        new InternalFunqtion((v, q, s) => { return (Value)m.Invoke(m.IsStatic ? null : s?.obj, v); }),
-                        new IDeclareInfo() {
-                            name = m.Name,
-                            type = null,
-                            access = Access.Public
-                        }));
-            }
-            return methods;
-        }
+			var fields = new List<Type.Field>();
+			foreach (var f in type
+				.GetFields()
+				.Where(_ =>
+					Attribute.GetCustomAttribute(_, typeof(NativeFieldAttribute)) != null)) {
+				fields.Add(new Type.Field(new IDeclareInfo() {
+					name = f.Name,
+					type = null,
+					access = Access.Public,
+					isReadonly = Attribute.GetCustomAttribute(f, typeof(NativeGetterAttribute)) != null
+				}));
+			}
+			return fields;
+		}
+
+		private static List<Method> buildNativeMethods(System.Type type) {
+			var methods = new List<Method>();
+			foreach (var m in type
+				.GetMethods()
+				.Where(_ =>
+					Attribute.GetCustomAttribute(_, typeof(NativeMethodAttribute)) != null)) {
+				methods.Add(new Type.Method(
+					new InternalFunqtion((v, q, s) => { return (Value) m.Invoke(m.IsStatic ? null : s?.obj, v); }),
+					new IDeclareInfo() {
+						name = m.Name,
+						type = null,
+						access = Access.Public
+					}));
+			}
+			return methods;
+		}
 
         public string render()
         {

@@ -99,7 +99,10 @@ namespace Qrakhen.Sqr.Core
         private string readValue(Token.Type type, Stack<char> input)
         {
             if (type == Token.Type.Comment) {
-                input.digestUntil('\n');
+                if (input.peek(1) == '~')
+                    input.digestUntil('#');
+                else 
+                    input.digestUntil('\n');
                 return null;
             }
 
@@ -144,7 +147,6 @@ namespace Qrakhen.Sqr.Core
             { Token.Type.String, "[\"']" },
             { Token.Type.Structure, @"[{}()[\],]" },
             { Token.Type.End, @";" },
-            //{ Token.Type.Accessor, @"[:]" },
             { Token.Type.ValueOf, "@" },
             { Token.Type.Whitespace, @"\s" },
             { Token.Type.Comment, @"#" },
