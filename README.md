@@ -1,7 +1,7 @@
 ﻿# Sqript
 ## Better, faster, cooler
 
-This is just here for completionist's sake of anyone was to ever ask where the 2 went.
+This is just here for completionist's sake if anyone was to ever ask where the 2 went.
 
 ![Sqript Command Line Interface](https://i.imgur.com/M36EDwW.png)
 
